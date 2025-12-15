@@ -1,578 +1,231 @@
-<!DOCTYPE html>
-<html lang="fa" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>رادمنتور | دستیار آموزشی هوشمند رادیولوژی</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Vazirmatn', 'sans-serif'],
-                    },
-                    colors: {
-                        'rad-dark': '#0f172a',
-                        'rad-panel': '#1e293b',
-                        'rad-blue': '#3b82f6',
-                        'rad-teal': '#14b8a6',
-                        'rad-danger': '#ef4444',
-                        'rad-warning': '#f59e0b',
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        body { font-family: 'Vazirmatn', sans-serif; background-color: #0f172a; color: #e2e8f0; }
-        .xray-container {
-            position: relative;
-            background: #000;
-            overflow: hidden;
-            aspect-ratio: 3/4;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 8px;
-            box-shadow: inset 0 0 50px rgba(255,255,255,0.1);
-        }
-        /* Simulated X-Ray Structure using CSS Gradients */
-        .fake-xray {
-            width: 80%;
-            height: 90%;
-            background: 
-                radial-gradient(circle at 30% 40%, rgba(20, 20, 20, 0.9) 10%, transparent 40%), /* Right Lung field dark */
-                radial-gradient(circle at 70% 40%, rgba(20, 20, 20, 0.9) 10%, transparent 40%), /* Left Lung field dark */
-                linear-gradient(to bottom, transparent 10%, rgba(200,200,200,0.1) 15%, transparent 20%), /* Clavicles */
-                linear-gradient(to bottom, transparent 40%, rgba(255,255,255,0.05) 50%, transparent 80%), /* Spine */
-                radial-gradient(circle at 50% 30%, rgba(255,255,255,0.1) 0%, transparent 20%); /* Heart shadow base */
-            border-radius: 40% 40% 10% 10%;
-            filter: blur(1px) contrast(1.2);
-            position: relative;
-        }
-        .pathology-spot {
-            position: absolute;
-            top: 60%;
-            right: 25%; /* Actually left lung in PA view logic, but physically right on screen */
-            width: 60px;
-            height: 50px;
-            background: rgba(255, 255, 255, 0.15);
-            filter: blur(8px);
-            border-radius: 50%;
-            opacity: 0; /* Hidden by default */
-            transition: opacity 0.5s ease;
-        }
-        .heatmap-overlay {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: radial-gradient(circle at 75% 60%, rgba(255, 0, 0, 0.4) 0%, rgba(255, 165, 0, 0.2) 20%, transparent 50%);
-            mix-blend-mode: screen;
-            opacity: 0;
-            transition: opacity 0.5s ease;
-            pointer-events: none;
-        }
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #1e293b; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
-        
-        /* Checkbox styling */
-        .checkbox-wrapper input:checked + div {
-            background-color: #3b82f6;
-            border-color: #3b82f6;
-        }
-        .checkbox-wrapper input:checked + div svg {
-            display: block;
-        }
-    </style>
-</head>
-<body class="h-screen flex flex-col overflow-hidden">
+import express from "express";
+import cors from "cors";
+import sqlite3 from "sqlite3";
+import { open } from "sqlite";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
-    <!-- Header -->
-    <header class="bg-rad-panel border-b border-gray-700 h-16 flex items-center justify-between px-6 shrink-0 z-20">
-        <div class="flex items-center gap-4">
-            <div class="bg-gradient-to-tr from-rad-blue to-rad-teal p-2 rounded-lg">
-                <i class="fa-solid fa-x-ray text-white text-xl"></i>
-            </div>
-            <div>
-                <h1 class="text-xl font-bold tracking-tight">رادمنتور <span class="text-rad-teal text-sm font-light opacity-80">| RadMentor AI</span></h1>
-                <p class="text-xs text-gray-400">پلتفرم آموزشی و شبیه‌سازی تفسیر رادیوگرافی</p>
-            </div>
-        </div>
+const PORT = 8080;
+const JWT_SECRET = "CHANGE_ME_TO_A_LONG_RANDOM_SECRET";
+const app = express();
 
-        <div class="flex items-center gap-6">
-            <!-- Mode Switch -->
-            <div class="flex bg-gray-800 rounded-full p-1 border border-gray-700">
-                <button id="btn-train-mode" onclick="setMode('training')" class="px-4 py-1.5 rounded-full text-sm font-medium transition-all bg-rad-blue text-white shadow-lg">حالت آموزشی</button>
-                <button id="btn-exam-mode" onclick="setMode('exam')" class="px-4 py-1.5 rounded-full text-sm font-medium text-gray-400 hover:text-white transition-all">حالت آزمون</button>
-            </div>
-            
-            <div class="flex items-center gap-3 border-r border-gray-700 pr-6">
-                <div class="text-left hidden md:block">
-                    <p class="text-sm font-bold">دکتر علوی</p>
-                    <p class="text-xs text-gray-400">رزیدنت سال ۲ رادیولوژی</p>
-                </div>
-                <div class="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center border border-gray-600">
-                    <i class="fa-solid fa-user-doctor text-gray-300"></i>
-                </div>
-            </div>
-        </div>
-    </header>
+app.use(cors());
+app.use(express.json({ limit: "2mb" }));
 
-    <!-- Main Content -->
-    <main class="flex-1 flex overflow-hidden">
-        
-        <!-- Left Panel: Image Viewer -->
-        <section class="w-full md:w-1/2 lg:w-7/12 bg-black flex flex-col relative border-l border-gray-800">
-            <!-- Toolbar -->
-            <div class="absolute top-4 left-4 z-10 flex flex-col gap-2">
-                <button class="w-10 h-10 bg-gray-800/80 backdrop-blur text-white rounded hover:bg-rad-blue transition" title="بزرگنمایی"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
-                <button class="w-10 h-10 bg-gray-800/80 backdrop-blur text-white rounded hover:bg-rad-blue transition" title="کوچک‌نمایی"><i class="fa-solid fa-magnifying-glass-minus"></i></button>
-                <button class="w-10 h-10 bg-gray-800/80 backdrop-blur text-white rounded hover:bg-rad-blue transition" title="کنتراست/روشنایی"><i class="fa-solid fa-circle-half-stroke"></i></button>
-                <button class="w-10 h-10 bg-gray-800/80 backdrop-blur text-white rounded hover:bg-rad-blue transition" title="معکوس کردن"><i class="fa-solid fa-image"></i></button>
-            </div>
+const db = await open({ filename: "./radmentor.sqlite", driver: sqlite3.Database });
 
-            <!-- Case Info Overlay -->
-            <div class="absolute top-4 right-4 z-10 bg-gray-900/80 backdrop-blur px-4 py-2 rounded border border-gray-700 text-right">
-                <p class="text-sm font-bold text-gray-200">بیمار: مجهول‌الهویه (آموزشی)</p>
-                <p class="text-xs text-gray-400">مرد، ۵۸ ساله | تنگی نفس و تب</p>
-                <p class="text-xs text-rad-teal mt-1">AP | Supine | Portable</p>
-            </div>
+await db.exec(`
+CREATE TABLE IF NOT EXISTS users (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  username TEXT UNIQUE NOT NULL,
+  password_hash TEXT NOT NULL,
+  role TEXT NOT NULL DEFAULT 'STUDENT',
+  grp TEXT NOT NULL DEFAULT 'CONTROL',
+  created_at INTEGER NOT NULL
+);
 
-            <!-- AI Overlay Toggle (Only in Feedback/Training) -->
-            <div id="ai-toggle-container" class="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-10 transition-opacity duration-300 opacity-0 pointer-events-none">
-                <button onclick="toggleHeatmap()" class="flex items-center gap-2 bg-rad-blue/90 hover:bg-rad-blue text-white px-6 py-2 rounded-full shadow-lg border border-white/20 backdrop-blur transition">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i>
-                    <span>نمایش تحلیل هوش مصنوعی (Grad-CAM)</span>
-                </button>
-            </div>
+CREATE TABLE IF NOT EXISTS attempts (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL,
+  username TEXT NOT NULL,
+  role TEXT NOT NULL,
+  grp TEXT NOT NULL,
+  phase TEXT NOT NULL,
+  ui_mode TEXT NOT NULL,
+  case_id TEXT NOT NULL,
+  started_at_ms INTEGER,
+  duration_sec INTEGER,
+  primary_dx TEXT,
+  confidence TEXT,
+  airway TEXT,
+  findings TEXT,
+  notes_free TEXT,
+  quality_rotation INTEGER,
+  quality_inspiration INTEGER,
+  quality_penetration INTEGER,
+  quality_note TEXT,
+  rf_tension_ptx INTEGER,
+  rf_massive_effusion INTEGER,
+  ai_allowed INTEGER,
+  ai_shown INTEGER,
+  truth_primary_dx TEXT,
+  truth_findings TEXT,
+  score INTEGER,
+  correct_dx INTEGER,
+  created_at INTEGER NOT NULL,
+  FOREIGN KEY(user_id) REFERENCES users(id)
+);
+`);
 
-            <!-- Viewer Canvas -->
-            <div class="w-full h-full flex items-center justify-center p-4">
-                <div class="xray-container h-full max-h-[800px]">
-                    <div class="fake-xray">
-                        <!-- Simulated Pathology: Right Lower Lobe Consolidation -->
-                        <div class="pathology-spot" id="pathology-layer" style="opacity: 0.6;"></div> 
-                    </div>
-                    <div class="heatmap-overlay" id="heatmap-layer"></div>
-                    
-                    <!-- Measurements/Annotations Layer -->
-                    <svg class="absolute inset-0 w-full h-full pointer-events-none opacity-0" id="annotation-layer">
-                        <rect x="65%" y="55%" width="15%" height="15%" fill="none" stroke="#ef4444" stroke-width="2" stroke-dasharray="5,5" />
-                        <text x="65%" y="53%" fill="#ef4444" font-size="12" font-family="Vazirmatn">تراکم مشکوک</text>
-                    </svg>
-                </div>
-            </div>
-            
-            <!-- Warning Footer -->
-            <div class="absolute bottom-2 right-2 text-[10px] text-gray-500 bg-black/50 px-2 rounded">
-                Dicom Viewer Simulation v1.0 | Not for Clinical Diagnosis
-            </div>
-        </section>
+async function ensureAdmin() {
+  const existing = await db.get("SELECT id FROM users WHERE role='ADMIN' LIMIT 1");
+  if (existing) return;
+  const hash = await bcrypt.hash("admin1234", 12);
+  await db.run(
+    "INSERT INTO users (username,password_hash,role,grp,created_at) VALUES (?,?,?,?,?)",
+    ["admin", hash, "ADMIN", "CONTROL", Date.now()]
+  );
+  console.log("Admin created: username=admin password=admin1234 (PLEASE CHANGE)");
+}
+await ensureAdmin();
 
-        <!-- Right Panel: Workflow & Interaction -->
-        <section class="w-full md:w-1/2 lg:w-5/12 bg-rad-panel flex flex-col h-full">
-            
-            <!-- Progress Stepper -->
-            <div class="p-4 border-b border-gray-700 bg-gray-800/50">
-                <div class="flex justify-between items-center text-xs text-gray-400 mb-2">
-                    <span>۱. کیفیت تصویر</span>
-                    <span>۲. بررسی سیستماتیک</span>
-                    <span>۳. تشخیص افتراقی</span>
-                    <span>۴. بازخورد</span>
-                </div>
-                <div class="w-full bg-gray-700 h-1.5 rounded-full overflow-hidden">
-                    <div id="progress-bar" class="bg-rad-teal h-full w-1/4 transition-all duration-500"></div>
-                </div>
-            </div>
+function signToken(user) {
+  return jwt.sign(
+    { id: user.id, username: user.username, role: user.role, group: user.grp },
+    JWT_SECRET,
+    { expiresIn: "12h" }
+  );
+}
 
-            <!-- Scrollable Content Area -->
-            <div class="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6" id="workflow-container">
-                
-                <!-- Step 1: Quality (RIP) -->
-                <div id="step-quality" class="step-content">
-                    <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                        <span class="w-6 h-6 rounded-full bg-rad-blue text-xs flex items-center justify-center">۱</span>
-                        ارزیابی کیفیت فنی
-                    </h2>
-                    <div class="bg-gray-800 rounded-lg p-4 border border-gray-700 space-y-3">
-                        <p class="text-sm text-gray-300 mb-2">قبل از تفسیر، از کیفیت تکنیکی تصویر اطمینان حاصل کنید:</p>
-                        
-                        <label class="checkbox-wrapper flex items-center gap-3 cursor-pointer p-2 hover:bg-gray-700 rounded transition">
-                            <input type="checkbox" class="hidden">
-                            <div class="w-5 h-5 border-2 border-gray-500 rounded flex items-center justify-center transition-colors">
-                                <svg class="w-3 h-3 text-white hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
-                            </div>
-                            <span class="text-sm">چرخش (Rotation): کلاویکل‌ها هم‌فاصله از مهره‌ها هستند؟</span>
-                        </label>
+function auth(req, res, next) {
+  const h = req.headers.authorization || "";
+  const token = h.startsWith("Bearer ") ? h.slice(7) : "";
+  try {
+    const payload = jwt.verify(token, JWT_SECRET);
+    req.user = payload;
+    next();
+  } catch {
+    res.status(401).json({ error: "Unauthorized" });
+  }
+}
 
-                        <label class="checkbox-wrapper flex items-center gap-3 cursor-pointer p-2 hover:bg-gray-700 rounded transition">
-                            <input type="checkbox" class="hidden">
-                            <div class="w-5 h-5 border-2 border-gray-500 rounded flex items-center justify-center transition-colors">
-                                <svg class="w-3 h-3 text-white hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
-                            </div>
-                            <span class="text-sm">دم (Inspiration): ۸-۱۰ دنده خلفی قابل مشاهده است؟</span>
-                        </label>
+function adminOnly(req, res, next) {
+  if (req.user?.role !== "ADMIN") return res.status(403).json({ error: "Forbidden" });
+  next();
+}
 
-                        <label class="checkbox-wrapper flex items-center gap-3 cursor-pointer p-2 hover:bg-gray-700 rounded transition">
-                            <input type="checkbox" class="hidden">
-                            <div class="w-5 h-5 border-2 border-gray-500 rounded flex items-center justify-center transition-colors">
-                                <svg class="w-3 h-3 text-white hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
-                            </div>
-                            <span class="text-sm">نفوذ (Penetration): مهره‌های پشت قلب دیده می‌شوند؟</span>
-                        </label>
-                    </div>
-                    <button onclick="nextStep(2)" class="mt-4 w-full bg-rad-blue hover:bg-blue-600 text-white py-2.5 rounded-lg font-medium transition shadow-lg shadow-blue-900/20">تایید و ادامه</button>
-                </div>
+// AUTH
+app.post("/auth/login", async (req, res) => {
+  const { username, password } = req.body || {};
+  if (!username || !password) return res.status(400).json({ error: "Missing credentials" });
 
-                <!-- Step 2: Findings (ABCDE) -->
-                <div id="step-abcde" class="step-content hidden">
-                    <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                        <span class="w-6 h-6 rounded-full bg-rad-blue text-xs flex items-center justify-center">۲</span>
-                        بررسی سیستماتیک (ABCDE)
-                    </h2>
-                    
-                    <div class="space-y-3">
-                        <!-- Airway -->
-                        <div class="border border-gray-700 rounded-lg overflow-hidden">
-                            <button class="w-full bg-gray-800 p-3 text-right text-sm font-bold flex justify-between items-center" onclick="toggleAccordion('acc-airway')">
-                                <span>A - Airway (راه‌های هوایی)</span>
-                                <i class="fa-solid fa-chevron-down text-gray-400"></i>
-                            </button>
-                            <div id="acc-airway" class="bg-gray-900/50 p-3 hidden space-y-2">
-                                <label class="flex items-center gap-2 text-sm text-gray-300"><input type="radio" name="airway" class="accent-rad-teal"> تراشه مرکزی است</label>
-                                <label class="flex items-center gap-2 text-sm text-gray-300"><input type="radio" name="airway" class="accent-rad-teal"> انحراف تراشه</label>
-                            </div>
-                        </div>
+  const user = await db.get("SELECT * FROM users WHERE username=?", [username]);
+  if (!user) return res.status(401).json({ error: "Invalid username/password" });
 
-                        <!-- Breathing -->
-                        <div class="border border-gray-700 rounded-lg overflow-hidden">
-                            <button class="w-full bg-gray-800 p-3 text-right text-sm font-bold flex justify-between items-center" onclick="toggleAccordion('acc-breathing')">
-                                <span>B - Breathing (ریه‌ها و پلور)</span>
-                                <i class="fa-solid fa-chevron-down text-gray-400"></i>
-                            </button>
-                            <div id="acc-breathing" class="bg-gray-900/50 p-3 hidden space-y-2">
-                                <label class="flex items-center gap-2 text-sm text-gray-300"><input type="checkbox" id="check-pneumothorax" class="accent-rad-teal"> پنوموتوراکس</label>
-                                <label class="flex items-center gap-2 text-sm text-gray-300"><input type="checkbox" id="check-consolidation" class="accent-rad-teal"> تراکم (Consolidation)</label>
-                                <label class="flex items-center gap-2 text-sm text-gray-300"><input type="checkbox" class="accent-rad-teal"> ادم ریوی</label>
-                                <label class="flex items-center gap-2 text-sm text-gray-300"><input type="checkbox" class="accent-rad-teal"> توده / ندول</label>
-                            </div>
-                        </div>
+  const ok = await bcrypt.compare(password, user.password_hash);
+  if (!ok) return res.status(401).json({ error: "Invalid username/password" });
 
-                        <!-- Circulation -->
-                        <div class="border border-gray-700 rounded-lg overflow-hidden">
-                            <button class="w-full bg-gray-800 p-3 text-right text-sm font-bold flex justify-between items-center" onclick="toggleAccordion('acc-circulation')">
-                                <span>C - Circulation (قلب و مدیاستن)</span>
-                                <i class="fa-solid fa-chevron-down text-gray-400"></i>
-                            </button>
-                            <div id="acc-circulation" class="bg-gray-900/50 p-3 hidden space-y-2">
-                                <label class="flex items-center gap-2 text-sm text-gray-300"><input type="checkbox" class="accent-rad-teal"> کاردیومگالی (CTR > 0.5)</label>
-                                <label class="flex items-center gap-2 text-sm text-gray-300"><input type="checkbox" class="accent-rad-teal"> پهن شدگی مدیاستن</label>
-                            </div>
-                        </div>
-                        
-                        <!-- Free Text Observations -->
-                        <div class="mt-4">
-                            <label class="block text-xs text-gray-400 mb-1">یادداشت‌های تکمیلی:</label>
-                            <textarea class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-sm text-white focus:border-rad-blue focus:outline-none resize-none h-20" placeholder="مثلاً: کدورت در قاعده ریه راست مشاهده شد..."></textarea>
-                        </div>
-                    </div>
+  const token = signToken(user);
+  res.json({
+    token,
+    user: { id: user.id, username: user.username, role: user.role, group: user.grp }
+  });
+});
 
-                    <button onclick="nextStep(3)" class="mt-6 w-full bg-rad-blue hover:bg-blue-600 text-white py-2.5 rounded-lg font-medium transition shadow-lg shadow-blue-900/20">ثبت مشاهدات</button>
-                </div>
+// SUBMIT ATTEMPT
+app.post("/attempts", auth, async (req, res) => {
+  const u = req.user;
+  const a = req.body || {};
 
-                <!-- Step 3: Differential & Diagnosis -->
-                <div id="step-dx" class="step-content hidden">
-                    <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                        <span class="w-6 h-6 rounded-full bg-rad-blue text-xs flex items-center justify-center">۳</span>
-                        جمع‌بندی تشخیصی
-                    </h2>
+  // حداقل‌های پژوهشی
+  if (!a.caseId || !a.phase || !a.uiMode) return res.status(400).json({ error: "Bad attempt payload" });
 
-                    <div class="bg-gray-800/50 border border-gray-700 p-4 rounded-lg mb-4">
-                        <p class="text-xs text-gray-400 mb-2">بر اساس یافته‌های شما:</p>
-                        <div class="flex flex-wrap gap-2" id="user-findings-display">
-                            <!-- Populated via JS -->
-                        </div>
-                    </div>
+  const now = Date.now();
+  const truthPrimaryDx = a.truth?.primaryDx || "";
+  const truthFindings = Array.isArray(a.truth?.findings) ? a.truth.findings.join(",") : "";
+  const findings = Array.isArray(a.findings) ? a.findings.join(",") : "";
 
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium mb-1 text-gray-300">تشخیص محتمل (Top Diagnosis):</label>
-                            <select id="primary-dx" class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-sm text-white focus:border-rad-teal outline-none">
-                                <option value="">انتخاب کنید...</option>
-                                <option value="normal">نرمال</option>
-                                <option value="pneumonia">پنومونی (Pneumonia)</option>
-                                <option value="chf">نارسایی قلبی (CHF)</option>
-                                <option value="pneumothorax">پنوموتوراکس</option>
-                            </select>
-                        </div>
+  await db.run(`
+    INSERT INTO attempts (
+      user_id, username, role, grp,
+      phase, ui_mode, case_id, started_at_ms, duration_sec,
+      primary_dx, confidence, airway, findings, notes_free,
+      quality_rotation, quality_inspiration, quality_penetration, quality_note,
+      rf_tension_ptx, rf_massive_effusion,
+      ai_allowed, ai_shown,
+      truth_primary_dx, truth_findings,
+      score, correct_dx,
+      created_at
+    ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+  `, [
+    u.id, u.username, u.role, u.group,
+    a.phase, a.uiMode, a.caseId, a.startedAtMs || null, a.durationSec ?? null,
+    a.primaryDx || "", a.confidence || "", a.airway || "", findings, a.notes?.free || "",
+    a.quality?.rotation ? 1 : 0, a.quality?.inspiration ? 1 : 0, a.quality?.penetration ? 1 : 0, a.quality?.note || "",
+    a.redFlags?.tensionPtx ? 1 : 0, a.redFlags?.massiveEffusion ? 1 : 0,
+    a.aiPolicy?.aiAllowed ? 1 : 0, a.aiPolicy?.aiShown ? 1 : 0,
+    truthPrimaryDx, truthFindings,
+    a.score ?? null, a.correctDx ? 1 : 0,
+    now
+  ]);
 
-                        <div>
-                            <label class="block text-sm font-medium mb-1 text-gray-300">میزان اطمینان شما:</label>
-                            <div class="flex gap-2 bg-gray-800 p-1 rounded border border-gray-700">
-                                <button class="flex-1 py-1 text-xs rounded hover:bg-gray-700 focus:bg-rad-teal focus:text-black transition">پایین</button>
-                                <button class="flex-1 py-1 text-xs rounded hover:bg-gray-700 focus:bg-rad-teal focus:text-black transition">متوسط</button>
-                                <button class="flex-1 py-1 text-xs rounded hover:bg-gray-700 focus:bg-rad-teal focus:text-black transition">بالا</button>
-                            </div>
-                        </div>
-                        
-                        <!-- Red Flags Section -->
-                        <div class="border border-rad-danger/30 bg-rad-danger/5 rounded-lg p-3">
-                            <p class="text-xs text-rad-danger font-bold mb-2"><i class="fa-solid fa-triangle-exclamation ml-1"></i> علائم هشدار (Red Flags) - آیا مورد زیر وجود دارد؟</p>
-                            <label class="flex items-center gap-2 text-xs text-gray-300"><input type="checkbox" class="accent-rad-danger"> تنشن پنوموتوراکس (انحراف مدیاستن)</label>
-                            <label class="flex items-center gap-2 text-xs text-gray-300 mt-1"><input type="checkbox" class="accent-rad-danger"> هوای آزاد زیر دیافراگم (پرفوراسیون)</label>
-                        </div>
-                    </div>
+  res.json({ ok: true });
+});
 
-                    <button onclick="finalizeSubmission()" class="mt-6 w-full bg-gradient-to-l from-rad-teal to-emerald-600 hover:brightness-110 text-white py-2.5 rounded-lg font-bold transition shadow-lg shadow-emerald-900/20">
-                        <i class="fa-solid fa-check ml-2"></i> نهایی‌سازی و دریافت بازخورد
-                    </button>
-                </div>
+// ADMIN: create user
+app.post("/admin/users", auth, adminOnly, async (req, res) => {
+  const { username, password, group } = req.body || {};
+  if (!username || !password) return res.status(400).json({ error: "Missing fields" });
 
-                <!-- Step 4: AI Feedback & Result -->
-                <div id="step-feedback" class="step-content hidden">
-                    <!-- Score Card -->
-                    <div class="bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700 rounded-xl p-5 mb-6 relative overflow-hidden">
-                        <div class="absolute top-0 left-0 w-1 h-full bg-rad-teal"></div>
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <h3 class="text-xl font-bold text-white mb-1">گزارش عملکرد</h3>
-                                <p class="text-sm text-gray-400">تشخیص مدل: <span class="text-rad-teal font-bold">پنومونی لوب تحتانی راست</span></p>
-                            </div>
-                            <div class="text-center">
-                                <div class="text-3xl font-bold text-emerald-400">۹۰٪</div>
-                                <div class="text-[10px] text-gray-500 uppercase tracking-wider">تطابق</div>
-                            </div>
-                        </div>
-                        
-                        <!-- AI Analysis Box -->
-                        <div class="mt-4 pt-4 border-t border-gray-700/50">
-                            <div class="flex items-center gap-2 mb-2">
-                                <i class="fa-solid fa-robot text-rad-blue"></i>
-                                <span class="text-sm font-bold text-rad-blue">تحلیل هوش مصنوعی (RadMentor AI):</span>
-                            </div>
-                            <div class="grid grid-cols-2 gap-2 text-xs">
-                                <div class="bg-gray-800 p-2 rounded flex justify-between">
-                                    <span>Pneumonia</span>
-                                    <span class="text-white font-mono">High (0.89)</span>
-                                </div>
-                                <div class="bg-gray-800 p-2 rounded flex justify-between opacity-50">
-                                    <span>Pneumothorax</span>
-                                    <span class="text-white font-mono">Low (0.02)</span>
-                                </div>
-                                <div class="bg-gray-800 p-2 rounded flex justify-between opacity-50">
-                                    <span>Effusion</span>
-                                    <span class="text-white font-mono">Low (0.12)</span>
-                                </div>
-                                <div class="bg-gray-800 p-2 rounded flex justify-between text-yellow-500/80">
-                                    <span>Consolidation</span>
-                                    <span class="text-white font-mono">Med (0.65)</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+  const grp = (group === "AI") ? "AI" : "CONTROL";
+  const hash = await bcrypt.hash(password, 12);
 
-                    <!-- Personalized Feedback -->
-                    <div class="space-y-4">
-                        <div class="p-3 bg-emerald-900/20 border border-emerald-500/30 rounded-lg">
-                            <h4 class="text-emerald-400 text-sm font-bold mb-1"><i class="fa-solid fa-check-circle ml-1"></i> نقاط قوت</h4>
-                            <p class="text-xs text-gray-300 leading-5">شما به درستی تراکم در قاعده ریه راست را تشخیص دادید. توجه به عدم وجود افیوژن پلور نیز صحیح بود.</p>
-                        </div>
+  try {
+    await db.run(
+      "INSERT INTO users (username,password_hash,role,grp,created_at) VALUES (?,?,?,?,?)",
+      [username, hash, "STUDENT", grp, Date.now()]
+    );
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(400).json({ error: "Username already exists" });
+  }
+});
 
-                        <div id="feedback-missed" class="p-3 bg-rad-warning/10 border border-rad-warning/30 rounded-lg hidden">
-                            <h4 class="text-rad-warning text-sm font-bold mb-1"><i class="fa-solid fa-lightbulb ml-1"></i> فرصت یادگیری (اگر اشتباه تشخیص دادید)</h4>
-                            <p class="text-xs text-gray-300 leading-5">علامت Silhouette Sign در حاشیه راست قلب مشهود است که نشان‌دهنده درگیری لوب میانی یا تحتانی راست است. <br> <strong>نکته:</strong> همیشه حاشیه‌های قلب را چک کنید.</p>
-                        </div>
-                        
-                        <div class="p-3 bg-gray-800 border border-gray-700 rounded-lg">
-                             <h4 class="text-gray-200 text-sm font-bold mb-2">اگر تشخیص من اشتباه باشد چه؟</h4>
-                             <ul class="text-xs text-gray-400 list-disc list-inside space-y-1">
-                                 <li>ممکن است یک <span class="text-white">آتلکتازی</span> باشد (بررسی شیفت تراشه).</li>
-                                 <li>ممکن است <span class="text-white">توده</span> باشد (بررسی حاشیه و ندول‌های اقماری).</li>
-                             </ul>
-                        </div>
-                    </div>
+// ADMIN: list attempts
+app.get("/admin/attempts", auth, adminOnly, async (req, res) => {
+  const { user, phase } = req.query;
+  const where = [];
+  const params = [];
 
-                    <div class="mt-6 flex gap-3">
-                        <button onclick="location.reload()" class="flex-1 bg-gray-700 hover:bg-gray-600 text-white py-2 rounded text-sm transition">کیس بعدی</button>
-                        <button onclick="alert('ذخیره شد در پوشه مرور')" class="flex-1 border border-gray-600 hover:border-gray-400 text-gray-300 py-2 rounded text-sm transition">نشان کردن برای مرور</button>
-                    </div>
-                </div>
+  if (user) { where.push("username LIKE ?"); params.push(`%${user}%`); }
+  if (phase) { where.push("phase = ?"); params.push(phase); }
 
-            </div>
+  const sql = `
+    SELECT
+      id, username, role, grp, phase, ui_mode, case_id,
+      duration_sec, primary_dx, confidence, airway, findings,
+      ai_allowed, ai_shown, truth_primary_dx, score, correct_dx, created_at
+    FROM attempts
+    ${where.length ? "WHERE " + where.join(" AND ") : ""}
+    ORDER BY created_at DESC
+    LIMIT 500
+  `;
 
-            <!-- Footer: Safety & Model Card -->
-            <footer class="p-3 border-t border-gray-800 bg-gray-900 text-[10px] text-gray-500 flex justify-between items-center shrink-0">
-                <span>© ۲۰۲۵ RadMentor AI v1.0 (Demo)</span>
-                <div class="flex gap-3">
-                    <button onclick="openModal('safety')" class="hover:text-gray-300 transition">سلب مسئولیت ایمنی</button>
-                    <button onclick="openModal('modelcard')" class="hover:text-gray-300 transition">کارت مدل (Model Card)</button>
-                    <button onclick="openModal('standards')" class="hover:text-gray-300 transition">استانداردها (WHO/SPIRIT)</button>
-                </div>
-            </footer>
-        </section>
-    </main>
+  const rows = await db.all(sql, params);
+  res.json({
+    items: rows.map(r => ({
+      id: r.id,
+      username: r.username,
+      role: r.role,
+      group: r.grp,
+      phase: r.phase,
+      uiMode: r.ui_mode,
+      caseId: r.case_id,
+      durationSec: r.duration_sec,
+      primaryDx: r.primary_dx,
+      confidence: r.confidence,
+      airway: r.airway,
+      findings: r.findings,
+      aiAllowed: !!r.ai_allowed,
+      aiShown: !!r.ai_shown,
+      truthPrimaryDx: r.truth_primary_dx,
+      score: r.score,
+      correctDx: !!r.correct_dx,
+      createdAt: r.created_at
+    }))
+  });
+});
 
-    <!-- Modals -->
-    <div id="modal-overlay" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-rad-panel border border-gray-700 rounded-xl max-w-lg w-full shadow-2xl overflow-hidden animate-[fadeIn_0.2s_ease-out]">
-            <div class="p-4 border-b border-gray-700 flex justify-between items-center bg-gray-800">
-                <h3 id="modal-title" class="font-bold text-white">عنوان</h3>
-                <button onclick="closeModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-times"></i></button>
-            </div>
-            <div id="modal-content" class="p-6 text-sm text-gray-300 max-h-[70vh] overflow-y-auto leading-6">
-                <!-- Content injected via JS -->
-            </div>
-            <div class="p-4 bg-gray-800 border-t border-gray-700 text-left">
-                <button onclick="closeModal()" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded text-xs transition">متوجه شدم</button>
-            </div>
-        </div>
-    </div>
+// ADMIN: export CSV
+app.get("/admin/attempts/export", auth, adminOnly, async (req, res) => {
+  const rows = await db.all(`SELECT * FROM attempts ORDER BY created_at DESC`);
+  const headers = Object.keys(rows[0] || { empty: "" });
+  const esc = (v) => `"${String(v ?? "").replaceAll('"','""')}"`;
+  const lines = [
+    headers.join(","),
+    ...rows.map(r => headers.map(h => esc(r[h])).join(","))
+  ];
+  res.json({ csv: lines.join("\n") });
+});
 
-    <script>
-        // State
-        let currentMode = 'training';
-        let findings = [];
-
-        // Mode Switching
-        function setMode(mode) {
-            currentMode = mode;
-            document.getElementById('btn-train-mode').className = mode === 'training' 
-                ? "px-4 py-1.5 rounded-full text-sm font-medium transition-all bg-rad-blue text-white shadow-lg"
-                : "px-4 py-1.5 rounded-full text-sm font-medium text-gray-400 hover:text-white transition-all";
-            
-            document.getElementById('btn-exam-mode').className = mode === 'exam'
-                ? "px-4 py-1.5 rounded-full text-sm font-medium transition-all bg-rad-blue text-white shadow-lg"
-                : "px-4 py-1.5 rounded-full text-sm font-medium text-gray-400 hover:text-white transition-all";
-            
-            // Logic changes for Exam Mode
-            if(mode === 'exam') {
-                // Hide hints or AI helpers if any were visible
-                document.getElementById('ai-toggle-container').classList.add('hidden');
-            }
-        }
-
-        // Navigation
-        function nextStep(stepNum) {
-            // Hide all steps
-            document.querySelectorAll('.step-content').forEach(el => el.classList.add('hidden'));
-            
-            // Show target step
-            if(stepNum === 2) document.getElementById('step-abcde').classList.remove('hidden');
-            if(stepNum === 3) {
-                document.getElementById('step-dx').classList.remove('hidden');
-                updateFindingsSummary();
-            }
-            if(stepNum === 4) document.getElementById('step-feedback').classList.remove('hidden');
-
-            // Update Progress Bar
-            const bar = document.getElementById('progress-bar');
-            bar.style.width = (stepNum * 25) + '%';
-        }
-
-        // Accordion Logic
-        function toggleAccordion(id) {
-            const el = document.getElementById(id);
-            el.classList.toggle('hidden');
-        }
-
-        // Heatmap Logic
-        let heatmapVisible = false;
-        function toggleHeatmap() {
-            const layer = document.getElementById('heatmap-layer');
-            const annot = document.getElementById('annotation-layer');
-            heatmapVisible = !heatmapVisible;
-            
-            if(heatmapVisible) {
-                layer.style.opacity = '1';
-                annot.style.opacity = '1';
-            } else {
-                layer.style.opacity = '0';
-                annot.style.opacity = '0';
-            }
-        }
-
-        // Findings Logic
-        function updateFindingsSummary() {
-            const container = document.getElementById('user-findings-display');
-            container.innerHTML = '';
-            
-            // Simple check for demo
-            if(document.getElementById('check-consolidation').checked) {
-                container.innerHTML += `<span class="bg-rad-teal/20 text-rad-teal text-xs px-2 py-1 rounded border border-rad-teal/30">تراکم (Consolidation)</span>`;
-            } else {
-                container.innerHTML = `<span class="text-gray-500 text-xs italic">مورد غیرطبیعی خاصی انتخاب نشده است.</span>`;
-            }
-        }
-
-        function finalizeSubmission() {
-            // Simulate processing
-            const btn = document.querySelector('#step-dx button');
-            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin ml-2"></i> در حال تحلیل...';
-            
-            setTimeout(() => {
-                nextStep(4);
-                
-                // Show AI button only in Training or Post-Exam
-                document.getElementById('ai-toggle-container').classList.remove('opacity-0', 'pointer-events-none');
-                
-                // Conditional Feedback Text
-                const userChoice = document.getElementById('primary-dx').value;
-                const missedBox = document.getElementById('feedback-missed');
-                
-                if(userChoice !== 'pneumonia') {
-                    missedBox.classList.remove('hidden');
-                } else {
-                    missedBox.classList.add('hidden');
-                }
-
-            }, 1000);
-        }
-
-        // Modal Logic
-        const modalContentMap = {
-            'safety': {
-                title: 'سلب مسئولیت ایمنی (Safety Disclaimer)',
-                body: `<p class="mb-2 text-rad-danger font-bold">هشدار: این یک محیط شبیه‌سازی آموزشی است.</p>
-                       <p>۱. هوش مصنوعی این سیستم برای تشخیص بالینی تایید نشده است.</p>
-                       <p>۲. هرگز نباید برای بیماران واقعی استفاده شود.</p>
-                       <p>۳. تمام تصاویر موجود در دمو فاقد هویت (De-identified) هستند.</p>
-                       <p class="mt-2 text-gray-400 text-xs">طراحی شده بر اساس اصول ایمنی بیمار و دستورالعمل‌های WHO.</p>`
-            },
-            'modelcard': {
-                title: 'کارت مدل (Model Card)',
-                body: `<ul class="list-disc list-inside space-y-2">
-                        <li><strong>نام مدل:</strong> RadMentor-CXR-v1 (Demo)</li>
-                        <li><strong>معماری:</strong> DenseNet-121 (Fine-tuned)</li>
-                        <li><strong>داده‌های آموزش:</strong> MIMIC-CXR و CheXpert (Public Datasets).</li>
-                        <li><strong>محدودیت‌ها:</strong> عملکرد ضعیف در تصاویر Supine و بیماران دارای ابزار پزشکی (تعبیه شده).</li>
-                        <li><strong>بایاس شناخته شده:</strong> احتمال خطای مثبت کاذب در بیماران چاق (BMI > 30).</li>
-                       </ul>`
-            },
-            'standards': {
-                title: 'استانداردها و حاکمیت',
-                body: `<p class="mb-2">این پلتفرم متعهد به رعایت استانداردهای گزارش‌دهی هوش مصنوعی در پزشکی است:</p>
-                       <div class="grid grid-cols-1 gap-2 text-xs font-mono text-rad-teal">
-                        <div class="bg-gray-900 p-2 rounded">SPIRIT-AI (پروتکل کارآزمایی)</div>
-                        <div class="bg-gray-900 p-2 rounded">CONSORT-AI (گزارش نتایج)</div>
-                        <div class="bg-gray-900 p-2 rounded">DECIDE-AI (مراحل اولیه بالینی)</div>
-                       </div>
-                       <p class="mt-3 text-xs">مطابق با اصول اخلاقی WHO برای هوش مصنوعی در سلامت: شفافیت، نظارت انسانی، و پاسخگویی.</p>`
-            }
-        };
-
-        function openModal(type) {
-            const data = modalContentMap[type];
-            document.getElementById('modal-title').innerText = data.title;
-            document.getElementById('modal-content').innerHTML = data.body;
-            document.getElementById('modal-overlay').classList.remove('hidden');
-        }
-
-        function closeModal() {
-            document.getElementById('modal-overlay').classList.add('hidden');
-        }
-    </script>
-</body>
-</html>
+app.listen(PORT, () => console.log(`API running on http://localhost:${PORT}`));
