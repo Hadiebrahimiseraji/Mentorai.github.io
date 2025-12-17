@@ -1,1449 +1,1607 @@
 <!doctype html>
 <html lang="fa" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>RadMentor | Single-file Research Platform</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="پلتفرم آموزشی–پژوهشی تفسیر CXR (صرفاً آموزشی/پژوهشی؛ غیرقابل استفاده بالینی)" />
+  <title>پلتفرم آموزشی–پژوهشی تفسیر CXR | RCT</title>
 
-  <!-- Tailwind (CDN) -->
+  <!-- TailwindCSS CDN (برای استقرار تولیدی، پیشنهاد می‌شود نسخه build شده استفاده شود) -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Vazirmatn -->
-  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" />
-
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: { sans: ['Vazirmatn','system-ui','sans-serif'] },
-          colors: {
-            bg0: '#0b1220',
-            bg1: '#0f172a',
-            panel: '#111c33',
-            panel2: '#142140',
-            border: '#22314f',
-            txt: '#e7eefc',
-            sub: '#9fb2d9',
-            brand: '#3b82f6',
-            mint: '#14b8a6',
-            warn: '#f59e0b',
-            danger: '#ef4444',
-            ok: '#22c55e'
-          }
-        }
-      }
-    }
-  </script>
-
   <style>
-    body { font-family: Vazirmatn, sans-serif; background:#0b1220; color:#e7eefc; }
-    .glass { background: rgba(17,28,51,.72); backdrop-filter: blur(10px); }
-    .soft-shadow { box-shadow: 0 10px 40px rgba(0,0,0,.35); }
-    .scroll::-webkit-scrollbar { width: 8px; height: 8px; }
-    .scroll::-webkit-scrollbar-thumb { background: #22314f; border-radius: 10px; }
-    .scroll::-webkit-scrollbar-track { background: #0b1220; }
-
-    .viewer { background:#000; border:1px solid #22314f; border-radius:14px; overflow:hidden; position:relative; }
-    .viewer img { width:100%; height:100%; object-fit:contain; transform-origin:center center; user-select:none; -webkit-user-drag:none; pointer-events:none; }
-    .heatmap { position:absolute; inset:0; opacity:0; transition:opacity .25s ease; mix-blend-mode:screen; pointer-events:none; }
-    .heatmap.on { opacity:1; }
-
-    .kbd {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size: 12px;
-      background:#0a1020;
-      border:1px solid #22314f;
-      padding:2px 6px;
-      border-radius:8px;
-      color:#9fb2d9;
-    }
+    /* بهبودهای کوچک RTL/خوانایی */
+    body { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji"; }
     .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
-    .pill { border:1px solid #22314f; background:rgba(17,28,51,.7); border-radius:999px; padding:6px 10px; font-size:12px; color:#9fb2d9; }
-    .btn { border:1px solid #22314f; background:#111c33; border-radius:14px; padding:10px 12px; transition:.15s; }
-    .btn:hover { background:#142140; border-color:#3b82f6; }
-    .btn-primary { background:#3b82f6; border-color:#3b82f6; color:white; font-weight:800; }
-    .btn-primary:hover { filter:brightness(1.1); }
-    .btn-mint { background:#14b8a6; border-color:#14b8a6; color:#06121d; font-weight:900; }
-    .btn-mint:hover { filter:brightness(1.07); }
-    .btn-danger { background:#ef4444; border-color:#ef4444; color:white; font-weight:900; }
-    .btn-danger:hover { filter:brightness(1.06); }
-
-    .input { width:100%; background:#0b1220; border:1px solid #22314f; border-radius:14px; padding:10px 12px; outline:none; }
-    .input:focus { border-color:#3b82f6; }
-    .select { width:100%; background:#0b1220; border:1px solid #22314f; border-radius:14px; padding:10px 12px; outline:none; }
-    .select:focus { border-color:#3b82f6; }
-    .textarea { width:100%; background:#0b1220; border:1px solid #22314f; border-radius:14px; padding:10px 12px; outline:none; }
-    .textarea:focus { border-color:#3b82f6; }
-
-    .tag { border:1px solid #22314f; background:rgba(20,33,64,.6); border-radius:12px; padding:6px 10px; font-size:12px; color:#9fb2d9; display:inline-flex; gap:8px; align-items:center; }
-    .sep { height:1px; background:#22314f; opacity:.7; }
-    .chip { display:inline-flex; align-items:center; gap:8px; border:1px solid #22314f; background:rgba(17,28,51,.8); border-radius:14px; padding:8px 10px; }
-    .muted { color:#9fb2d9; }
-    .title { font-weight:900; letter-spacing:-.2px; }
-    .dangerbox { border:1px solid rgba(239,68,68,.35); background:rgba(239,68,68,.12); border-radius:16px; padding:12px; }
-    .okbox { border:1px solid rgba(34,197,94,.35); background:rgba(34,197,94,.10); border-radius:16px; padding:12px; }
-    .warnbox { border:1px solid rgba(245,158,11,.35); background:rgba(245,158,11,.10); border-radius:16px; padding:12px; }
-
-    /* Modal */
-    .modal-backdrop { position:fixed; inset:0; background:rgba(0,0,0,.55); display:none; align-items:center; justify-content:center; z-index:1000; }
-    .modal { width:min(980px, 92vw); max-height:86vh; overflow:auto; border:1px solid #22314f; background:rgba(17,28,51,.9); backdrop-filter: blur(10px); border-radius:18px; box-shadow:0 25px 80px rgba(0,0,0,.55); }
+    .focus-ring:focus { outline: 3px solid rgba(59,130,246,.6); outline-offset: 2px; }
+    .kbd { border: 1px solid rgb(203,213,225); border-bottom-width: 2px; padding: 0 .4rem; border-radius: .4rem; background: rgb(248,250,252); }
+    .badge { display:inline-flex; align-items:center; gap:.35rem; padding:.2rem .6rem; border-radius:999px; font-size:.75rem; border:1px solid; }
+    .hidden-print { display: block; }
+    @media print {
+      .hidden-print { display: none !important; }
+      a:after { content: " (" attr(href) ")"; font-size: 10px; color: #555; }
+    }
   </style>
 </head>
 
-<body class="min-h-screen">
-
-<header class="sticky top-0 z-50 border-b border-border bg-bg1/75 backdrop-blur">
-  <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
-    <div class="flex items-center gap-3">
-      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand to-mint flex items-center justify-center soft-shadow">
-        <i class="fa-solid fa-x-ray text-white text-lg"></i>
+<body class="bg-slate-50 text-slate-900">
+  <!-- Top Warning Banner -->
+  <div class="hidden-print bg-rose-700 text-white">
+    <div class="max-w-7xl mx-auto px-4 py-2 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+      <div class="font-semibold">
+        هشدار: این سامانه «صرفاً آموزشی و پژوهشی» است و برای تصمیم‌گیری بالینی/درمانی استفاده نمی‌شود.
       </div>
-      <div>
-        <div class="title">RadMentor (Single-file)</div>
-        <div class="text-xs muted -mt-0.5">آموزش/پژوهش تفسیر CXR با گروه‌بندی مداخله/کنترل</div>
+      <div class="text-sm opacity-95">
+        استفاده از داده بیمار واقعی، PHI، یا توصیه درمانی در این سامانه ممنوع است.
       </div>
     </div>
+  </div>
 
-    <div class="flex items-center gap-2">
-      <div id="hdr-phase" class="hidden md:flex pill items-center gap-2">
-        <i class="fa-solid fa-flask"></i>
-        <span>Phase: <span id="hdr-phase-text" class="text-txt font-bold">—</span></span>
-      </div>
-
-      <div id="hdr-protocol" class="hidden md:flex pill items-center gap-2">
-        <i class="fa-solid fa-diagram-project"></i>
-        <span>Protocol: <span id="hdr-protocol-text" class="text-txt font-bold">—</span></span>
-      </div>
-
-      <div id="hdr-user" class="hidden chip">
-        <i class="fa-solid fa-user-doctor muted"></i>
-        <div class="text-sm">
-          <div class="font-extrabold" id="hdr-username">—</div>
-          <div class="text-xs muted -mt-1">
-            <span id="hdr-role">—</span> • <span id="hdr-group">—</span>
-          </div>
+  <!-- App Shell -->
+  <header class="hidden-print bg-white border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+      <div class="flex items-center justify-between gap-3">
+        <div>
+          <h1 class="text-lg md:text-xl font-bold">پلتفرم آموزشی–پژوهشی تفسیر رادیوگرافی قفسه سینه (CXR)</h1>
+          <p class="text-sm text-slate-600">طراحی‌شده برای اجرای کارآزمایی تصادفی‌سازی‌شده آموزشی (Pilot + Main RCT) — غیرقابل استفاده بالینی</p>
         </div>
       </div>
 
-      <button id="btn-logout" class="hidden btn">
-        <i class="fa-solid fa-right-from-bracket ml-2"></i>خروج
-      </button>
+      <div class="flex flex-wrap items-center gap-2">
+        <span id="badgeRole" class="badge border-slate-300 text-slate-700 bg-slate-100">نقش: <b>میهمان</b></span>
+        <span id="badgeArm" class="badge border-slate-300 text-slate-700 bg-slate-100">گروه: <b>نامشخص</b></span>
+        <span id="badgePhase" class="badge border-slate-300 text-slate-700 bg-slate-100">فاز: <b>—</b></span>
+        <span id="badgeAI" class="badge border-slate-300 text-slate-700 bg-slate-100">AI: <b>—</b></span>
+        <button id="btnOpenConsent" class="px-3 py-2 rounded-lg bg-slate-900 text-white text-sm hover:bg-slate-800 focus-ring">نمایش اطلاعیه اخلاقی</button>
+      </div>
     </div>
-  </div>
-</header>
 
-<div id="app" class="max-w-7xl mx-auto p-4 grid gap-4"></div>
+    <!-- Navigation -->
+    <nav class="bg-white">
+      <div class="max-w-7xl mx-auto px-4 pb-4 flex flex-wrap gap-2">
+        <button data-route="home" class="navbtn px-3 py-2 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-sm focus-ring">صفحه اصلی و پروتکل</button>
+        <button data-route="login" class="navbtn px-3 py-2 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-sm focus-ring">ورود/پروفایل پژوهش</button>
+        <button data-route="pretest" class="navbtn px-3 py-2 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-sm focus-ring">پیش‌آزمون</button>
+        <button data-route="training" class="navbtn px-3 py-2 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-sm focus-ring">آموزش</button>
+        <button data-route="posttest" class="navbtn px-3 py-2 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-sm focus-ring">پس‌آزمون</button>
+        <button data-route="surveys" class="navbtn px-3 py-2 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-sm focus-ring">SUS / NPS</button>
+        <button data-route="research" class="navbtn px-3 py-2 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-sm focus-ring">داشبورد پژوهشگر</button>
+        <button data-route="admin" class="navbtn px-3 py-2 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-sm focus-ring">ادمین/پیکربندی</button>
+      </div>
+    </nav>
+  </header>
 
-<!-- Toast -->
-<div id="toast" class="fixed bottom-5 left-5 hidden px-4 py-3 rounded-xl border border-border bg-panel soft-shadow text-sm"></div>
+  <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
+    <!-- Consent / Ethics Modal -->
+    <section id="consentModal" class="hidden fixed inset-0 bg-black/50 z-50">
+      <div class="absolute inset-0 flex items-center justify-center p-4">
+        <div class="w-full max-w-3xl bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+          <div class="p-4 border-b border-slate-200 flex items-center justify-between gap-3">
+            <h2 class="text-lg font-bold">اطلاعیه اخلاقی، حریم خصوصی و محدودیت استفاده</h2>
+            <button id="btnCloseConsent" class="px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-sm focus-ring">بستن</button>
+          </div>
+          <div class="p-5 space-y-4 text-sm leading-7">
+            <div class="p-4 rounded-xl bg-rose-50 border border-rose-200">
+              <p class="font-semibold text-rose-800">این سامانه صرفاً برای آموزش و پژوهش طراحی شده است.</p>
+              <ul class="mt-2 list-disc pr-6 text-rose-900">
+                <li>استفاده برای تصمیم‌گیری بالینی، تشخیص واقعی بیمار، یا توصیه درمانی ممنوع است.</li>
+                <li>خروجی «هوش مصنوعی» در صورت نمایش، کمک‌یار آموزشی است و جایگزین قضاوت انسانی نیست.</li>
+                <li>هیچ داده‌ی شناسایی‌کننده بیمار (PHI) و هیچ داده حساس فردی نباید وارد سامانه شود.</li>
+              </ul>
+            </div>
 
-<!-- Modal -->
-<div id="modal-backdrop" class="modal-backdrop">
-  <div class="modal scroll">
-    <div class="p-4 border-b border-border flex items-center justify-between">
-      <div class="font-black text-lg" id="modal-title">—</div>
-      <button id="modal-close" class="btn"><i class="fa-solid fa-xmark ml-2"></i>بستن</button>
-    </div>
-    <div class="p-4" id="modal-body"></div>
-  </div>
-</div>
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+              <p class="font-semibold">حداقل‌گرایی داده و شبه‌ناشناس‌سازی</p>
+              <p>شناسه‌ها به‌صورت مستعار (Pseudonymized) ذخیره می‌شوند. سامانه از شما نام/کدملی/اطلاعات تماس را درخواست نمی‌کند. پاسخ‌ها برای تحلیل پژوهشی و مطابق پروتکل استفاده می‌شوند.</p>
+            </div>
 
-<script>
-/* ============================================================
-   RadMentor Single-file Platform
-============================================================ */
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+              <p class="font-semibold">حقوق شرکت‌کننده</p>
+              <ul class="mt-2 list-disc pr-6">
+                <li>مشارکت داوطلبانه است و عدم مشارکت نباید پیامد آموزشی/اداری برای شما داشته باشد.</li>
+                <li>می‌توانید در هر زمان از ادامه خارج شوید (طبق سازوکار تعریف‌شده در پروتکل مرکز).</li>
+                <li>تمام تعاملات کلیدی برای ممیزی پژوهشی ثبت می‌شود (Audit Log).</li>
+              </ul>
+            </div>
 
-/* -----------------------------
-   Helpers
------------------------------ */
-const $ = (sel, root=document) => root.querySelector(sel);
-const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
-const app = $("#app");
+            <div class="flex items-center gap-3 justify-end">
+              <label class="flex items-center gap-2 select-none">
+                <input id="chkConsent" type="checkbox" class="w-4 h-4" />
+                <span>مطالب بالا را خواندم و می‌پذیرم (صرفاً آموزشی/پژوهشی).</span>
+              </label>
+              <button id="btnAcceptConsent" class="px-4 py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-800 focus-ring disabled:opacity-50" disabled>
+                ثبت پذیرش
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-function escapeHtml(s="") {
-  return String(s)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
+    <!-- HOME / PROTOCOL -->
+    <section id="route-home" class="route space-y-6">
+      <div class="bg-white rounded-2xl border border-slate-200 p-6">
+        <h2 class="text-xl font-bold">پروتکل مطالعه و منطق سامانه</h2>
+        <p class="mt-2 text-slate-700 leading-7">
+          این پلتفرم برای اجرای کارآزمایی آموزشی–بالینی تصادفی‌سازی‌شده در حوزه تفسیر CXR طراحی شده است. مسیر استاندارد شامل
+          <b>پیش‌آزمون</b>، <b>مرحله آموزش</b> و <b>پس‌آزمون</b> است. در آزمون‌ها، هوش مصنوعی طبق پروتکل <b>قفل</b> است.
+        </p>
 
-function toast(msg, kind="info", ms=2800) {
-  const el = $("#toast");
-  el.classList.remove("hidden");
-  el.textContent = msg;
-  el.style.borderColor =
-    kind==="error" ? "#ef4444" :
-    kind==="ok" ? "#14b8a6" :
-    kind==="warn" ? "#f59e0b" : "#22314f";
-  setTimeout(() => el.classList.add("hidden"), ms);
-}
+        <div class="mt-4 grid md:grid-cols-3 gap-4">
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <h3 class="font-bold">هدف پژوهشی</h3>
+            <p class="mt-2 text-sm text-slate-700 leading-7">
+              سنجش اثر «کمک‌یار آموزشی مبتنی بر AI» در مقایسه با آموزش استاندارد بر عملکرد تفسیر CXR، زمان تفسیر، کیفیت گزارش و تجربه کاربری.
+            </p>
+          </div>
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <h3 class="font-bold">منع استفاده بالینی</h3>
+            <p class="mt-2 text-sm text-slate-700 leading-7">
+              سامانه برای تصمیم‌گیری بالینی طراحی نشده است. هرگونه استفاده درمانی/تشخیصی واقعی ممنوع است و در UI به‌صورت مستمر یادآوری می‌شود.
+            </p>
+          </div>
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <h3 class="font-bold">قفل نسخه (Locked)</h3>
+            <p class="mt-2 text-sm text-slate-700 leading-7">
+              در طول جمع‌آوری داده‌های RCT، نسخه منطق سامانه و تنظیمات AI باید ثابت بماند؛ هر تغییر پس از پایان داده‌گیری اعمال می‌شود.
+            </p>
+          </div>
+        </div>
 
-function fmtTimeSec(sec) {
-  if (sec == null || Number.isNaN(sec)) return "—";
-  sec = Math.max(0, Math.floor(sec));
-  const mm = String(Math.floor(sec/60)).padStart(2,"0");
-  const ss = String(sec%60).padStart(2,"0");
-  return `${mm}:${ss}`;
-}
+        <div class="mt-6 p-4 rounded-xl bg-amber-50 border border-amber-200">
+          <p class="font-semibold text-amber-900">راهنمای سریع برای فراگیر</p>
+          <ol class="mt-2 list-decimal pr-6 text-sm leading-7 text-amber-950">
+            <li>ابتدا در بخش «ورود/پروفایل پژوهش» شناسه مستعار خود را بسازید و پذیرش اخلاقی را ثبت کنید.</li>
+            <li>در «پیش‌آزمون» بدون AI پاسخ دهید (زمان به‌صورت خودکار ثبت می‌شود).</li>
+            <li>در «آموزش» بسته به گروه مطالعه، AI ممکن است برای یادگیری فعال باشد (در آزمون‌ها همیشه قفل است).</li>
+            <li>در «پس‌آزمون» مجدداً بدون AI پاسخ دهید.</li>
+            <li>در پایان، پرسشنامه‌های SUS و NPS را تکمیل کنید.</li>
+          </ol>
+        </div>
+      </div>
 
-function uuid() {
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, c => {
-    const r = Math.random()*16|0;
-    const v = c === "x" ? r : (r&0x3|0x8);
-    return v.toString(16);
-  });
-}
-function nowMs(){ return Date.now(); }
+      <div class="bg-white rounded-2xl border border-slate-200 p-6">
+        <h3 class="text-lg font-bold">چارچوب آموزشی استاندارد: ABCDE در CXR (راهنمای آموزشی)</h3>
+        <p class="mt-2 text-slate-700 text-sm leading-7">
+          این سامانه برای استانداردسازی فرایند مشاهده و گزارش‌نویسی از رویکرد ABCDE استفاده می‌کند.
+          هدف، ایجاد زبان مشترک، کاهش خطاهای غفلت (omission) و افزایش قابلیت اندازه‌گیری عملکرد است.
+        </p>
 
-/* -----------------------------
-   Wikimedia Creative Commons images
------------------------------ */
-const IMG = (fileName) => `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(fileName)}`;
+        <div class="mt-4 grid lg:grid-cols-5 gap-3 text-sm">
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200"><b>A</b>: Airway / راه‌های هوایی (تراکئا، انحراف، کارینا)</div>
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200"><b>B</b>: Breathing / ریه و پلور (ارتشاح، پنوموتوراکس، افیوژن)</div>
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200"><b>C</b>: Circulation / قلب و مدیاستن (اندازه قلب، کانتور، مدیاستن)</div>
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200"><b>D</b>: Diaphragm / دیافراگم (زاویه‌ها، گنبدها، هوا زیر دیافراگم)</div>
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200"><b>E</b>: Everything else / سایر (استخوان، بافت نرم، خطوط/لوله‌ها)</div>
+        </div>
+      </div>
+    </section>
 
-const SEED_CASES = [
-  {
-    id: "CXR-0001",
-    title: "نرمال (PA)",
-    modality: "CXR",
-    view: "PA",
-    age: 28,
-    sex: "F",
-    complaint: "Check-up",
-    imageUrl: IMG("Normal_posteroanterior_(PA)_chest_radiograph_(X-ray).jpg"),
-    truth: { primaryDx: "normal", findings: [] },
-    ai: { probs: { pneumonia: 0.03, pneumothorax: 0.01, effusion: 0.02, cardiomegaly: 0.06, normal: 0.92 }, heatmap: { x: 50, y: 50, r: 35 } }
+    <!-- LOGIN / PROFILE -->
+    <section id="route-login" class="route hidden space-y-6">
+      <div class="bg-white rounded-2xl border border-slate-200 p-6">
+        <h2 class="text-xl font-bold">ورود و پروفایل پژوهشی (بدون اطلاعات شناسایی)</h2>
+        <p class="mt-2 text-slate-700 leading-7 text-sm">
+          در این نسخه دمو، «ورود» به‌صورت ایجاد یک شناسه مستعار انجام می‌شود. در استقرار واقعی، اتصال به سامانه احراز هویت سازمانی با سیاست‌های امنیتی توصیه می‌شود.
+        </p>
+
+        <div class="mt-4 grid md:grid-cols-2 gap-4">
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <h3 class="font-bold">۱) ایجاد/انتخاب شناسه مستعار</h3>
+            <div class="mt-3 space-y-3">
+              <label class="block text-sm">
+                شناسه شرکت‌کننده (Participant ID) — مستعار
+                <input id="inpParticipantId" class="mt-1 w-full px-3 py-2 rounded-lg border border-slate-300 focus-ring" placeholder="مثال: P-9F3A2" />
+              </label>
+              <label class="block text-sm">
+                سطح آموزشی
+                <select id="selLevel" class="mt-1 w-full px-3 py-2 rounded-lg border border-slate-300 focus-ring">
+                  <option value="">انتخاب…</option>
+                  <option>دانشجوی پزشکی</option>
+                  <option>اینترن</option>
+                  <option>دستیار سال ۱</option>
+                  <option>دستیار سال ۲+</option>
+                  <option>پزشک عمومی</option>
+                  <option>سایر</option>
+                </select>
+              </label>
+              <label class="block text-sm">
+                مرکز (کد مرکز پژوهش) — بدون نام
+                <input id="inpSiteCode" class="mt-1 w-full px-3 py-2 rounded-lg border border-slate-300 focus-ring" placeholder="مثال: SITE-03" />
+              </label>
+              <button id="btnSaveProfile" class="w-full px-4 py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-800 focus-ring">ذخیره پروفایل</button>
+              <p class="text-xs text-slate-600 leading-6">
+                توجه: از واردکردن نام، شماره تماس، ایمیل شخصی یا هر داده شناسایی‌کننده خودداری کنید.
+              </p>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <h3 class="font-bold">۲) تنظیمات مطالعه (برای دمو)</h3>
+            <p class="mt-2 text-sm text-slate-700 leading-7">
+              در RCT واقعی، تخصیص گروه توسط سازوکار تصادفی‌سازی و به‌صورت پنهان انجام می‌شود. اینجا صرفاً برای نمایش گردش‌کار دمو است.
+            </p>
+
+            <div class="mt-3 space-y-3">
+              <label class="block text-sm">
+                نقش
+                <select id="selRole" class="mt-1 w-full px-3 py-2 rounded-lg border border-slate-300 focus-ring">
+                  <option value="student">دانشجو/فراگیر</option>
+                  <option value="researcher">پژوهشگر</option>
+                  <option value="admin">ادمین</option>
+                </select>
+              </label>
+
+              <label class="block text-sm">
+                بازوی مطالعه (Arm)
+                <select id="selArm" class="mt-1 w-full px-3 py-2 rounded-lg border border-slate-300 focus-ring">
+                  <option value="">نامشخص</option>
+                  <option value="control">کنترل (آموزش استاندارد بدون AI)</option>
+                  <option value="intervention">مداخله (آموزش استاندارد + AI در آموزش)</option>
+                </select>
+              </label>
+
+              <button id="btnSaveStudySettings" class="w-full px-4 py-2 rounded-lg bg-white border border-slate-300 hover:bg-slate-100 focus-ring">
+                اعمال تنظیمات دمو
+              </button>
+
+              <div class="mt-3 p-3 rounded-xl bg-white border border-slate-200">
+                <p class="text-sm font-semibold">وضعیت پذیرش اخلاقی</p>
+                <div class="mt-2 flex items-center justify-between gap-2">
+                  <span id="consentStatus" class="text-sm text-slate-700">ثبت نشده</span>
+                  <button id="btnShowConsent2" class="px-3 py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-800 text-sm focus-ring">نمایش/ثبت</button>
+                </div>
+              </div>
+
+              <div class="mt-3 p-3 rounded-xl bg-white border border-slate-200">
+                <p class="text-sm font-semibold">میانبرهای کیفیت داده</p>
+                <ul class="mt-2 text-xs text-slate-600 leading-6 list-disc pr-6">
+                  <li>در آزمون‌ها به حدس کور پاسخ ندهید؛ در صورت عدم قطعیت، اطمینان را پایین‌تر ثبت کنید.</li>
+                  <li>در آموزش (در صورت مجاز بودن AI) ابتدا پاسخ مستقل ثبت کنید، سپس AI را ببینید و در صورت نیاز اصلاح کنید.</li>
+                </ul>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRETEST -->
+    <section id="route-pretest" class="route hidden space-y-6">
+      <div class="bg-white rounded-2xl border border-slate-200 p-6">
+        <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
+          <div>
+            <h2 class="text-xl font-bold">پیش‌آزمون (AI قفل است)</h2>
+            <p class="mt-2 text-sm text-slate-700 leading-7">
+              این بخش برای سنجش خط پایه عملکرد تفسیر CXR است. مطابق پروتکل، در پیش‌آزمون هیچ خروجی AI نمایش داده نمی‌شود.
+            </p>
+          </div>
+          <div class="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-900 text-sm">
+            وضعیت AI: <b>قفل پروتکلی</b> (غیرقابل فعال‌سازی)
+          </div>
+        </div>
+
+        <div class="mt-4 grid lg:grid-cols-2 gap-4">
+          <!-- Case Viewer -->
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <div class="flex items-center justify-between gap-2">
+              <h3 class="font-bold">نمایش کیس (دمو)</h3>
+              <div class="text-xs text-slate-600 mono">
+                CaseID: <span id="pre_caseId">CXR-PT-001</span>
+              </div>
+            </div>
+
+            <div class="mt-3 rounded-xl bg-white border border-slate-200 p-3">
+              <!-- Demo Image Placeholder -->
+              <div class="aspect-[4/3] rounded-lg bg-slate-100 border border-dashed border-slate-300 flex items-center justify-center text-slate-600 text-sm">
+                تصویر CXR (دمو) — در استقرار واقعی از DICOMweb/تصاویر ناشناس استفاده می‌شود
+              </div>
+
+              <div class="mt-3 flex flex-wrap gap-2">
+                <button class="px-3 py-2 rounded-lg bg-white border border-slate-300 hover:bg-slate-100 text-sm focus-ring" id="btnPreStart">شروع تایمر</button>
+                <button class="px-3 py-2 rounded-lg bg-white border border-slate-300 hover:bg-slate-100 text-sm focus-ring" id="btnPreStop">توقف/ثبت زمان</button>
+                <span class="px-3 py-2 rounded-lg bg-slate-900 text-white text-sm mono">Time: <span id="pre_timer">00:00</span></span>
+              </div>
+
+              <div class="mt-3 p-3 rounded-xl bg-amber-50 border border-amber-200 text-sm leading-7">
+                <b>یادآوری:</b> رویکرد ABCDE را دنبال کنید. سپس گزارش ساختاریافته را کامل کنید.
+              </div>
+            </div>
+
+            <div class="mt-3 p-3 rounded-xl bg-white border border-slate-200">
+              <p class="text-sm font-semibold">دکمه AI (غیرفعال در آزمون)</p>
+              <button disabled class="mt-2 w-full px-4 py-2 rounded-lg bg-slate-200 text-slate-500 text-sm cursor-not-allowed">
+                نمایش خروجی AI (در آزمون‌ها قفل است)
+              </button>
+              <p class="mt-2 text-xs text-slate-600 leading-6">
+                هر تلاش برای فعال‌سازی AI در آزمون باید ثبت و بررسی شود. در این دمو، قفل سخت‌افزاری/نرم‌افزاری اعمال شده است.
+              </p>
+            </div>
+          </div>
+
+          <!-- Response Form -->
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <h3 class="font-bold">فرم پاسخ (پیش‌آزمون)</h3>
+
+            <form id="formPretest" class="mt-3 space-y-4">
+              <fieldset class="p-3 rounded-xl bg-white border border-slate-200">
+                <legend class="px-2 text-sm font-semibold">چک‌لیست ABCDE</legend>
+                <div class="mt-2 grid md:grid-cols-2 gap-2 text-sm">
+                  <label class="flex items-center gap-2"><input type="checkbox" name="abcde_A" class="w-4 h-4"> A: راه‌های هوایی بررسی شد</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" name="abcde_B" class="w-4 h-4"> B: ریه/پلور بررسی شد</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" name="abcde_C" class="w-4 h-4"> C: قلب/مدیاستن بررسی شد</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" name="abcde_D" class="w-4 h-4"> D: دیافراگم بررسی شد</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" name="abcde_E" class="w-4 h-4"> E: سایر (استخوان/لوله‌ها/بافت نرم) بررسی شد</label>
+                </div>
+              </fieldset>
+
+              <fieldset class="p-3 rounded-xl bg-white border border-slate-200">
+                <legend class="px-2 text-sm font-semibold">یافته‌های هدف (صرفاً برای پژوهش)</legend>
+                <p class="text-xs text-slate-600 leading-6 mt-1">
+                  این گزینه‌ها برای ساختاردهی پاسخ پژوهشی است و «لیست کامل تشخیص‌ها» تلقی نمی‌شود.
+                </p>
+                <div class="mt-2 grid md:grid-cols-2 gap-2 text-sm">
+                  <label class="flex items-center gap-2"><input type="checkbox" name="finding_normal" class="w-4 h-4"> نرمال/بدون یافته مهم</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" name="finding_consolidation" class="w-4 h-4"> ارتشاح/Consolidation</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" name="finding_pleural_effusion" class="w-4 h-4"> افیوژن پلور</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" name="finding_pneumothorax" class="w-4 h-4"> پنوموتوراکس</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" name="finding_nodule" class="w-4 h-4"> ندول/توده</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" name="finding_cardiomegaly" class="w-4 h-4"> بزرگی قلب</label>
+                </div>
+              </fieldset>
+
+              <div class="p-3 rounded-xl bg-white border border-slate-200">
+                <label class="block text-sm font-semibold">گزارش ساختاریافته (الزام پژوهشی)</label>
+                <p class="text-xs text-slate-600 leading-6 mt-1">
+                  قالب پیشنهادی: کیفیت تصویر → یافته‌ها (ABCDE) → تشخیص اصلی/دیفرانسیل محدود → جمع‌بندی.
+                </p>
+                <textarea name="structured_report" rows="6" class="mt-2 w-full px-3 py-2 rounded-lg border border-slate-300 focus-ring" placeholder="متن گزارش را اینجا بنویسید..."></textarea>
+              </div>
+
+              <div class="p-3 rounded-xl bg-white border border-slate-200">
+                <label class="block text-sm font-semibold">اطمینان (0 تا 100)</label>
+                <input name="confidence" type="range" min="0" max="100" value="50" class="mt-2 w-full" />
+                <div class="mt-1 text-xs text-slate-600">عدد اطمینان: <span id="pre_confVal" class="mono">50</span></div>
+              </div>
+
+              <div class="flex flex-col md:flex-row gap-2">
+                <button type="submit" class="w-full px-4 py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-800 focus-ring">ثبت پاسخ پیش‌آزمون</button>
+                <button type="button" id="btnPreNextCase" class="w-full px-4 py-2 rounded-lg bg-white border border-slate-300 hover:bg-slate-100 focus-ring">کیس بعدی (دمو)</button>
+              </div>
+
+              <div class="text-xs text-slate-600 leading-6">
+                ثبت پاسخ شامل زمان تفسیر، گزینه‌های انتخابی، متن گزارش و اطمینان است. داده‌ها با شناسه مستعار ذخیره می‌شود.
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TRAINING -->
+    <section id="route-training" class="route hidden space-y-6">
+      <div class="bg-white rounded-2xl border border-slate-200 p-6">
+        <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
+          <div>
+            <h2 class="text-xl font-bold">آموزش (AI فقط در بازوی مداخله مجاز است)</h2>
+            <p class="mt-2 text-sm text-slate-700 leading-7">
+              در هر کیس آموزشی: ابتدا تفسیر مستقل ثبت می‌شود، سپس (در صورت مجاز بودن) خروجی AI و توضیح‌پذیری نمایش داده می‌شود
+              و امکان اصلاح پاسخ فراهم است. در پایان، نکات آموزشی و مرجع استاندارد (در استقرار واقعی) ارائه می‌گردد.
+            </p>
+          </div>
+          <div id="trainingAIBox" class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-sm">
+            وضعیت AI در آموزش: <b id="trainingAIStatus">—</b>
+          </div>
+        </div>
+
+        <div class="mt-4 grid lg:grid-cols-2 gap-4">
+          <!-- Case Viewer -->
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <div class="flex items-center justify-between gap-2">
+              <h3 class="font-bold">نمایش کیس آموزشی</h3>
+              <div class="text-xs text-slate-600 mono">
+                CaseID: <span id="tr_caseId">CXR-TR-001</span>
+              </div>
+            </div>
+
+            <div class="mt-3 rounded-xl bg-white border border-slate-200 p-3">
+              <div class="aspect-[4/3] rounded-lg bg-slate-100 border border-dashed border-slate-300 flex items-center justify-center text-slate-600 text-sm">
+                تصویر CXR آموزشی (دمو)
+              </div>
+
+              <div class="mt-3 flex flex-wrap gap-2">
+                <button class="px-3 py-2 rounded-lg bg-white border border-slate-300 hover:bg-slate-100 text-sm focus-ring" id="btnTrStart">شروع تایمر</button>
+                <button class="px-3 py-2 rounded-lg bg-white border border-slate-300 hover:bg-slate-100 text-sm focus-ring" id="btnTrStop">توقف/ثبت زمان</button>
+                <span class="px-3 py-2 rounded-lg bg-slate-900 text-white text-sm mono">Time: <span id="tr_timer">00:00</span></span>
+              </div>
+
+              <!-- AI Panel -->
+              <div class="mt-4 p-3 rounded-xl border border-slate-200 bg-slate-50">
+                <div class="flex items-center justify-between gap-2">
+                  <p class="text-sm font-semibold">پنل AI (کمک‌یار آموزشی)</p>
+                  <button id="btnShowAI" class="px-3 py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-800 text-sm focus-ring">
+                    نمایش AI / XAI
+                  </button>
+                </div>
+                <p class="mt-2 text-xs text-slate-600 leading-6">
+                  خروجی AI ممکن است خطا داشته باشد، سوگیری داشته باشد، یا در برخی الگوها ناپایدار باشد. این خروجی «تشخیص پزشکی» نیست.
+                </p>
+
+                <div id="aiOutput" class="hidden mt-3 space-y-3">
+                  <div class="p-3 rounded-xl bg-white border border-slate-200">
+                    <p class="text-sm font-semibold">پیش‌بینی‌های چندبرچسبه (دمو)</p>
+                    <div class="mt-2 space-y-2 text-sm">
+                      <div class="flex items-center justify-between"><span>Consolidation</span><span class="mono">0.62</span></div>
+                      <div class="flex items-center justify-between"><span>Pleural effusion</span><span class="mono">0.18</span></div>
+                      <div class="flex items-center justify-between"><span>Pneumothorax</span><span class="mono">0.07</span></div>
+                      <div class="flex items-center justify-between"><span>Nodule/Mass</span><span class="mono">0.21</span></div>
+                      <div class="flex items-center justify-between"><span>Cardiomegaly</span><span class="mono">0.12</span></div>
+                    </div>
+                    <p class="mt-2 text-xs text-slate-600">اعداد نمایشی هستند و برای دمو استفاده می‌شوند (بدون ادعای کارایی).</p>
+                  </div>
+
+                  <div class="p-3 rounded-xl bg-white border border-slate-200">
+                    <p class="text-sm font-semibold">توضیح‌پذیری (XAI) — نقشه توجه (دمو)</p>
+                    <div class="mt-2 aspect-[4/3] rounded-lg bg-slate-100 border border-dashed border-slate-300 flex items-center justify-center text-slate-600 text-sm">
+                      Heatmap دمو — در استقرار واقعی از روش‌های معتبر توضیح‌پذیری استفاده می‌شود
+                    </div>
+                    <label class="mt-2 flex items-center gap-2 text-sm">
+                      <input id="chkXAIViewed" type="checkbox" class="w-4 h-4" />
+                      نقشه توضیح‌پذیری را مشاهده کردم
+                    </label>
+                  </div>
+
+                  <div class="p-3 rounded-xl bg-amber-50 border border-amber-200">
+                    <p class="text-sm font-semibold text-amber-900">نکته آموزشی (دمو)</p>
+                    <p class="mt-2 text-sm text-amber-950 leading-7">
+                      تمرین هدف: توصیف یافته‌ها با زبان ساختاریافته و توجه به پلور و زاویه‌های کوستوفرنیک، حتی در موارد ظاهراً ساده.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-3 p-3 rounded-xl bg-white border border-slate-200">
+                <p class="text-sm font-semibold">مرجع استاندارد و بازخورد (دمو)</p>
+                <p class="mt-2 text-xs text-slate-600 leading-6">
+                  در استقرار واقعی، مرجع استاندارد توسط رادیولوژیست‌ها/داوری چندگانه تهیه و به‌صورت کنترل‌شده نمایش داده می‌شود.
+                </p>
+                <button id="btnShowGold" class="mt-2 w-full px-4 py-2 rounded-lg bg-white border border-slate-300 hover:bg-slate-100 text-sm focus-ring">
+                  نمایش بازخورد/مرجع (دمو)
+                </button>
+                <div id="goldBox" class="hidden mt-3 p-3 rounded-xl bg-slate-50 border border-slate-200 text-sm leading-7">
+                  <b>Gold (دمو):</b> یافته آموزشی نمونه. این متن جایگزین مرجع واقعی نیست و فقط برای نمایش جریان آموزش است.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Training Form -->
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <h3 class="font-bold">ثبت پاسخ در آموزش (قبل/بعد از AI)</h3>
+            <p class="mt-2 text-sm text-slate-700 leading-7">
+              ابتدا «پاسخ مستقل» را ثبت کنید. سپس اگر AI مجاز بود، آن را ببینید و «پاسخ پس از AI» را در صورت تغییر ثبت کنید.
+              در بازوی کنترل، بخش AI قفل است و پاسخ پس از AI باید خالی بماند.
+            </p>
+
+            <form id="formTraining" class="mt-3 space-y-4">
+              <div class="p-3 rounded-xl bg-white border border-slate-200">
+                <p class="text-sm font-semibold">پاسخ مستقل (Pre-AI)</p>
+                <textarea name="pre_ai_report" rows="5" class="mt-2 w-full px-3 py-2 rounded-lg border border-slate-300 focus-ring" placeholder="گزارش/یافته‌های مستقل خود را ثبت کنید..."></textarea>
+
+                <label class="block text-sm font-semibold mt-3">اطمینان (0 تا 100)</label>
+                <input name="pre_ai_confidence" type="range" min="0" max="100" value="50" class="mt-2 w-full" />
+                <div class="mt-1 text-xs text-slate-600">عدد اطمینان: <span id="tr_preConfVal" class="mono">50</span></div>
+              </div>
+
+              <div id="postAIBox" class="p-3 rounded-xl bg-white border border-slate-200">
+                <p class="text-sm font-semibold">پاسخ پس از مشاهده AI (Post-AI)</p>
+                <p class="mt-1 text-xs text-slate-600 leading-6">
+                  این بخش فقط در بازوی مداخله و فقط در آموزش قابل تکمیل است.
+                </p>
+                <textarea id="post_ai_report" name="post_ai_report" rows="5" class="mt-2 w-full px-3 py-2 rounded-lg border border-slate-300 focus-ring" placeholder="در صورت تغییر، گزارش اصلاح‌شده را ثبت کنید..."></textarea>
+
+                <label class="block text-sm font-semibold mt-3">اطمینان پس از AI (0 تا 100)</label>
+                <input id="post_ai_confidence" name="post_ai_confidence" type="range" min="0" max="100" value="50" class="mt-2 w-full" />
+                <div class="mt-1 text-xs text-slate-600">عدد اطمینان: <span id="tr_postConfVal" class="mono">50</span></div>
+
+                <div class="mt-3 grid md:grid-cols-2 gap-2 text-sm">
+                  <label class="flex items-center gap-2"><input type="checkbox" name="ai_changed_decision" class="w-4 h-4"> پس از AI تصمیم/گزارش تغییر کرد</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" name="ai_increased_confidence" class="w-4 h-4"> AI اطمینان را افزایش داد</label>
+                </div>
+              </div>
+
+              <fieldset class="p-3 rounded-xl bg-white border border-slate-200">
+                <legend class="px-2 text-sm font-semibold">ثبت تعامل با UI (برای تحلیل کاربردپذیری)</legend>
+                <div class="mt-2 grid md:grid-cols-2 gap-2 text-sm">
+                  <label class="flex items-center gap-2"><input type="checkbox" name="used_zoom" class="w-4 h-4"> از ابزار نمایش/زوم استفاده شد</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" name="used_xai" class="w-4 h-4"> از XAI استفاده شد/دیده شد</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" name="read_tips" class="w-4 h-4"> نکات آموزشی مطالعه شد</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" name="opened_gold" class="w-4 h-4"> بازخورد/مرجع (دمو) باز شد</label>
+                </div>
+              </fieldset>
+
+              <div class="flex flex-col md:flex-row gap-2">
+                <button type="submit" class="w-full px-4 py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-800 focus-ring">ثبت کیس آموزشی</button>
+                <button type="button" id="btnTrNextCase" class="w-full px-4 py-2 rounded-lg bg-white border border-slate-300 hover:bg-slate-100 focus-ring">کیس بعدی (دمو)</button>
+              </div>
+
+              <div class="text-xs text-slate-600 leading-6">
+                داده‌های آموزش شامل Pre-AI و (در صورت مجاز بودن) Post-AI و نیز لاگ مشاهده AI/XAI است.
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- POSTTEST -->
+    <section id="route-posttest" class="route hidden space-y-6">
+      <div class="bg-white rounded-2xl border border-slate-200 p-6">
+        <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
+          <div>
+            <h2 class="text-xl font-bold">پس‌آزمون (AI قفل است)</h2>
+            <p class="mt-2 text-sm text-slate-700 leading-7">
+              پس‌آزمون برای سنجش پیامدهای آموزشی پس از مداخله است. مطابق پروتکل، در پس‌آزمون هیچ خروجی AI نمایش داده نمی‌شود.
+            </p>
+          </div>
+          <div class="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-900 text-sm">
+            وضعیت AI: <b>قفل پروتکلی</b> (غیرقابل فعال‌سازی)
+          </div>
+        </div>
+
+        <div class="mt-4 grid lg:grid-cols-2 gap-4">
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <div class="flex items-center justify-between gap-2">
+              <h3 class="font-bold">نمایش کیس (دمو)</h3>
+              <div class="text-xs text-slate-600 mono">
+                CaseID: <span id="post_caseId">CXR-PO-001</span>
+              </div>
+            </div>
+
+            <div class="mt-3 rounded-xl bg-white border border-slate-200 p-3">
+              <div class="aspect-[4/3] rounded-lg bg-slate-100 border border-dashed border-slate-300 flex items-center justify-center text-slate-600 text-sm">
+                تصویر CXR (دمو)
+              </div>
+
+              <div class="mt-3 flex flex-wrap gap-2">
+                <button class="px-3 py-2 rounded-lg bg-white border border-slate-300 hover:bg-slate-100 text-sm focus-ring" id="btnPostStart">شروع تایمر</button>
+                <button class="px-3 py-2 rounded-lg bg-white border border-slate-300 hover:bg-slate-100 text-sm focus-ring" id="btnPostStop">توقف/ثبت زمان</button>
+                <span class="px-3 py-2 rounded-lg bg-slate-900 text-white text-sm mono">Time: <span id="post_timer">00:00</span></span>
+              </div>
+
+              <div class="mt-3 p-3 rounded-xl bg-white border border-slate-200">
+                <p class="text-sm font-semibold">AI (غیرفعال در آزمون)</p>
+                <button disabled class="mt-2 w-full px-4 py-2 rounded-lg bg-slate-200 text-slate-500 text-sm cursor-not-allowed">
+                  نمایش خروجی AI (در آزمون‌ها قفل است)
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <h3 class="font-bold">فرم پاسخ (پس‌آزمون)</h3>
+
+            <form id="formPosttest" class="mt-3 space-y-4">
+              <fieldset class="p-3 rounded-xl bg-white border border-slate-200">
+                <legend class="px-2 text-sm font-semibold">چک‌لیست ABCDE</legend>
+                <div class="mt-2 grid md:grid-cols-2 gap-2 text-sm">
+                  <label class="flex items-center gap-2"><input type="checkbox" name="abcde_A" class="w-4 h-4"> A: راه‌های هوایی بررسی شد</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" name="abcde_B" class="w-4 h-4"> B: ریه/پلور بررسی شد</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" name="abcde_C" class="w-4 h-4"> C: قلب/مدیاستن بررسی شد</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" name="abcde_D" class="w-4 h-4"> D: دیافراگم بررسی شد</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" name="abcde_E" class="w-4 h-4"> E: سایر بررسی شد</label>
+                </div>
+              </fieldset>
+
+              <fieldset class="p-3 rounded-xl bg-white border border-slate-200">
+                <legend class="px-2 text-sm font-semibold">یافته‌های هدف</legend>
+                <div class="mt-2 grid md:grid-cols-2 gap-2 text-sm">
+                  <label class="flex items-center gap-2"><input type="checkbox" name="finding_normal" class="w-4 h-4"> نرمال/بدون یافته مهم</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" name="finding_consolidation" class="w-4 h-4"> ارتشاح/Consolidation</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" name="finding_pleural_effusion" class="w-4 h-4"> افیوژن پلور</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" name="finding_pneumothorax" class="w-4 h-4"> پنوموتوراکس</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" name="finding_nodule" class="w-4 h-4"> ندول/توده</label>
+                  <label class="flex items-center gap-2"><input type="checkbox" name="finding_cardiomegaly" class="w-4 h-4"> بزرگی قلب</label>
+                </div>
+              </fieldset>
+
+              <div class="p-3 rounded-xl bg-white border border-slate-200">
+                <label class="block text-sm font-semibold">گزارش ساختاریافته</label>
+                <textarea name="structured_report" rows="6" class="mt-2 w-full px-3 py-2 rounded-lg border border-slate-300 focus-ring" placeholder="متن گزارش را اینجا بنویسید..."></textarea>
+              </div>
+
+              <div class="p-3 rounded-xl bg-white border border-slate-200">
+                <label class="block text-sm font-semibold">اطمینان (0 تا 100)</label>
+                <input name="confidence" type="range" min="0" max="100" value="50" class="mt-2 w-full" />
+                <div class="mt-1 text-xs text-slate-600">عدد اطمینان: <span id="post_confVal" class="mono">50</span></div>
+              </div>
+
+              <div class="flex flex-col md:flex-row gap-2">
+                <button type="submit" class="w-full px-4 py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-800 focus-ring">ثبت پاسخ پس‌آزمون</button>
+                <button type="button" id="btnPostNextCase" class="w-full px-4 py-2 rounded-lg bg-white border border-slate-300 hover:bg-slate-100 focus-ring">کیس بعدی (دمو)</button>
+              </div>
+
+              <div class="text-xs text-slate-600 leading-6">
+                داده‌های پس‌آزمون برای تحلیل پیامدها با پیش‌آزمون مقایسه می‌شود.
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SURVEYS -->
+    <section id="route-surveys" class="route hidden space-y-6">
+      <div class="bg-white rounded-2xl border border-slate-200 p-6">
+        <h2 class="text-xl font-bold">ارزیابی کاربردپذیری و پذیرش (SUS / NPS)</h2>
+        <p class="mt-2 text-sm text-slate-700 leading-7">
+          لطفاً بر اساس تجربه واقعی خود در استفاده از سامانه پاسخ دهید. این بخش به تحلیل تجربه کاربری و بهینه‌سازی سامانه کمک می‌کند.
+        </p>
+
+        <div class="mt-4 grid lg:grid-cols-2 gap-4">
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <h3 class="font-bold">SUS (System Usability Scale)</h3>
+            <p class="mt-2 text-xs text-slate-600 leading-6">
+              مقیاس ۱ تا ۵: ۱=کاملاً مخالفم، ۵=کاملاً موافقم
+            </p>
+
+            <form id="formSUS" class="mt-3 space-y-3">
+              <div id="susItems" class="space-y-3"></div>
+
+              <button type="submit" class="mt-2 w-full px-4 py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-800 focus-ring">
+                ثبت SUS و محاسبه امتیاز
+              </button>
+
+              <div class="mt-3 p-3 rounded-xl bg-white border border-slate-200">
+                <p class="text-sm font-semibold">امتیاز SUS (0 تا 100)</p>
+                <p class="mt-2 text-sm text-slate-700">SUS: <span id="susScore" class="mono">—</span></p>
+                <p class="mt-1 text-xs text-slate-600 leading-6">
+                  تفسیر امتیاز باید با احتیاط و متناسب با زمینه انجام شود. این سامانه «دمو» است و امتیاز صرفاً برای پژوهش و بهبود UX استفاده می‌شود.
+                </p>
+              </div>
+            </form>
+          </div>
+
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <h3 class="font-bold">NPS (Net Promoter Score) + بازخورد کیفی</h3>
+            <form id="formNPS" class="mt-3 space-y-4">
+              <div class="p-3 rounded-xl bg-white border border-slate-200">
+                <label class="block text-sm font-semibold">NPS: احتمال توصیه این پلتفرم به همکار/همکلاسی؟ (0 تا 10)</label>
+                <input name="nps" type="range" min="0" max="10" value="7" class="mt-2 w-full" />
+                <div class="mt-1 text-xs text-slate-600">عدد: <span id="npsVal" class="mono">7</span></div>
+              </div>
+
+              <div class="p-3 rounded-xl bg-white border border-slate-200">
+                <label class="block text-sm font-semibold">بازخورد کوتاه (کیفی)</label>
+                <textarea name="qual_feedback" rows="6" class="mt-2 w-full px-3 py-2 rounded-lg border border-slate-300 focus-ring"
+                  placeholder="مثلاً: سهولت استفاده، وضوح نمایش، ارزش آموزشی، نقاط ابهام، پیشنهاد بهبود..."></textarea>
+              </div>
+
+              <button type="submit" class="w-full px-4 py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-800 focus-ring">
+                ثبت NPS و بازخورد
+              </button>
+
+              <div class="text-xs text-slate-600 leading-6">
+                پاسخ‌های کیفی برای استخراج مضمون‌ها (Thematic Analysis) و اصلاح طراحی استفاده می‌شود.
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RESEARCH DASHBOARD -->
+    <section id="route-research" class="route hidden space-y-6">
+      <div class="bg-white rounded-2xl border border-slate-200 p-6">
+        <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
+          <div>
+            <h2 class="text-xl font-bold">داشبورد پژوهشگر (مرور داده‌ها و صادرات)</h2>
+            <p class="mt-2 text-sm text-slate-700 leading-7">
+              این بخش برای مشاهده داده‌های ساختاریافته و لاگ‌ها است. در استقرار واقعی، این دسترسی باید محدود، ثبت‌شده و مبتنی بر نقش باشد.
+            </p>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-sm">
+            یادآوری: هیچ PHI نباید در داده‌ها وجود داشته باشد.
+          </div>
+        </div>
+
+        <div class="mt-4 grid lg:grid-cols-2 gap-4">
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <h3 class="font-bold">خلاصه داده‌های ثبت‌شده</h3>
+            <div class="mt-3 space-y-2 text-sm">
+              <div class="flex items-center justify-between"><span>تعداد رکوردهای پاسخ</span><span id="statResponses" class="mono">0</span></div>
+              <div class="flex items-center justify-between"><span>تعداد رویدادهای Audit Log</span><span id="statAudit" class="mono">0</span></div>
+              <div class="flex items-center justify-between"><span>SUS ثبت‌شده</span><span id="statSUS" class="mono">خیر</span></div>
+              <div class="flex items-center justify-between"><span>NPS ثبت‌شده</span><span id="statNPS" class="mono">خیر</span></div>
+            </div>
+
+            <div class="mt-4 flex flex-col md:flex-row gap-2">
+              <button id="btnRefreshStats" class="w-full px-4 py-2 rounded-lg bg-white border border-slate-300 hover:bg-slate-100 focus-ring">به‌روزرسانی</button>
+              <button id="btnExportJSON" class="w-full px-4 py-2 rounded-lg bg-slate-900 text-white hover:bg-slate-800 focus-ring">خروجی JSON</button>
+            </div>
+
+            <div class="mt-3 p-3 rounded-xl bg-white border border-slate-200">
+              <p class="text-sm font-semibold">خروجی (پیش‌نمایش)</p>
+              <pre id="jsonPreview" class="mt-2 text-xs bg-slate-900 text-slate-50 rounded-xl p-3 overflow-auto max-h-72 mono">—</pre>
+              <p class="mt-2 text-xs text-slate-600 leading-6">
+                در استقرار واقعی، خروجی باید از مسیر امن و ثبت‌شده تولید شود و کنترل‌های دسترسی/امضا/نسخه‌گذاری داشته باشد.
+              </p>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <h3 class="font-bold">Audit Log (نمونه)</h3>
+            <p class="mt-2 text-xs text-slate-600 leading-6">
+              رویدادها شامل ورود، شروع/توقف تایمر، ثبت پاسخ، مشاهده AI/XAI، تغییر مسیرها و تلاش‌های خلاف پروتکل است.
+            </p>
+            <div class="mt-3 p-3 rounded-xl bg-white border border-slate-200">
+              <div class="flex items-center justify-between gap-2">
+                <p class="text-sm font-semibold">آخرین رویدادها</p>
+                <button id="btnClearDemo" class="px-3 py-2 rounded-lg bg-white border border-slate-300 hover:bg-slate-100 text-sm focus-ring">پاکسازی داده‌های دمو</button>
+              </div>
+              <div id="auditList" class="mt-3 space-y-2 text-xs"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ADMIN -->
+    <section id="route-admin" class="route hidden space-y-6">
+      <div class="bg-white rounded-2xl border border-slate-200 p-6">
+        <h2 class="text-xl font-bold">ادمین/پیکربندی (دمو)</h2>
+        <p class="mt-2 text-sm text-slate-700 leading-7">
+          این بخش برای نمایش «قوانین پروتکلی» و کنترل نسخه است. در RCT واقعی، هر تغییر باید مطابق فرآیند مدیریت تغییرات (Change Control)
+          و پس از پایان داده‌گیری اعمال شود.
+        </p>
+
+        <div class="mt-4 grid lg:grid-cols-2 gap-4">
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <h3 class="font-bold">قوانین قفل AI</h3>
+            <ul class="mt-3 text-sm leading-7 list-disc pr-6">
+              <li>Pre-test: AI همیشه قفل</li>
+              <li>Training: AI فقط در بازوی مداخله مجاز</li>
+              <li>Post-test: AI همیشه قفل</li>
+              <li>هر تلاش برای فعال‌سازی AI در آزمون باید log شود</li>
+            </ul>
+
+            <div class="mt-4 p-3 rounded-xl bg-white border border-slate-200">
+              <p class="text-sm font-semibold">نسخه سامانه (Demo)</p>
+              <div class="mt-2 flex items-center justify-between">
+                <span>App Version</span>
+                <span id="appVersion" class="mono">1.0.0-demo</span>
+              </div>
+              <div class="mt-2 flex items-center justify-between">
+                <span>Protocol Lock</span>
+                <span class="mono">ON</span>
+              </div>
+              <p class="mt-2 text-xs text-slate-600 leading-6">
+                در استقرار واقعی، نسخه باید به‌صورت امضاشده/قابل ممیزی و با ثبت تغییرات نگهداری شود.
+              </p>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <h3 class="font-bold">اسکیماهای داده (JSON-ready)</h3>
+            <p class="mt-2 text-xs text-slate-600 leading-6">
+              این اسکیماها برای هم‌راستایی تیم فنی/پژوهشی ارائه شده‌اند و باید با پروتکل و برنامه تحلیل آماری همگام شوند.
+            </p>
+
+            <pre class="mt-3 text-xs bg-slate-900 text-slate-50 rounded-xl p-3 overflow-auto max-h-96 mono">
+{
+  "participant": {
+    "participant_id": "P-XXXX",
+    "role": "student|researcher|admin",
+    "arm": "control|intervention",
+    "level": "دانشجو/اینترن/دستیار...",
+    "site_code": "SITE-XX",
+    "consent_accepted_at": "ISO-8601"
   },
-  {
-    id: "CXR-0002",
-    title: "پنومونی واضح (RML/RLL)",
-    modality: "CXR",
-    view: "PA",
-    age: 56,
-    sex: "M",
-    complaint: "تب + تنگی نفس",
-    imageUrl: IMG("PneumonisWedge09.JPG"),
-    truth: { primaryDx: "pneumonia", findings: ["consolidation"] },
-    ai: { probs: { pneumonia: 0.89, pneumothorax: 0.02, effusion: 0.12, cardiomegaly: 0.08, normal: 0.05 }, heatmap: { x: 70, y: 65, r: 28 } }
+  "response": {
+    "response_id": "UUID",
+    "participant_id": "P-XXXX",
+    "case_id": "CXR-TR-001",
+    "phase": "pretest|training|posttest",
+    "timestamp": "ISO-8601",
+    "time_seconds": 123,
+    "abcde": {"A":true,"B":true,"C":true,"D":false,"E":true},
+    "findings": {"normal":false,"consolidation":true,"effusion":false,"pneumothorax":false,"nodule":false,"cardiomegaly":false},
+    "structured_report": "text",
+    "confidence_0_100": 72,
+    "training_extras": {
+      "pre_ai_report": "text",
+      "pre_ai_confidence": 60,
+      "ai_allowed": true,
+      "ai_viewed": true,
+      "xai_viewed": true,
+      "post_ai_report": "text",
+      "post_ai_confidence": 75,
+      "changed_decision": true
+    }
   },
-  {
-    id: "CXR-0003",
-    title: "پنوموتوراکس (مثال آموزشی)",
-    modality: "CXR",
-    view: "AP",
-    age: 34,
-    sex: "M",
-    complaint: "درد قفسه سینه ناگهانی",
-    imageUrl: IMG("Pneumothorax_CXR.jpg"),
-    truth: { primaryDx: "pneumothorax", findings: ["pneumothorax"] },
-    ai: { probs: { pneumonia: 0.04, pneumothorax: 0.92, effusion: 0.08, cardiomegaly: 0.05, normal: 0.03 }, heatmap: { x: 30, y: 40, r: 30 } }
-  },
-  {
-    id: "CXR-0004",
-    title: "افیوژن پلور (Right)",
-    modality: "CXR",
-    view: "PA",
-    age: 67,
-    sex: "F",
-    complaint: "تنگی نفس",
-    imageUrl: IMG("Pleural_effusion.jpg"),
-    truth: { primaryDx: "effusion", findings: ["effusion"] },
-    ai: { probs: { pneumonia: 0.18, pneumothorax: 0.01, effusion: 0.86, cardiomegaly: 0.12, normal: 0.04 }, heatmap: { x: 72, y: 78, r: 30 } }
+  "audit_event": {
+    "event_id": "UUID",
+    "participant_id": "P-XXXX",
+    "role": "student|researcher|admin",
+    "arm": "control|intervention",
+    "route": "home|pretest|training|posttest|surveys|research|admin",
+    "action": "NAVIGATE|TIMER_START|FORM_SUBMIT|AI_VIEW|LOCK_VIOLATION_ATTEMPT|EXPORT",
+    "case_id": "optional",
+    "timestamp": "ISO-8601",
+    "meta": {"key":"value"}
   }
-];
+}
+            </pre>
+          </div>
+        </div>
+      </div>
+    </section>
 
-/* -----------------------------
-   App State (in-memory)
------------------------------ */
-const state = {
-  session: null,
-  protocol: null,
-  viewer: { zoom: 1, invert: false, brightness: 100, contrast: 100 },
-  current: { assignmentId: null, caseId: null, startedAtMs: null, aiShown: false, started: false, _draft: null }
-};
+    <!-- Footer -->
+    <footer class="text-xs text-slate-600 py-6">
+      <div class="bg-white rounded-2xl border border-slate-200 p-4">
+        <p class="leading-6">
+          © نسخه دمو — این سامانه صرفاً برای آموزش/پژوهش طراحی شده است و برای استفاده بالینی مجاز نیست.
+          برای اجرای RCT واقعی، اتصال به زیرساخت امن، مدیریت نسخه قفل‌شده، و رویه‌های رسمی GCP/امنیت اطلاعات الزامی است.
+        </p>
+      </div>
+    </footer>
+  </main>
 
-/* -----------------------------
-   IndexedDB tiny layer
------------------------------ */
-const DB_NAME = "radmentor_singlefile_db";
-const DB_VERSION = 1;
-let db = null;
-
-function idbOpen() {
-  return new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, DB_VERSION);
-    req.onupgradeneeded = () => {
-      const d = req.result;
-
-      if (!d.objectStoreNames.contains("users")) {
-        const s = d.createObjectStore("users", { keyPath: "id" });
-        s.createIndex("username", "username", { unique: true });
-        s.createIndex("role", "role", { unique: false });
-        s.createIndex("group", "group", { unique: false });
-      }
-
-      if (!d.objectStoreNames.contains("protocols")) {
-        const s = d.createObjectStore("protocols", { keyPath: "id" });
-        s.createIndex("active", "active", { unique: false });
-      }
-
-      if (!d.objectStoreNames.contains("cases")) {
-        const s = d.createObjectStore("cases", { keyPath: "id" });
-        s.createIndex("modality", "modality", { unique: false });
-      }
-
-      if (!d.objectStoreNames.contains("assignments")) {
-        const s = d.createObjectStore("assignments", { keyPath: "id" });
-        s.createIndex("userId", "userId", { unique: false });
-        s.createIndex("phase", "phase", { unique: false });
-        s.createIndex("status", "status", { unique: false });
-      }
-
-      if (!d.objectStoreNames.contains("attempts")) {
-        const s = d.createObjectStore("attempts", { keyPath: "id" });
-        s.createIndex("userId", "userId", { unique: false });
-        s.createIndex("caseId", "caseId", { unique: false });
-        s.createIndex("phase", "phase", { unique: false });
-        s.createIndex("createdAt", "createdAt", { unique: false });
-      }
-
-      if (!d.objectStoreNames.contains("audit")) {
-        const s = d.createObjectStore("audit", { keyPath: "id" });
-        s.createIndex("createdAt", "createdAt", { unique: false });
-        s.createIndex("actorUserId", "actorUserId", { unique: false });
-      }
-
-      if (!d.objectStoreNames.contains("meta")) {
-        d.createObjectStore("meta", { keyPath: "key" });
-      }
+  <script>
+    /***********************
+     * Research-Grade Demo State
+     ***********************/
+    const STORAGE_KEY = "CXR_RCT_DEMO_V1";
+    const defaultState = {
+      app: { version: "1.0.0-demo", protocolLock: true },
+      participant: {
+        participant_id: "",
+        role: "student",
+        arm: "",
+        level: "",
+        site_code: "",
+        consent_accepted_at: ""
+      },
+      responses: [],
+      surveys: { sus: null, nps: null },
+      audit: []
     };
-    req.onsuccess = () => resolve(req.result);
-    req.onerror = () => reject(req.error);
-  });
-}
 
-function tx(store, mode="readonly") {
-  const t = db.transaction(store, mode);
-  return {
-    store: t.objectStore(store),
-    done: () => new Promise((res, rej)=>{ t.oncomplete=res; t.onerror=()=>rej(t.error); })
-  };
-}
-
-async function idbPut(storeName, value) {
-  const { store, done } = tx(storeName, "readwrite");
-  store.put(value);
-  await done();
-  return value;
-}
-async function idbGet(storeName, key) {
-  const { store, done } = tx(storeName, "readonly");
-  const req = store.get(key);
-  const out = await new Promise((res, rej)=>{ req.onsuccess=()=>res(req.result); req.onerror=()=>rej(req.error); });
-  await done();
-  return out;
-}
-async function idbDel(storeName, key) {
-  const { store, done } = tx(storeName, "readwrite");
-  store.delete(key);
-  await done();
-}
-async function idbAll(storeName) {
-  const { store, done } = tx(storeName, "readonly");
-  const req = store.getAll();
-  const out = await new Promise((res, rej)=>{ req.onsuccess=()=>res(req.result||[]); req.onerror=()=>rej(req.error); });
-  await done();
-  return out;
-}
-async function idbByIndex(storeName, indexName, value) {
-  const { store, done } = tx(storeName, "readonly");
-  const idx = store.index(indexName);
-  const req = idx.getAll(value);
-  const out = await new Promise((res, rej)=>{ req.onsuccess=()=>res(req.result||[]); req.onerror=()=>rej(req.error); });
-  await done();
-  return out;
-}
-async function idbFirstByIndex(storeName, indexName, value) {
-  const all = await idbByIndex(storeName, indexName, value);
-  return all[0] || null;
-}
-
-/* -----------------------------
-   Crypto: PBKDF2 password hashing
------------------------------ */
-async function pbkdf2Hash(password, saltB64, iterations=150000) {
-  const enc = new TextEncoder();
-  const salt = saltB64 ? Uint8Array.from(atob(saltB64), c => c.charCodeAt(0)) : crypto.getRandomValues(new Uint8Array(16));
-  const keyMaterial = await crypto.subtle.importKey("raw", enc.encode(password), "PBKDF2", false, ["deriveBits"]);
-  const bits = await crypto.subtle.deriveBits({ name: "PBKDF2", salt, iterations, hash: "SHA-256" }, keyMaterial, 256);
-  const hash = new Uint8Array(bits);
-  const hashB64 = btoa(String.fromCharCode(...hash));
-  const newSaltB64 = btoa(String.fromCharCode(...salt));
-  return { saltB64: newSaltB64, hashB64 };
-}
-
-function constantTimeEqual(a, b) {
-  a = String(a||""); b = String(b||"");
-  if (a.length !== b.length) return false;
-  let out = 0;
-  for (let i=0;i<a.length;i++) out |= (a.charCodeAt(i) ^ b.charCodeAt(i));
-  return out === 0;
-}
-
-/* -----------------------------
-   Protocol & Policy
------------------------------ */
-const PHASES = ["pilot","pretest","training","posttest"];
-
-function defaultProtocol() {
-  return {
-    id: "proto-" + uuid(),
-    name: "default-rct",
-    active: true,
-    createdAt: nowMs(),
-    rules: {
-      ai: {
-        disableInPhases: ["pretest","posttest"],
-        disableInUIModes: ["exam"],
-        requireInitialSubmitBeforeAI: true
-      },
-      feedback: {
-        showTruthInTraining: true,
-        showTruthInExam: false
-      },
-      scoring: { dxWeight: 70, findingsWeight: 30 }
+    function nowISO() { return new Date().toISOString(); }
+    function uuid() {
+      return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, c => {
+        const r = Math.random()*16|0, v = c === "x" ? r : (r&0x3|0x8);
+        return v.toString(16);
+      });
     }
-  };
-}
 
-function canUseAI({ user, phase, uiMode, initialSubmitted }) {
-  const proto = state.protocol;
-  if (!proto || !user) return false;
-  if ((proto.rules.ai.disableInPhases||[]).includes(phase)) return false;
-  if ((proto.rules.ai.disableInUIModes||[]).includes(uiMode)) return false;
-  if (user.group !== "AI") return false;
-  if (proto.rules.ai.requireInitialSubmitBeforeAI && !initialSubmitted) return false;
-  return true;
-}
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return structuredClone(defaultState);
+        const s = JSON.parse(raw);
+        return { ...structuredClone(defaultState), ...s };
+      } catch {
+        return structuredClone(defaultState);
+      }
+    }
 
-/* -----------------------------
-   Audit log
------------------------------ */
-async function audit(action, detail={}) {
-  const actor = state.session?.userId || null;
-  const entry = {
-    id: "aud-" + uuid(),
-    createdAt: nowMs(),
-    actorUserId: actor,
-    actorUsername: state.session?.username || "anonymous",
-    action,
-    detail
-  };
-  await idbPut("audit", entry);
-}
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      refreshBadges();
+    }
 
-/* -----------------------------
-   Seed DB
------------------------------ */
-async function seedIfNeeded() {
-  const meta = await idbGet("meta", "seeded");
-  if (meta?.value === true) return;
+    function audit(action, meta = {}) {
+      const ev = {
+        event_id: uuid(),
+        participant_id: state.participant.participant_id || "GUEST",
+        role: state.participant.role || "student",
+        arm: state.participant.arm || "",
+        route: currentRoute,
+        action,
+        case_id: meta.case_id || null,
+        timestamp: nowISO(),
+        meta
+      };
+      state.audit.push(ev);
+      saveState();
+    }
 
-  const proto = defaultProtocol();
-  await idbPut("protocols", proto);
+    let state = loadState();
+    let currentRoute = "home";
 
-  for (const c of SEED_CASES) await idbPut("cases", c);
+    /***********************
+     * Routing
+     ***********************/
+    const routes = ["home","login","pretest","training","posttest","surveys","research","admin"];
+    function showRoute(name) {
+      routes.forEach(r => {
+        const el = document.getElementById("route-" + r);
+        if (el) el.classList.toggle("hidden", r !== name);
+      });
+      currentRoute = name;
+      audit("NAVIGATE", { to: name });
+      refreshBadges();
+      refreshTrainingAIUI();
+      refreshResearchDashboard();
+    }
 
-  const adminUser = await idbFirstByIndex("users", "username", "admin");
-  if (!adminUser) {
-    const { saltB64, hashB64 } = await pbkdf2Hash("admin1234");
-    await idbPut("users", {
-      id: "usr-" + uuid(),
-      username: "admin",
-      role: "ADMIN",
-      group: "CONTROL",
-      createdAt: nowMs(),
-      pass: { saltB64, hashB64 },
-      profile: { displayName: "Admin" }
+    document.querySelectorAll(".navbtn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        showRoute(btn.dataset.route);
+      });
     });
-  }
 
-  await idbPut("meta", { key:"seeded", value:true, createdAt: nowMs() });
-}
+    /***********************
+     * Consent Modal
+     ***********************/
+    const consentModal = document.getElementById("consentModal");
+    const btnOpenConsent = document.getElementById("btnOpenConsent");
+    const btnShowConsent2 = document.getElementById("btnShowConsent2");
+    const btnCloseConsent = document.getElementById("btnCloseConsent");
+    const chkConsent = document.getElementById("chkConsent");
+    const btnAcceptConsent = document.getElementById("btnAcceptConsent");
 
-/* -----------------------------
-   Session
------------------------------ */
-function loadSession() {
-  const raw = localStorage.getItem("rm_session");
-  if (!raw) return null;
-  try { return JSON.parse(raw); } catch { return null; }
-}
-function saveSession(sess) { localStorage.setItem("rm_session", JSON.stringify(sess)); }
-function clearSession() { localStorage.removeItem("rm_session"); }
-
-async function refreshHeader() {
-  const sess = state.session;
-  const elUser = $("#hdr-user");
-  const elLogout = $("#btn-logout");
-  const elPhase = $("#hdr-phase");
-  const elProto = $("#hdr-protocol");
-
-  if (!sess) {
-    elUser.classList.add("hidden");
-    elLogout.classList.add("hidden");
-    elPhase.classList.add("hidden");
-    elProto.classList.add("hidden");
-    return;
-  }
-  elUser.classList.remove("hidden");
-  elLogout.classList.remove("hidden");
-  elPhase.classList.remove("hidden");
-  elProto.classList.remove("hidden");
-
-  $("#hdr-username").textContent = sess.username;
-  $("#hdr-role").textContent = sess.role;
-  $("#hdr-group").textContent = sess.group;
-  $("#hdr-phase-text").textContent = sess.phase || "—";
-  $("#hdr-protocol-text").textContent = state.protocol?.name || "—";
-}
-
-/* -----------------------------
-   Modal
------------------------------ */
-function modalOpen(title, html) {
-  $("#modal-title").textContent = title;
-  $("#modal-body").innerHTML = html;
-  $("#modal-backdrop").style.display = "flex";
-}
-function modalClose() {
-  $("#modal-backdrop").style.display = "none";
-  $("#modal-title").textContent = "—";
-  $("#modal-body").innerHTML = "";
-}
-$("#modal-close").onclick = modalClose;
-$("#modal-backdrop").addEventListener("click", (e) => {
-  if (e.target.id === "modal-backdrop") modalClose();
-});
-
-/* -----------------------------
-   Rendering: Login
------------------------------ */
-function renderLogin() {
-  app.innerHTML = `
-    <div class="grid lg:grid-cols-2 gap-4">
-      <div class="glass border border-border rounded-2xl p-6 soft-shadow">
-        <div class="text-2xl font-black mb-2">ورود به سامانه</div>
-        <div class="text-sm muted leading-7 mb-4">
-          این نسخه «تک‌فایل» است و داده‌ها را در مرورگر (IndexedDB) ذخیره می‌کند. برای RCT واقعی بهتر است بک‌اند داشته باشید.
-        </div>
-
-        <div class="warnbox text-sm leading-7 mb-4">
-          <div class="font-extrabold mb-1"><i class="fa-solid fa-triangle-exclamation ml-2"></i>یادآوری پژوهشی</div>
-          <div>این سامانه برای آموزش/پژوهش است و جایگزین تصمیم‌گیری بالینی نیست.</div>
-        </div>
-
-        <div class="grid gap-3">
-          <div>
-            <label class="text-xs muted">نام کاربری</label>
-            <input id="in-username" class="input mt-1" placeholder="مثلاً: student01" />
-          </div>
-          <div>
-            <label class="text-xs muted">رمز عبور</label>
-            <input id="in-password" type="password" class="input mt-1" placeholder="••••••••" />
-          </div>
-
-          <button id="btn-login" class="btn btn-primary">
-            <i class="fa-solid fa-right-to-bracket ml-2"></i>ورود
-          </button>
-
-          <div class="text-xs muted leading-6">
-            ورود پیش‌فرض ادمین: <span class="kbd">admin</span> / <span class="kbd">admin1234</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="border border-border rounded-2xl p-6 bg-gradient-to-br from-panel to-bg1 soft-shadow">
-        <div class="text-xl font-black mb-2">قابلیت‌ها (همه داخل همین فایل)</div>
-        <ul class="text-sm muted leading-7 list-disc list-inside">
-          <li>نقش‌ها: Admin / Student</li>
-          <li>گروه‌بندی: AI vs Control</li>
-          <li>پروتکل: فازها + قفل AI بر اساس Phase و Mode</li>
-          <li>Assignment کیس‌ها برای هر کاربر</li>
-          <li>ثبت زمان و پاسخ‌ها و نمره</li>
-          <li>داشبورد Admin: مشاهده تلاش‌ها، فیلتر، خروجی CSV، audit log</li>
-        </ul>
-
-        <div class="mt-4 okbox text-sm leading-7">
-          <div class="font-extrabold mb-1"><i class="fa-solid fa-seedling ml-2"></i>پیشنهاد عملی</div>
-          <div>این تک‌فایل برای پایلوت عالی است. وقتی پروتکل نهایی شد، همین ساختار را به Node+SQLite مهاجرت می‌دهید.</div>
-        </div>
-
-        <div class="mt-4 text-xs muted leading-6">
-          تصاویر نمونه از Wikimedia Commons با Special:FilePath لود می‌شوند (Creative Commons).
-        </div>
-      </div>
-    </div>
-  `;
-
-  $("#btn-login").onclick = async () => {
-    const username = $("#in-username").value.trim();
-    const password = $("#in-password").value.trim();
-    if (!username || !password) return toast("نام کاربری و رمز را وارد کنید.", "error");
-
-    try {
-      const user = await idbFirstByIndex("users", "username", username);
-      if (!user) return toast("نام کاربری یا رمز اشتباه است.", "error");
-
-      const { hashB64 } = await pbkdf2Hash(password, user.pass.saltB64);
-      if (!constantTimeEqual(hashB64, user.pass.hashB64)) return toast("نام کاربری یا رمز اشتباه است.", "error");
-
-      const protos = await idbAll("protocols");
-      const active = protos.find(p => p.active) || protos[0] || defaultProtocol();
-      if (!protos.length) await idbPut("protocols", active);
-      state.protocol = active;
-
-      const phaseKey = `rm_phase_${user.id}`;
-      const phase = localStorage.getItem(phaseKey) || "pilot";
-
-      state.session = { userId: user.id, username: user.username, role: user.role, group: user.group, protocolId: active.id, phase };
-      saveSession(state.session);
-
-      await audit("LOGIN", { username: user.username, role: user.role });
-      toast("ورود موفق.", "ok");
-      await refreshHeader();
-      render();
-    } catch (e) {
-      toast("خطا در ورود: " + (e?.message || e), "error");
+    function openConsent() {
+      consentModal.classList.remove("hidden");
+      audit("CONSENT_OPEN");
     }
-  };
-}
-
-/* -----------------------------
-   Common UI blocks
------------------------------ */
-function card(title, icon, innerHtml, extra="") {
-  return `
-    <div class="glass border border-border rounded-2xl p-5 soft-shadow ${extra}">
-      <div class="flex items-center justify-between mb-3">
-        <div class="font-extrabold text-lg">
-          <i class="fa-solid ${icon} muted ml-2"></i>${title}
-        </div>
-      </div>
-      ${innerHtml}
-    </div>
-  `;
-}
-function smallCard(title, icon, innerHtml) {
-  return `
-    <div class="border border-border rounded-2xl bg-panel/70 p-4">
-      <div class="font-extrabold mb-2">
-        <i class="fa-solid ${icon} muted ml-2"></i>${title}
-      </div>
-      ${innerHtml}
-    </div>
-  `;
-}
-function badge(text, icon="fa-tag") {
-  return `<span class="tag"><i class="fa-solid ${icon}"></i>${escapeHtml(text)}</span>`;
-}
-
-/* -----------------------------
-   Admin (همان نسخه‌ی تو؛ بدون تغییر ماهوی)
-   (برای کوتاه‌تر شدن پیام، اینجا همان کد Admin تو را نگه داشتم.)
-   نکته: اگر می‌خواهی، نسخه‌ی کامل Admin را هم دقیقاً همینجا می‌چسبانم؛
-   ولی مشکل “نشان داده نشدن” از اسکریپت تودرتو بود، نه از Admin.
------------------------------ */
-
-/* ========== برای اینکه فایل کامل کار کند، Admin را ساده می‌کنم ========== */
-async function renderAdmin() {
-  app.innerHTML = card("Admin", "fa-shield-halved", `
-    <div class="text-sm muted leading-7">
-      این نسخه‌ی اصلاح‌شده روی بخش Student/Workspace تمرکز دارد.
-      اگر نسخه‌ی کامل Admin (همان کد خودت) را دقیقاً داخل همین فایل می‌خواهی،
-      بگو تا بدون حذف هیچ چیزی، یکپارچه‌اش کنم.
-    </div>
-  `);
-}
-
-/* -----------------------------
-   Student
------------------------------ */
-async function renderStudent() {
-  const sess = state.session;
-  const user = await idbGet("users", sess.userId);
-  const proto = state.protocol || (await idbAll("protocols")).find(p=>p.active) || defaultProtocol();
-  state.protocol = proto;
-
-  const phaseKey = `rm_phase_${user.id}`;
-  const currentPhase = localStorage.getItem(phaseKey) || sess.phase || "pilot";
-  sess.phase = currentPhase;
-  saveSession(sess);
-
-  const allAssignments = await idbByIndex("assignments", "userId", user.id);
-  const phaseAssignments = allAssignments.filter(a => a.phase === currentPhase).sort((a,b)=>(a.order??999)-(b.order??999));
-  const open = phaseAssignments.filter(a => a.status === "OPEN");
-  const done = phaseAssignments.filter(a => a.status === "DONE");
-
-  const currentAssignment = open[0] || null;
-  const currentCase = currentAssignment ? await idbGet("cases", currentAssignment.caseId) : null;
-
-  app.innerHTML = `
-    <div class="grid lg:grid-cols-12 gap-4">
-      <section class="lg:col-span-4 grid gap-4">
-        ${card("Student Dashboard", "fa-graduation-cap", `
-          <div class="flex flex-wrap gap-2 mb-3">
-            ${badge(`User: ${sess.username}`, "fa-user")}
-            ${badge(`Group: ${sess.group}`, "fa-users")}
-            ${badge(`Phase: ${currentPhase}`, "fa-flask")}
-          </div>
-
-          <div class="grid gap-2">
-            <label class="text-xs muted">تغییر Phase (برای پایلوت)</label>
-            <select id="st_phase" class="select">
-              ${PHASES.map(p=>`<option value="${p}" ${p===currentPhase?"selected":""}>${p}</option>`).join("")}
-            </select>
-          </div>
-
-          <div class="sep my-4"></div>
-
-          <div class="grid grid-cols-2 gap-2 text-sm">
-            <div class="border border-border rounded-2xl bg-bg0/25 p-3">
-              <div class="muted text-xs">Assignments OPEN</div>
-              <div class="text-2xl font-black">${open.length}</div>
-            </div>
-            <div class="border border-border rounded-2xl bg-bg0/25 p-3">
-              <div class="muted text-xs">Assignments DONE</div>
-              <div class="text-2xl font-black">${done.length}</div>
-            </div>
-          </div>
-        `)}
-      </section>
-
-      <section class="lg:col-span-8 grid gap-4">
-        ${card("کار روی کیس", "fa-x-ray", `
-          ${currentCase ? renderCaseWorkspace(currentCase, currentAssignment, user, currentPhase) : `
-            <div class="warnbox text-sm leading-7">
-              <div class="font-extrabold mb-1"><i class="fa-solid fa-triangle-exclamation ml-2"></i>Assignment ندارید</div>
-              <div>برای این Phase کیس تخصیص داده نشده یا همه DONE شده‌اند.</div>
-              <div class="sep my-3"></div>
-              <div class="text-xs muted">برای تست سریع: با ادمین وارد شو و assignment بساز (یا بگو تا Admin کامل را هم یکپارچه کنم).</div>
-            </div>
-          `}
-        `)}
-      </section>
-    </div>
-  `;
-
-  $("#st_phase").onchange = (e) => {
-    localStorage.setItem(`rm_phase_${user.id}`, e.target.value);
-    sess.phase = e.target.value;
-    saveSession(sess);
-    $("#hdr-phase-text").textContent = e.target.value;
-    render();
-  };
-
-  if (currentCase) initCaseWorkspace(currentCase, currentAssignment, user, currentPhase);
-}
-
-/* -----------------------------
-   Student: Workspace HTML
------------------------------ */
-function renderCaseWorkspace(c, assignment, user, phase) {
-  return `
-    <div class="grid lg:grid-cols-12 gap-4">
-      <div class="lg:col-span-7">
-        <div class="viewer h-[70vh] soft-shadow">
-          <div class="absolute top-3 right-3 z-10 glass border border-border rounded-xl px-3 py-2 text-xs">
-            <div class="font-bold">${escapeHtml(c.id)} — ${escapeHtml(c.title)}</div>
-            <div class="muted">${escapeHtml(c.sex)}, ${escapeHtml(String(c.age))} | ${escapeHtml(c.view)} | ${escapeHtml(c.complaint||"")}</div>
-            <div class="muted mt-1">Assignment: <span class="mono">${escapeHtml(assignment.id)}</span></div>
-          </div>
-
-          <div class="absolute top-3 left-3 z-10 flex flex-col gap-2">
-            <button id="tool_zoom_in" class="w-10 h-10 rounded-xl glass border border-border hover:border-brand transition flex items-center justify-center" title="زوم +">
-              <i class="fa-solid fa-magnifying-glass-plus"></i>
-            </button>
-            <button id="tool_zoom_out" class="w-10 h-10 rounded-xl glass border border-border hover:border-brand transition flex items-center justify-center" title="زوم -">
-              <i class="fa-solid fa-magnifying-glass-minus"></i>
-            </button>
-            <button id="tool_invert" class="w-10 h-10 rounded-xl glass border border-border hover:border-brand transition flex items-center justify-center" title="معکوس">
-              <i class="fa-solid fa-circle-half-stroke"></i>
-            </button>
-            <button id="tool_reset" class="w-10 h-10 rounded-xl glass border border-border hover:border-brand transition flex items-center justify-center" title="ریست">
-              <i class="fa-solid fa-rotate"></i>
-            </button>
-          </div>
-
-          <div class="absolute bottom-3 right-3 z-10 glass border border-border rounded-xl px-3 py-2 text-[11px] muted">
-            <i class="fa-solid fa-triangle-exclamation text-warn ml-1"></i>Not for clinical use
-          </div>
-
-          <div class="w-full h-full flex items-center justify-center p-3">
-            <div class="w-full h-full relative">
-              <img id="xray-img" alt="CXR" src="${escapeHtml(c.imageUrl)}" />
-              <div id="heatmap" class="heatmap"></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="mt-3 grid md:grid-cols-3 gap-3">
-          ${smallCard("Mode", "fa-toggle-on", `
-            <div class="flex bg-bg0 border border-border rounded-xl p-1">
-              <button id="btn-mode-training" class="flex-1 px-3 py-2 rounded-lg text-sm">Training</button>
-              <button id="btn-mode-exam" class="flex-1 px-3 py-2 rounded-lg text-sm">Exam</button>
-            </div>
-            <div class="text-xs muted mt-2">در Exam، AI قفل می‌شود (طبق پروتکل).</div>
-          `)}
-
-          ${smallCard("Timer", "fa-stopwatch", `
-            <div class="flex items-center justify-between">
-              <div class="text-2xl font-black" id="timer">00:00</div>
-              <button id="btn-start" class="btn btn-mint">شروع</button>
-            </div>
-            <div class="text-xs muted mt-2">برای ثبت معتبر زمان، اول Start را بزن.</div>
-          `)}
-
-          ${smallCard("Progress", "fa-list-check", `
-            <div class="text-sm muted leading-7">
-              phase: <span class="mono">${escapeHtml(phase)}</span><br/>
-              assignment order: <span class="mono">${assignment.order}</span><br/>
-              status: <span class="mono">${assignment.status}</span>
-            </div>
-          `)}
-        </div>
-      </div>
-
-      <div class="lg:col-span-5">
-        <div class="border border-border rounded-2xl bg-panel/70 p-5 soft-shadow h-[70vh] flex flex-col">
-          <div class="flex items-center justify-between mb-2">
-            <div>
-              <div class="text-lg font-extrabold">فرم تفسیر ساختاریافته</div>
-              <div class="text-xs muted">ABCDE + Dx + Confidence + AI (در صورت مجاز)</div>
-            </div>
-            <div class="text-xs muted">
-              <span class="kbd">${escapeHtml(assignment.uiMode)}</span>
-            </div>
-          </div>
-
-          <div class="scroll flex-1 overflow-y-auto pr-1 space-y-4">
-            ${sectionQuality()}
-            ${sectionABCDE()}
-            ${sectionDx()}
-            ${sectionAI(c)}
-            ${sectionAfterAI()}
-          </div>
-
-          <div class="mt-4 grid grid-cols-2 gap-3">
-            <button id="btn-skip" class="btn"><i class="fa-solid fa-forward ml-2"></i>Skip (Mark DONE)</button>
-            <button id="btn-submit" class="btn btn-primary"><i class="fa-solid fa-check ml-2"></i>ثبت پاسخ</button>
-          </div>
-
-          <div class="text-xs muted mt-2 leading-6">
-            در گروه AI: ابتدا ثبت اولیه، سپس (اگر مجاز) AI را ببین و «بعد از AI» را هم ثبت کن.
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-/* ---------- Sections ---------- */
-function chk(id, label) {
-  return `
-    <label class="flex items-center gap-2 px-3 py-2 rounded-xl bg-panel2/50 border border-border hover:border-brand transition cursor-pointer">
-      <input id="${id}" type="checkbox" class="accent-mint">
-      <span>${label}</span>
-    </label>
-  `;
-}
-function chk2(id, label) {
-  return `
-    <label class="flex items-center gap-2 px-3 py-2 rounded-xl bg-panel2/60 border border-border hover:border-brand transition cursor-pointer">
-      <input id="${id}" type="checkbox" class="accent-mint">
-      <span>${label}</span>
-    </label>
-  `;
-}
-function radio(name, val, label) {
-  return `
-    <label class="flex items-center gap-2 px-3 py-2 rounded-xl bg-panel2/60 border border-border hover:border-brand transition cursor-pointer">
-      <input type="radio" name="${name}" value="${val}" class="accent-mint">
-      <span>${label}</span>
-    </label>
-  `;
-}
-
-function sectionQuality() {
-  return `
-    <div class="border border-border rounded-2xl bg-bg0/25 p-4">
-      <div class="font-extrabold mb-2"><i class="fa-solid fa-camera muted ml-2"></i>RIP — کیفیت فنی</div>
-      <div class="grid gap-2 text-sm muted">
-        ${chk("q_rotation","Rotation: کلاویکل‌ها هم‌فاصله از مهره‌ها؟")}
-        ${chk("q_inspiration","Inspiration: ۸–۱۰ دنده خلفی دیده می‌شود؟")}
-        ${chk("q_penetration","Penetration: مهره‌ها پشت قلب دیده می‌شوند؟")}
-        <div class="mt-2">
-          <label class="text-xs muted">یادداشت کیفیت</label>
-          <textarea id="q_note" class="textarea mt-1" rows="2" placeholder="مثلاً Underexposed / rotation خفیف..."></textarea>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-function sectionABCDE() {
-  return `
-    <div class="border border-border rounded-2xl bg-bg0/25 p-4">
-      <div class="font-extrabold mb-2"><i class="fa-solid fa-list-check muted ml-2"></i>ABCDE — بررسی سیستماتیک</div>
-
-      <div class="grid gap-3 text-sm muted">
-        <div class="rounded-xl border border-border bg-panel/40 p-3">
-          <div class="font-bold text-txt mb-2">A — Airway</div>
-          <div class="grid gap-2">
-            ${radio("airway","central","تراشه مرکزی")}
-            ${radio("airway","deviated","انحراف تراشه")}
-          </div>
-        </div>
-
-        <div class="rounded-xl border border-border bg-panel/40 p-3">
-          <div class="font-bold text-txt mb-2">B — Breathing (Lungs/Pleura)</div>
-          <div class="grid md:grid-cols-2 gap-2">
-            ${chk2("f_consolidation","Consolidation / Infiltrate")}
-            ${chk2("f_pneumothorax","Pneumothorax")}
-            ${chk2("f_effusion","Pleural Effusion")}
-            ${chk2("f_nodule","Nodule / Mass")}
-            ${chk2("f_edema","Pulmonary Edema")}
-            ${chk2("f_atelectasis","Atelectasis")}
-          </div>
-        </div>
-
-        <div class="rounded-xl border border-border bg-panel/40 p-3">
-          <div class="font-bold text-txt mb-2">C — Circulation</div>
-          <div class="grid md:grid-cols-2 gap-2">
-            ${chk2("f_cardiomegaly","Cardiomegaly (CTR>0.5)")}
-            ${chk2("f_widened_mediastinum","Widened Mediastinum")}
-          </div>
-        </div>
-
-        <div class="rounded-xl border border-border bg-panel/40 p-3">
-          <div class="font-bold text-txt mb-2">D — Diaphragm</div>
-          <div class="grid md:grid-cols-2 gap-2">
-            ${chk2("f_free_air","Free air under diaphragm")}
-            ${chk2("f_costophrenic_blunt","Blunted costophrenic angle")}
-          </div>
-        </div>
-
-        <div class="rounded-xl border border-border bg-panel/40 p-3">
-          <div class="font-bold text-txt mb-2">E — Everything else</div>
-          <div class="grid md:grid-cols-2 gap-2">
-            ${chk2("f_fracture","Rib fracture")}
-            ${chk2("f_device","Lines / tubes present")}
-          </div>
-        </div>
-
-        <div>
-          <label class="text-xs muted">یادداشت آزاد</label>
-          <textarea id="note_free" class="textarea mt-1" rows="3" placeholder="شرح: consolidation در RLL، silhouette sign ..."></textarea>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-/* ====== این سه تا همان قسمت‌هایی بود که به خاطر <script> تودرتو خراب می‌شد ====== */
-function sectionDx() {
-  return `
-    <div class="border border-border rounded-2xl bg-bg0/25 p-4">
-      <div class="font-extrabold mb-2"><i class="fa-solid fa-stethoscope muted ml-2"></i>جمع‌بندی تشخیصی</div>
-
-      <div class="grid gap-3 text-sm">
-        <div>
-          <label class="text-xs muted">تشخیص اصلی (Primary Dx)</label>
-          <select id="primaryDx" class="select mt-1">
-            <option value="">انتخاب کنید…</option>
-            <option value="normal">Normal</option>
-            <option value="pneumonia">Pneumonia</option>
-            <option value="pneumothorax">Pneumothorax</option>
-            <option value="effusion">Pleural Effusion</option>
-            <option value="chf">CHF / Congestion</option>
-            <option value="other">Other</option>
-          </select>
-        </div>
-
-        <div>
-          <label class="text-xs muted">سطح اطمینان (Confidence)</label>
-          <div class="mt-1 grid grid-cols-3 gap-2">
-            <button type="button" class="btn conf" data-conf="low">پایین</button>
-            <button type="button" class="btn conf" data-conf="med">متوسط</button>
-            <button type="button" class="btn conf" data-conf="high">بالا</button>
-          </div>
-          <input type="hidden" id="confidence" value="" />
-        </div>
-
-        <div class="dangerbox text-xs muted leading-7">
-          <div class="font-extrabold text-danger mb-2"><i class="fa-solid fa-triangle-exclamation ml-2"></i>Red Flags</div>
-          <div class="grid gap-2">
-            ${chk2("rf_tension_ptx","Tension pneumothorax (shift/hemodynamic)")}
-            ${chk2("rf_massive_effusion","Massive effusion / mediastinal shift")}
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-function probRow(name, p) {
-  const v = (Math.round((p||0)*100)/100).toFixed(2);
-  return `
-    <div class="rounded-xl border border-border bg-panel/60 p-2 flex items-center justify-between">
-      <span class="muted">${escapeHtml(name)}</span>
-      <span class="mono text-txt">${v}</span>
-    </div>
-  `;
-}
-
-function sectionAI(c) {
-  const probs = c.ai?.probs || { pneumonia:.2, pneumothorax:.2, effusion:.2, cardiomegaly:.2, normal:.2 };
-  return `
-    <div class="border border-border rounded-2xl bg-bg0/25 p-4">
-      <div class="font-extrabold mb-2"><i class="fa-solid fa-robot muted ml-2"></i>بازخورد AI (برای گروه مداخله)</div>
-
-      <div id="ai-box" class="grid gap-3">
-        <div id="ai-hint" class="text-xs muted leading-6"></div>
-
-        <div class="grid grid-cols-2 gap-2">
-          <button id="btn-ai-toggle" class="btn btn-mint"><i class="fa-solid fa-wand-magic-sparkles ml-2"></i>Grad-CAM</button>
-          <button id="btn-ai-showprobs" class="btn"><i class="fa-solid fa-chart-simple ml-2"></i>Probabilities</button>
-        </div>
-
-        <div id="ai-probs" class="hidden grid md:grid-cols-2 gap-2 text-xs">
-          ${probRow("Pneumonia", probs.pneumonia)}
-          ${probRow("Pneumothorax", probs.pneumothorax)}
-          ${probRow("Effusion", probs.effusion)}
-          ${probRow("Cardiomegaly", probs.cardiomegaly)}
-          ${probRow("Normal", probs.normal)}
-        </div>
-
-        <div class="warnbox text-xs muted leading-7">
-          <div class="font-extrabold mb-1"><i class="fa-solid fa-flask ml-2"></i>یادآوری پژوهشی</div>
-          <div>خروجی AI «مکمل قضاوت انسانی» است و طبق Phase/Mode قفل می‌شود.</div>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-function sectionAfterAI() {
-  return `
-    <div class="border border-border rounded-2xl bg-bg0/25 p-4">
-      <div class="font-extrabold mb-2"><i class="fa-solid fa-pen-to-square muted ml-2"></i>بعد از دیدن AI (فقط گروه AI)</div>
-
-      <div id="afterai-box" class="grid gap-3 opacity-50 pointer-events-none">
-        <div class="text-xs muted leading-6" id="afterai-hint">
-          ابتدا پاسخ اولیه را ثبت کنید؛ سپس (اگر مجاز باشد) AI فعال می‌شود و این بخش باز می‌شود.
-        </div>
-
-        <label class="flex items-center gap-2 px-3 py-2 rounded-xl border border-border bg-panel/50 cursor-pointer">
-          <input id="changedAfterAI" type="checkbox" class="accent-mint" />
-          <span class="text-sm">بعد از دیدن AI نظرم تغییر کرد</span>
-        </label>
-
-        <div class="grid md:grid-cols-2 gap-3">
-          <div>
-            <label class="text-xs muted">Primary Dx (after AI)</label>
-            <select id="primaryDx_afterAI" class="select mt-1">
-              <option value="">—</option>
-              <option value="normal">Normal</option>
-              <option value="pneumonia">Pneumonia</option>
-              <option value="pneumothorax">Pneumothorax</option>
-              <option value="effusion">Pleural Effusion</option>
-              <option value="chf">CHF / Congestion</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-
-          <div>
-            <label class="text-xs muted">Confidence (after AI)</label>
-            <div class="mt-1 grid grid-cols-3 gap-2">
-              <button type="button" class="btn conf2" data-conf2="low">پایین</button>
-              <button type="button" class="btn conf2" data-conf2="med">متوسط</button>
-              <button type="button" class="btn conf2" data-conf2="high">بالا</button>
-            </div>
-            <input type="hidden" id="confidence_afterAI" value="" />
-          </div>
-        </div>
-
-        <div class="text-xs muted leading-6">
-          نکته: برای تحلیل، هر دو پاسخ «قبل» و «بعد» ذخیره می‌شوند (اگر بخش فعال باشد).
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-/* -----------------------------
-   Confidence buttons
------------------------------ */
-document.addEventListener("click", (e) => {
-  const b1 = e.target.closest(".conf");
-  if (b1) {
-    const v = b1.dataset.conf;
-    $("#confidence").value = v;
-    $$(".conf").forEach(x => x.classList.remove("ring-2","ring-mint"));
-    b1.classList.add("ring-2","ring-mint");
-  }
-
-  const b2 = e.target.closest(".conf2");
-  if (b2) {
-    const v = b2.dataset.conf2;
-    $("#confidence_afterAI").value = v;
-    $$(".conf2").forEach(x => x.classList.remove("ring-2","ring-mint"));
-    b2.classList.add("ring-2","ring-mint");
-  }
-});
-
-/* -----------------------------
-   Viewer ops
------------------------------ */
-function applyViewer() {
-  const img = $("#xray-img");
-  if (!img) return;
-  const { zoom, invert, brightness, contrast } = state.viewer;
-  img.style.transform = `scale(${zoom})`;
-  img.style.filter = `invert(${invert?1:0}) brightness(${brightness}%) contrast(${contrast}%)`;
-}
-
-function setHeatmap(c, on) {
-  const hm = $("#heatmap");
-  if (!hm) return;
-  hm.classList.toggle("on", !!on);
-  if (!on) return;
-  const h = c.ai?.heatmap || { x:50, y:50, r:30 };
-  hm.style.background = `
-    radial-gradient(circle at ${h.x}% ${h.y}%,
-      rgba(255,0,0,.55) 0%,
-      rgba(255,165,0,.30) ${h.r}%,
-      rgba(255,255,0,.12) ${Math.min(70,h.r+18)}%,
-      transparent ${Math.min(95,h.r+35)}%)
-  `;
-}
-
-/* -----------------------------
-   Timer
------------------------------ */
-let timerInt = null;
-function startTimer() {
-  if (state.current.started) return;
-  state.current.started = true;
-  state.current.startedAtMs = nowMs();
-  $("#btn-start").disabled = true;
-  $("#btn-start").textContent = "در حال اجرا";
-  tick();
-  timerInt = setInterval(tick, 500);
-}
-function stopTimer() {
-  if (timerInt) clearInterval(timerInt);
-  timerInt = null;
-  state.current.started = false;
-  state.current.startedAtMs = null;
-  const t = $("#timer");
-  if (t) t.textContent = "00:00";
-}
-function tick() {
-  const t = $("#timer");
-  if (!t || !state.current.startedAtMs) return;
-  const sec = Math.floor((nowMs() - state.current.startedAtMs)/1000);
-  t.textContent = fmtTimeSec(sec);
-}
-
-/* -----------------------------
-   Collect + score
------------------------------ */
-function collectInitialForm() {
-  const findings = [];
-  const map = [
-    ["f_consolidation","consolidation"],
-    ["f_pneumothorax","pneumothorax"],
-    ["f_effusion","effusion"],
-    ["f_cardiomegaly","cardiomegaly"],
-    ["f_edema","edema"],
-    ["f_nodule","nodule"],
-    ["f_atelectasis","atelectasis"],
-    ["f_widened_mediastinum","widened_mediastinum"],
-    ["f_free_air","free_air"],
-    ["f_costophrenic_blunt","blunted_cp"],
-    ["f_fracture","fracture"],
-    ["f_device","device"]
-  ];
-  map.forEach(([id,val]) => { if ($("#"+id)?.checked) findings.push(val); });
-
-  const airway = document.querySelector('input[name="airway"]:checked')?.value || "";
-  const primaryDx = $("#primaryDx")?.value || "";
-  const confidence = $("#confidence")?.value || "";
-
-  return {
-    quality: {
-      rotation: $("#q_rotation")?.checked || false,
-      inspiration: $("#q_inspiration")?.checked || false,
-      penetration: $("#q_penetration")?.checked || false,
-      note: $("#q_note")?.value || ""
-    },
-    airway,
-    findings,
-    primaryDx,
-    confidence,
-    redFlags: {
-      tensionPtx: $("#rf_tension_ptx")?.checked || false,
-      massiveEffusion: $("#rf_massive_effusion")?.checked || false
-    },
-    notes: { free: $("#note_free")?.value || "" }
-  };
-}
-
-function collectAfterAIForm() {
-  return {
-    changedAfterAI: $("#changedAfterAI")?.checked || false,
-    primaryDx_afterAI: $("#primaryDx_afterAI")?.value || "",
-    confidence_afterAI: $("#confidence_afterAI")?.value || ""
-  };
-}
-
-function jaccard(aArr, bArr) {
-  const a = new Set(aArr || []);
-  const b = new Set(bArr || []);
-  const inter = [...a].filter(x => b.has(x)).length;
-  const union = new Set([...a, ...b]).size || 1;
-  return inter/union;
-}
-
-function scoreAttempt(caseObj, primaryDx, findings) {
-  const truthDx = caseObj.truth?.primaryDx || "";
-  const truthFind = caseObj.truth?.findings || [];
-  const okDx = (primaryDx === truthDx);
-  const wDx = state.protocol?.rules?.scoring?.dxWeight ?? 70;
-  const wFi = state.protocol?.rules?.scoring?.findingsWeight ?? 30;
-  const jac = jaccard(findings, truthFind);
-  const score = Math.round((okDx ? wDx : 0) + (wFi * jac));
-  return { score, correctDx: okDx, truthPrimaryDx: truthDx, truthFindings: truthFind };
-}
-
-/* -----------------------------
-   Workspace init + AI locks
------------------------------ */
-function initCaseWorkspace(c, assignment, user, phase) {
-  state.current.assignmentId = assignment.id;
-  state.current.caseId = c.id;
-  state.current.aiShown = false;
-
-  let uiMode = assignment.uiMode || "training";
-  setModeButtons(uiMode);
-
-  $("#tool_zoom_in").onclick = () => { state.viewer.zoom = Math.min(3, state.viewer.zoom + 0.1); applyViewer(); };
-  $("#tool_zoom_out").onclick = () => { state.viewer.zoom = Math.max(0.7, state.viewer.zoom - 0.1); applyViewer(); };
-  $("#tool_invert").onclick = () => { state.viewer.invert = !state.viewer.invert; applyViewer(); };
-  $("#tool_reset").onclick = () => { state.viewer = { zoom:1, invert:false, brightness:100, contrast:100 }; applyViewer(); };
-
-  $("#btn-mode-training").onclick = () => { uiMode="training"; setModeButtons(uiMode); enforceAILocks(); };
-  $("#btn-mode-exam").onclick = () => { uiMode="exam"; setModeButtons(uiMode); enforceAILocks(); };
-
-  $("#btn-start").onclick = () => startTimer();
-
-  $("#btn-ai-showprobs").onclick = () => $("#ai-probs").classList.toggle("hidden");
-  $("#btn-ai-toggle").onclick = () => {
-    if (!enforceAILocks(true)) return;
-    state.current.aiShown = !state.current.aiShown;
-    setHeatmap(c, state.current.aiShown);
-  };
-
-  let initialSubmitted = false;
-
-  $("#btn-submit").onclick = async () => {
-    if (!state.current.startedAtMs) return toast("برای ثبت زمان، اول Start را بزن.", "error");
-
-    if (!initialSubmitted) {
-      const base = collectInitialForm();
-      if (!base.primaryDx) return toast("تشخیص اصلی را انتخاب کنید.", "error");
-
-      const durationSec = Math.floor((nowMs() - state.current.startedAtMs)/1000);
-      const scored = scoreAttempt(c, base.primaryDx, base.findings);
-
-      const attemptDraft = {
-        id: "att-" + uuid(),
-        createdAt: nowMs(),
-        userId: user.id,
-        username: user.username,
-        role: user.role,
-        group: user.group,
-        protocolId: state.protocol?.id || "",
-        phase,
-        uiMode,
-        assignmentId: assignment.id,
-        caseId: c.id,
-        startedAtMs: state.current.startedAtMs,
-        durationSec,
-        ...base,
-        aiAllowed: false,
-        aiShown: false,
-        truthPrimaryDx: scored.truthPrimaryDx,
-        truthFindings: scored.truthFindings,
-        score: scored.score,
-        correctDx: scored.correctDx,
-        changedAfterAI: false,
-        primaryDx_afterAI: "",
-        confidence_afterAI: ""
+    function closeConsent() {
+      consentModal.classList.add("hidden");
+      audit("CONSENT_CLOSE");
+    }
+
+    btnOpenConsent.addEventListener("click", openConsent);
+    btnShowConsent2.addEventListener("click", openConsent);
+    btnCloseConsent.addEventListener("click", closeConsent);
+
+    chkConsent.addEventListener("change", () => {
+      btnAcceptConsent.disabled = !chkConsent.checked;
+    });
+
+    btnAcceptConsent.addEventListener("click", () => {
+      state.participant.consent_accepted_at = nowISO();
+      saveState();
+      audit("CONSENT_ACCEPT");
+      closeConsent();
+      refreshConsentStatus();
+    });
+
+    function refreshConsentStatus() {
+      const el = document.getElementById("consentStatus");
+      if (!el) return;
+      el.textContent = state.participant.consent_accepted_at ? ("ثبت شد: " + state.participant.consent_accepted_at) : "ثبت نشده";
+    }
+
+    /***********************
+     * Badges
+     ***********************/
+    function refreshBadges() {
+      const roleMap = { student: "دانشجو/فراگیر", researcher: "پژوهشگر", admin: "ادمین" };
+      document.getElementById("badgeRole").innerHTML = `نقش: <b>${roleMap[state.participant.role] || "میهمان"}</b>`;
+      document.getElementById("badgeArm").innerHTML = `گروه: <b>${state.participant.arm ? (state.participant.arm === "control" ? "کنترل" : "مداخله") : "نامشخص"}</b>`;
+
+      const phaseLabel = (currentRoute === "pretest") ? "پیش‌آزمون" :
+                         (currentRoute === "training") ? "آموزش" :
+                         (currentRoute === "posttest") ? "پس‌آزمون" :
+                         (currentRoute === "surveys") ? "پرسشنامه" :
+                         (currentRoute === "research") ? "پژوهش" :
+                         (currentRoute === "admin") ? "ادمین" : "پروتکل";
+      document.getElementById("badgePhase").innerHTML = `فاز: <b>${phaseLabel}</b>`;
+
+      document.getElementById("badgeAI").innerHTML = `AI: <b>${aiStatusLabel()}</b>`;
+      document.getElementById("appVersion").textContent = state.app.version;
+    }
+
+    function aiAllowedInCurrentRoute() {
+      if (currentRoute === "pretest" || currentRoute === "posttest") return false;
+      if (currentRoute === "training") return state.participant.arm === "intervention";
+      return false;
+    }
+
+    function aiStatusLabel() {
+      if (currentRoute === "pretest" || currentRoute === "posttest") return "قفل";
+      if (currentRoute === "training") return (state.participant.arm === "intervention") ? "مجاز در آموزش" : "قفل (کنترل)";
+      return "—";
+    }
+
+    /***********************
+     * Profile / Study Settings
+     ***********************/
+    document.getElementById("btnSaveProfile").addEventListener("click", () => {
+      const pid = document.getElementById("inpParticipantId").value.trim();
+      const lvl = document.getElementById("selLevel").value;
+      const site = document.getElementById("inpSiteCode").value.trim();
+
+      // حداقل اعتبارسنجی پژوهشی
+      if (!pid || pid.length < 3) {
+        alert("شناسه مستعار معتبر وارد کنید (حداقل ۳ کاراکتر).");
+        audit("VALIDATION_FAIL", { field: "participant_id" });
+        return;
+      }
+
+      state.participant.participant_id = pid;
+      state.participant.level = lvl;
+      state.participant.site_code = site;
+      saveState();
+      audit("PROFILE_SAVE", { participant_id: pid, level: lvl, site_code: site });
+      refreshConsentStatus();
+      alert("پروفایل ذخیره شد.");
+    });
+
+    document.getElementById("btnSaveStudySettings").addEventListener("click", () => {
+      state.participant.role = document.getElementById("selRole").value;
+      state.participant.arm = document.getElementById("selArm").value;
+      saveState();
+      audit("STUDY_SETTINGS_SAVE", { role: state.participant.role, arm: state.participant.arm });
+      refreshTrainingAIUI();
+      alert("تنظیمات دمو اعمال شد.");
+    });
+
+    /***********************
+     * Timers (Pre/Training/Post)
+     ***********************/
+    function makeTimer(labelEl) {
+      let t = 0;
+      let interval = null;
+      function format(sec){
+        const m = String(Math.floor(sec / 60)).padStart(2,"0");
+        const s = String(sec % 60).padStart(2,"0");
+        return `${m}:${s}`;
+      }
+      function start() {
+        if (interval) return;
+        interval = setInterval(() => {
+          t += 1;
+          labelEl.textContent = format(t);
+        }, 1000);
+      }
+      function stop() {
+        if (!interval) return t;
+        clearInterval(interval);
+        interval = null;
+        return t;
+      }
+      function reset() {
+        t = 0;
+        labelEl.textContent = format(t);
+      }
+      function seconds() { return t; }
+      return { start, stop, reset, seconds };
+    }
+
+    const preTimer = makeTimer(document.getElementById("pre_timer"));
+    const trTimer  = makeTimer(document.getElementById("tr_timer"));
+    const postTimer= makeTimer(document.getElementById("post_timer"));
+
+    document.getElementById("btnPreStart").addEventListener("click", () => { preTimer.start(); audit("TIMER_START", { phase:"pretest", case_id: getPreCaseId() }); });
+    document.getElementById("btnPreStop").addEventListener("click", () => { preTimer.stop(); audit("TIMER_STOP", { phase:"pretest", seconds: preTimer.seconds(), case_id: getPreCaseId() }); });
+
+    document.getElementById("btnTrStart").addEventListener("click", () => { trTimer.start(); audit("TIMER_START", { phase:"training", case_id: getTrCaseId() }); });
+    document.getElementById("btnTrStop").addEventListener("click", () => { trTimer.stop(); audit("TIMER_STOP", { phase:"training", seconds: trTimer.seconds(), case_id: getTrCaseId() }); });
+
+    document.getElementById("btnPostStart").addEventListener("click", () => { postTimer.start(); audit("TIMER_START", { phase:"posttest", case_id: getPostCaseId() }); });
+    document.getElementById("btnPostStop").addEventListener("click", () => { postTimer.stop(); audit("TIMER_STOP", { phase:"posttest", seconds: postTimer.seconds(), case_id: getPostCaseId() }); });
+
+    function getPreCaseId(){ return document.getElementById("pre_caseId").textContent; }
+    function getTrCaseId(){ return document.getElementById("tr_caseId").textContent; }
+    function getPostCaseId(){ return document.getElementById("post_caseId").textContent; }
+
+    /***********************
+     * Confidence sliders display
+     ***********************/
+    function bindRangeToLabel(formId, rangeName, labelId) {
+      const form = document.getElementById(formId);
+      const range = form.querySelector(`input[name="${rangeName}"]`);
+      const label = document.getElementById(labelId);
+      if (!range || !label) return;
+      label.textContent = range.value;
+      range.addEventListener("input", () => label.textContent = range.value);
+    }
+    bindRangeToLabel("formPretest","confidence","pre_confVal");
+    bindRangeToLabel("formPosttest","confidence","post_confVal");
+    bindRangeToLabel("formTraining","pre_ai_confidence","tr_preConfVal");
+
+    // Post-AI range has id
+    const postRange = document.getElementById("post_ai_confidence");
+    const postLabel = document.getElementById("tr_postConfVal");
+    postLabel.textContent = postRange.value;
+    postRange.addEventListener("input", ()=> postLabel.textContent = postRange.value);
+
+    /***********************
+     * Training AI Panel behavior
+     ***********************/
+    const btnShowAI = document.getElementById("btnShowAI");
+    const aiOutput = document.getElementById("aiOutput");
+    const chkXAIViewed = document.getElementById("chkXAIViewed");
+    const postAIBox = document.getElementById("postAIBox");
+    const postAIReport = document.getElementById("post_ai_report");
+
+    function refreshTrainingAIUI() {
+      const statusEl = document.getElementById("trainingAIStatus");
+      if (!statusEl) return;
+
+      const allowed = (state.participant.arm === "intervention");
+      statusEl.textContent = allowed ? "مجاز (فقط برای آموزش)" : "قفل (بازوی کنترل یا تخصیص نامشخص)";
+      document.getElementById("trainingAIBox").className =
+        "p-3 rounded-xl border text-sm " + (allowed ? "bg-emerald-50 border-emerald-200 text-emerald-900" : "bg-rose-50 border-rose-200 text-rose-900");
+
+      // AI Button
+      btnShowAI.disabled = !allowed;
+      btnShowAI.classList.toggle("opacity-50", !allowed);
+      btnShowAI.classList.toggle("cursor-not-allowed", !allowed);
+
+      // Post AI fields
+      postAIReport.disabled = !allowed;
+      postRange.disabled = !allowed;
+
+      if (!allowed) {
+        aiOutput.classList.add("hidden");
+        chkXAIViewed.checked = false;
+      }
+    }
+
+    btnShowAI.addEventListener("click", () => {
+      const allowed = aiAllowedInCurrentRoute();
+      if (!allowed) {
+        audit("LOCK_VIOLATION_ATTEMPT", { feature:"AI_VIEW", phase:"training", case_id: getTrCaseId() });
+        alert("AI طبق پروتکل قفل است (بازوی کنترل یا خارج از آموزش).");
+        return;
+      }
+      aiOutput.classList.toggle("hidden");
+      audit("AI_VIEW", { phase:"training", case_id: getTrCaseId(), visible: !aiOutput.classList.contains("hidden") });
+    });
+
+    chkXAIViewed.addEventListener("change", () => {
+      audit("XAI_TOGGLE", { phase:"training", case_id: getTrCaseId(), viewed: chkXAIViewed.checked });
+    });
+
+    // Gold feedback demo
+    const btnShowGold = document.getElementById("btnShowGold");
+    const goldBox = document.getElementById("goldBox");
+    btnShowGold.addEventListener("click", () => {
+      goldBox.classList.toggle("hidden");
+      audit("GOLD_TOGGLE", { phase:"training", case_id: getTrCaseId(), opened: !goldBox.classList.contains("hidden") });
+    });
+
+    /***********************
+     * Form serialization helpers
+     ***********************/
+    function serializeForm(form) {
+      const data = {};
+      const fd = new FormData(form);
+      // checkboxes not checked won't appear; handle separately
+      for (const [k,v] of fd.entries()) data[k] = v;
+
+      // collect checkboxes
+      form.querySelectorAll('input[type="checkbox"][name]').forEach(cb => {
+        data[cb.name] = cb.checked;
+      });
+      // ranges
+      form.querySelectorAll('input[type="range"][name]').forEach(r => {
+        data[r.name] = Number(r.value);
+      });
+      return data;
+    }
+
+    function ensureParticipantReady() {
+      if (!state.participant.participant_id) {
+        alert("ابتدا در بخش ورود/پروفایل، شناسه مستعار را ثبت کنید.");
+        showRoute("login");
+        return false;
+      }
+      if (!state.participant.consent_accepted_at) {
+        alert("برای ادامه، پذیرش اطلاعیه اخلاقی لازم است.");
+        openConsent();
+        return false;
+      }
+      return true;
+    }
+
+    /***********************
+     * Pretest submit
+     ***********************/
+    document.getElementById("formPretest").addEventListener("submit", (e) => {
+      e.preventDefault();
+      if (!ensureParticipantReady()) return;
+
+      const form = e.target;
+      const d = serializeForm(form);
+
+      const resp = {
+        response_id: uuid(),
+        participant_id: state.participant.participant_id,
+        case_id: getPreCaseId(),
+        phase: "pretest",
+        timestamp: nowISO(),
+        time_seconds: preTimer.seconds(),
+        abcde: { A:d.abcde_A, B:d.abcde_B, C:d.abcde_C, D:d.abcde_D, E:d.abcde_E },
+        findings: {
+          normal: d.finding_normal,
+          consolidation: d.finding_consolidation,
+          effusion: d.finding_pleural_effusion,
+          pneumothorax: d.finding_pneumothorax,
+          nodule: d.finding_nodule,
+          cardiomegaly: d.finding_cardiomegaly
+        },
+        structured_report: d.structured_report || "",
+        confidence_0_100: Number(d.confidence ?? 50),
+        training_extras: null
       };
 
-      state.current._draft = attemptDraft;
-      initialSubmitted = true;
+      state.responses.push(resp);
+      audit("FORM_SUBMIT", { phase:"pretest", case_id: resp.case_id, time_seconds: resp.time_seconds });
+      saveState();
+      alert("پاسخ پیش‌آزمون ثبت شد.");
+      preTimer.reset();
+      form.reset();
+      // reset label
+      document.getElementById("pre_confVal").textContent = "50";
+    });
 
-      toast("پاسخ اولیه ثبت شد.", "ok");
+    /***********************
+     * Posttest submit
+     ***********************/
+    document.getElementById("formPosttest").addEventListener("submit", (e) => {
+      e.preventDefault();
+      if (!ensureParticipantReady()) return;
 
-      const allowedNow = canUseAI({ user, phase, uiMode, initialSubmitted:true });
-      attemptDraft.aiAllowed = allowedNow;
+      const form = e.target;
+      const d = serializeForm(form);
 
-      if (allowedNow) {
-        $("#afterai-box").classList.remove("opacity-50","pointer-events-none");
-        $("#afterai-hint").textContent = "AI فعال است. اگر نظرت تغییر کرد، این بخش را پر کن و دوباره «ثبت پاسخ» را بزن.";
-        $("#ai-hint").innerHTML = `AI فعال است (گروه <span class="kbd">AI</span>). برای Grad-CAM روی دکمه بزن.`;
-        $("#btn-submit").innerHTML = `<i class="fa-solid fa-check ml-2"></i>ثبت نهایی (After AI)`;
-        enforceAILocks();
-      } else {
-        await finalizeAttemptAndClose(attemptDraft);
+      const resp = {
+        response_id: uuid(),
+        participant_id: state.participant.participant_id,
+        case_id: getPostCaseId(),
+        phase: "posttest",
+        timestamp: nowISO(),
+        time_seconds: postTimer.seconds(),
+        abcde: { A:d.abcde_A, B:d.abcde_B, C:d.abcde_C, D:d.abcde_D, E:d.abcde_E },
+        findings: {
+          normal: d.finding_normal,
+          consolidation: d.finding_consolidation,
+          effusion: d.finding_pleural_effusion,
+          pneumothorax: d.finding_pneumothorax,
+          nodule: d.finding_nodule,
+          cardiomegaly: d.finding_cardiomegaly
+        },
+        structured_report: d.structured_report || "",
+        confidence_0_100: Number(d.confidence ?? 50),
+        training_extras: null
+      };
+
+      state.responses.push(resp);
+      audit("FORM_SUBMIT", { phase:"posttest", case_id: resp.case_id, time_seconds: resp.time_seconds });
+      saveState();
+      alert("پاسخ پس‌آزمون ثبت شد.");
+      postTimer.reset();
+      form.reset();
+      document.getElementById("post_confVal").textContent = "50";
+    });
+
+    /***********************
+     * Training submit
+     ***********************/
+    document.getElementById("formTraining").addEventListener("submit", (e) => {
+      e.preventDefault();
+      if (!ensureParticipantReady()) return;
+
+      const allowed = (state.participant.arm === "intervention");
+      const form = e.target;
+      const d = serializeForm(form);
+
+      // basic validation: pre-ai report should not be empty in training
+      if (!d.pre_ai_report || String(d.pre_ai_report).trim().length < 10) {
+        alert("لطفاً در آموزش، گزارش مستقل (Pre-AI) را با حداقل ۱۰ کاراکتر ثبت کنید.");
+        audit("VALIDATION_FAIL", { phase:"training", field:"pre_ai_report", case_id: getTrCaseId() });
+        return;
       }
-      return;
+
+      const resp = {
+        response_id: uuid(),
+        participant_id: state.participant.participant_id,
+        case_id: getTrCaseId(),
+        phase: "training",
+        timestamp: nowISO(),
+        time_seconds: trTimer.seconds(),
+        abcde: null,
+        findings: null,
+        structured_report: "",
+        confidence_0_100: null,
+        training_extras: {
+          pre_ai_report: d.pre_ai_report || "",
+          pre_ai_confidence: Number(d.pre_ai_confidence ?? 50),
+          ai_allowed: allowed,
+          ai_viewed: !aiOutput.classList.contains("hidden"),
+          xai_viewed: chkXAIViewed.checked || d.used_xai === true,
+          post_ai_report: allowed ? (d.post_ai_report || "") : "",
+          post_ai_confidence: allowed ? Number(d.post_ai_confidence ?? 50) : null,
+          changed_decision: allowed ? Boolean(d.ai_changed_decision) : false,
+          ai_increased_confidence: allowed ? Boolean(d.ai_increased_confidence) : false,
+          ui_usage: {
+            used_zoom: Boolean(d.used_zoom),
+            used_xai: Boolean(d.used_xai),
+            read_tips: Boolean(d.read_tips),
+            opened_gold: Boolean(d.opened_gold)
+          }
+        }
+      };
+
+      // protocol guard: if control arm, do not accept post-ai content
+      if (!allowed) {
+        const hasPost = (d.post_ai_report && String(d.post_ai_report).trim().length > 0);
+        if (hasPost) {
+          audit("LOCK_VIOLATION_ATTEMPT", { feature:"POST_AI_ENTRY", case_id: resp.case_id });
+          alert("طبق پروتکل، در بازوی کنترل ثبت Post-AI مجاز نیست. این فیلد پاک شد.");
+          resp.training_extras.post_ai_report = "";
+          resp.training_extras.post_ai_confidence = null;
+        }
+      }
+
+      state.responses.push(resp);
+      audit("FORM_SUBMIT", { phase:"training", case_id: resp.case_id, time_seconds: resp.time_seconds, ai_allowed: allowed });
+      saveState();
+      alert("کیس آموزشی ثبت شد.");
+      trTimer.reset();
+      form.reset();
+      document.getElementById("tr_preConfVal").textContent = "50";
+      document.getElementById("tr_postConfVal").textContent = "50";
+      aiOutput.classList.add("hidden");
+      chkXAIViewed.checked = false;
+    });
+
+    /***********************
+     * Demo case navigation
+     ***********************/
+    function nextCaseId(prefix, n) {
+      return `${prefix}-${String(n).padStart(3,"0")}`;
+    }
+    let preN = 1, trN = 1, postN = 1;
+
+    document.getElementById("btnPreNextCase").addEventListener("click", () => {
+      preN += 1;
+      document.getElementById("pre_caseId").textContent = nextCaseId("CXR-PT", preN);
+      preTimer.reset();
+      audit("CASE_NEXT", { phase:"pretest", case_id: getPreCaseId() });
+    });
+
+    document.getElementById("btnTrNextCase").addEventListener("click", () => {
+      trN += 1;
+      document.getElementById("tr_caseId").textContent = nextCaseId("CXR-TR", trN);
+      trTimer.reset();
+      aiOutput.classList.add("hidden");
+      chkXAIViewed.checked = false;
+      goldBox.classList.add("hidden");
+      audit("CASE_NEXT", { phase:"training", case_id: getTrCaseId() });
+    });
+
+    document.getElementById("btnPostNextCase").addEventListener("click", () => {
+      postN += 1;
+      document.getElementById("post_caseId").textContent = nextCaseId("CXR-PO", postN);
+      postTimer.reset();
+      audit("CASE_NEXT", { phase:"posttest", case_id: getPostCaseId() });
+    });
+
+    /***********************
+     * SUS / NPS forms
+     ***********************/
+    const susStatements = [
+      "فکر می‌کنم دوست دارم مرتب از این سامانه استفاده کنم.",
+      "سامانه بیش از حد پیچیده است.",
+      "فکر می‌کنم استفاده از سامانه آسان است.",
+      "برای استفاده از سامانه به کمک فنی نیاز دارم.",
+      "قابلیت‌های مختلف سامانه به‌خوبی یکپارچه شده‌اند.",
+      "در سامانه ناسازگاری‌های زیادی وجود دارد.",
+      "تصور می‌کنم اغلب افراد به‌سرعت یاد می‌گیرند از سامانه استفاده کنند.",
+      "استفاده از سامانه بسیار دست‌وپاگیر است.",
+      "در استفاده از سامانه احساس اطمینان دارم.",
+      "قبل از شروع استفاده، لازم است چیزهای زیادی یاد بگیرم."
+    ];
+
+    function renderSUS() {
+      const box = document.getElementById("susItems");
+      box.innerHTML = "";
+      susStatements.forEach((txt, idx) => {
+        const q = idx + 1;
+        const wrap = document.createElement("div");
+        wrap.className = "p-3 rounded-xl bg-white border border-slate-200";
+        wrap.innerHTML = `
+          <label class="block text-sm font-semibold">SUS-${q}: ${txt}</label>
+          <div class="mt-2 grid grid-cols-5 gap-2 text-xs">
+            ${[1,2,3,4,5].map(v => `
+              <label class="flex items-center justify-center gap-1 p-2 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer">
+                <input type="radio" name="sus_${q}" value="${v}" class="w-4 h-4" required />
+                <span>${v}</span>
+              </label>
+            `).join("")}
+          </div>
+          <div class="mt-2 text-xs text-slate-600">۱=کاملاً مخالفم … ۵=کاملاً موافقم</div>
+        `;
+        box.appendChild(wrap);
+      });
+    }
+    renderSUS();
+
+    function computeSUS(values) {
+      // SUS scoring:
+      // odd items: score = value - 1
+      // even items: score = 5 - value
+      // total * 2.5
+      let sum = 0;
+      for (let i=0; i<10; i++) {
+        const v = Number(values[i]);
+        if ((i % 2) === 0) sum += (v - 1);
+        else sum += (5 - v);
+      }
+      return sum * 2.5;
     }
 
-    const draft = state.current._draft;
-    if (!draft) return toast("Draft پیدا نشد.", "error");
+    document.getElementById("formSUS").addEventListener("submit", (e) => {
+      e.preventDefault();
+      if (!ensureParticipantReady()) return;
 
-    const after = collectAfterAIForm();
-    draft.changedAfterAI = !!after.changedAfterAI;
-    draft.primaryDx_afterAI = after.primaryDx_afterAI || "";
-    draft.confidence_afterAI = after.confidence_afterAI || "";
-    draft.aiShown = !!state.current.aiShown;
+      const form = e.target;
+      const vals = [];
+      for (let q=1; q<=10; q++) {
+        const checked = form.querySelector(`input[name="sus_${q}"]:checked`);
+        vals.push(checked ? checked.value : null);
+      }
+      if (vals.some(v => v === null)) {
+        alert("لطفاً همه سوالات SUS را پاسخ دهید.");
+        audit("VALIDATION_FAIL", { phase:"surveys", tool:"SUS" });
+        return;
+      }
 
-    if (draft.changedAfterAI && !draft.primaryDx_afterAI) {
-      return toast("اگر تغییر کردی، Dx بعد از AI را انتخاب کن.", "error");
+      const score = computeSUS(vals);
+      state.surveys.sus = {
+        participant_id: state.participant.participant_id,
+        timestamp: nowISO(),
+        items: vals.map(Number),
+        score
+      };
+      document.getElementById("susScore").textContent = String(score.toFixed(1));
+      audit("SURVEY_SUBMIT", { tool:"SUS", score });
+      saveState();
+      alert("SUS ثبت شد.");
+      refreshResearchDashboard();
+    });
+
+    // NPS binding
+    const npsRange = document.querySelector('#formNPS input[name="nps"]');
+    const npsVal = document.getElementById("npsVal");
+    npsVal.textContent = npsRange.value;
+    npsRange.addEventListener("input", ()=> npsVal.textContent = npsRange.value);
+
+    document.getElementById("formNPS").addEventListener("submit", (e) => {
+      e.preventDefault();
+      if (!ensureParticipantReady()) return;
+
+      const d = serializeForm(e.target);
+      state.surveys.nps = {
+        participant_id: state.participant.participant_id,
+        timestamp: nowISO(),
+        nps: Number(d.nps ?? 0),
+        qual_feedback: String(d.qual_feedback || "")
+      };
+      audit("SURVEY_SUBMIT", { tool:"NPS", nps: state.surveys.nps.nps });
+      saveState();
+      alert("NPS و بازخورد ثبت شد.");
+      refreshResearchDashboard();
+    });
+
+    /***********************
+     * Research dashboard
+     ***********************/
+    function refreshResearchDashboard() {
+      document.getElementById("statResponses").textContent = String(state.responses.length);
+      document.getElementById("statAudit").textContent = String(state.audit.length);
+      document.getElementById("statSUS").textContent = state.surveys.sus ? "بله" : "خیر";
+      document.getElementById("statNPS").textContent = state.surveys.nps ? "بله" : "خیر";
+      refreshAuditList();
+      refreshConsentStatus();
     }
 
-    const finalDx = (draft.changedAfterAI && draft.primaryDx_afterAI) ? draft.primaryDx_afterAI : draft.primaryDx;
-    const rescored = scoreAttempt(c, finalDx, draft.findings);
-    draft.score = rescored.score;
-    draft.correctDx = rescored.correctDx;
-
-    await finalizeAttemptAndClose(draft);
-  };
-
-  $("#btn-skip").onclick = async () => {
-    if (!confirm("این Assignment به DONE تبدیل شود بدون ثبت Attempt؟")) return;
-    assignment.status = "DONE";
-    await idbPut("assignments", assignment);
-    await audit("SKIP_ASSIGNMENT_DONE", { assignmentId: assignment.id, caseId: assignment.caseId, username: user.username });
-    toast("DONE شد.", "ok");
-    stopTimer();
-    render();
-  };
-
-  function setModeButtons(mode) {
-    const a = $("#btn-mode-training");
-    const b = $("#btn-mode-exam");
-    if (mode === "training") {
-      a.className = "flex-1 px-3 py-2 rounded-lg text-sm bg-brand text-white font-extrabold";
-      b.className = "flex-1 px-3 py-2 rounded-lg text-sm muted";
-    } else {
-      b.className = "flex-1 px-3 py-2 rounded-lg text-sm bg-brand text-white font-extrabold";
-      a.className = "flex-1 px-3 py-2 rounded-lg text-sm muted";
+    function refreshAuditList() {
+      const list = document.getElementById("auditList");
+      if (!list) return;
+      list.innerHTML = "";
+      const tail = state.audit.slice(-12).reverse();
+      tail.forEach(ev => {
+        const item = document.createElement("div");
+        item.className = "p-2 rounded-lg border border-slate-200 bg-slate-50";
+        item.innerHTML = `
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <div><b>${ev.action}</b> <span class="mono text-slate-600">${ev.timestamp}</span></div>
+              <div class="text-slate-600">route=${ev.route} arm=${ev.arm || "-"} role=${ev.role || "-"}</div>
+              ${ev.case_id ? `<div class="text-slate-600 mono">case=${ev.case_id}</div>` : ""}
+            </div>
+            <div class="mono text-slate-500">#${ev.event_id.slice(0,8)}</div>
+          </div>
+        `;
+        list.appendChild(item);
+      });
     }
-    assignment.uiMode = mode;
-  }
 
-  function enforceAILocks(showToast=false) {
-    const box = $("#ai-box");
-    const allowed = canUseAI({ user, phase, uiMode, initialSubmitted });
-    if (box) {
-      box.classList.toggle("opacity-50", !allowed);
-      box.classList.toggle("pointer-events-none", !allowed);
+    document.getElementById("btnRefreshStats").addEventListener("click", () => {
+      refreshResearchDashboard();
+      audit("REFRESH_DASHBOARD");
+    });
+
+    document.getElementById("btnExportJSON").addEventListener("click", () => {
+      if (state.participant.role !== "researcher" && state.participant.role !== "admin") {
+        alert("این اقدام فقط برای پژوهشگر/ادمین مجاز است (دمو).");
+        audit("ACCESS_DENY", { action:"EXPORT" });
+        return;
+      }
+      const payload = {
+        exported_at: nowISO(),
+        app: state.app,
+        participant: state.participant,
+        responses: state.responses,
+        surveys: state.surveys,
+        audit: state.audit
+      };
+      const pretty = JSON.stringify(payload, null, 2);
+      document.getElementById("jsonPreview").textContent = pretty;
+      audit("EXPORT", { format:"json", bytes: pretty.length });
+
+      // trigger download
+      const blob = new Blob([pretty], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `CXR_RCT_EXPORT_${(state.participant.participant_id || "GUEST")}_${Date.now()}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    });
+
+    document.getElementById("btnClearDemo").addEventListener("click", () => {
+      if (state.participant.role !== "admin") {
+        alert("پاکسازی فقط برای ادمین مجاز است (دمو).");
+        audit("ACCESS_DENY", { action:"CLEAR_DEMO" });
+        return;
+      }
+      if (!confirm("پاکسازی تمام داده‌های دمو در این مرورگر انجام شود؟")) return;
+      localStorage.removeItem(STORAGE_KEY);
+      state = loadState();
+      audit("CLEAR_DEMO");
+      saveState();
+      refreshResearchDashboard();
+      alert("داده‌های دمو پاک شد.");
+    });
+
+    /***********************
+     * Initial UI sync
+     ***********************/
+    function initFromStateToUI() {
+      document.getElementById("inpParticipantId").value = state.participant.participant_id || "";
+      document.getElementById("selLevel").value = state.participant.level || "";
+      document.getElementById("inpSiteCode").value = state.participant.site_code || "";
+      document.getElementById("selRole").value = state.participant.role || "student";
+      document.getElementById("selArm").value = state.participant.arm || "";
+      refreshConsentStatus();
+      refreshTrainingAIUI();
+
+      // If SUS already exists, show score
+      if (state.surveys.sus && typeof state.surveys.sus.score === "number") {
+        document.getElementById("susScore").textContent = String(state.surveys.sus.score.toFixed(1));
+      }
+      if (state.surveys.nps && typeof state.surveys.nps.nps === "number") {
+        npsRange.value = String(state.surveys.nps.nps);
+        npsVal.textContent = String(state.surveys.nps.nps);
+      }
+      refreshResearchDashboard();
+      refreshBadges();
     }
-    const hint = $("#ai-hint");
-    if (hint) {
-      hint.textContent = allowed
-        ? "AI فعال است. (در صورت نیاز Grad-CAM و Probabilities را باز کن.)"
-        : "AI قفل است (Phase/Mode یا گروه کنترل یا هنوز پاسخ اولیه ثبت نشده).";
-    }
-    if (!allowed) {
-      state.current.aiShown = false;
-      setHeatmap(c, false);
-      if (showToast) toast("AI در این مرحله/حالت مجاز نیست.", "error");
-    }
-    return allowed;
-  }
 
-  async function finalizeAttemptAndClose(attemptObj) {
-    await idbPut("attempts", attemptObj);
-    await audit("SUBMIT_ATTEMPT", { attemptId: attemptObj.id, username: attemptObj.username, caseId: attemptObj.caseId, phase: attemptObj.phase });
-
-    assignment.status = "DONE";
-    await idbPut("assignments", assignment);
-    await audit("MARK_ASSIGNMENT_DONE", { assignmentId: assignment.id, caseId: assignment.caseId, username: user.username });
-
-    toast("ثبت شد و Assignment DONE شد.", "ok");
-    stopTimer();
-    state.current._draft = null;
-    render();
-  }
-
-  enforceAILocks();
-  applyViewer();
-  setHeatmap(c, false);
-}
-
-/* -----------------------------
-   Router
------------------------------ */
-async function render() {
-  await refreshHeader();
-
-  if (!state.session) return renderLogin();
-
-  const protos = await idbAll("protocols");
-  state.protocol = protos.find(p=>p.active) || protos[0] || defaultProtocol();
-  if (state.session.role === "ADMIN") return renderAdmin();
-  return renderStudent();
-}
-
-/* -----------------------------
-   Logout
------------------------------ */
-$("#btn-logout").onclick = async () => {
-  if (!state.session) return;
-  await audit("LOGOUT", { username: state.session.username });
-  state.session = null;
-  clearSession();
-  toast("خارج شدید.", "ok");
-  render();
-};
-
-/* -----------------------------
-   Boot
------------------------------ */
-(async function boot() {
-  db = await idbOpen();
-  await seedIfNeeded();
-
-  const sess = loadSession();
-  if (sess) {
-    state.session = sess;
-    const protos = await idbAll("protocols");
-    state.protocol = protos.find(p=>p.active) || protos[0] || defaultProtocol();
-    if (!protos.length) await idbPut("protocols", state.protocol);
-  }
-  await refreshHeader();
-  render();
-})();
-</script>
+    // Default route
+    initFromStateToUI();
+    showRoute("home");
+  </script>
 </body>
 </html>
