@@ -30,7 +30,6 @@
         .header { background: linear-gradient(135deg, var(--primary) 0%, #0052a3 100%); color: white; padding: 1.5rem 2rem; position: sticky; top: 0; z-index: 1000; }
         .header-content { max-width: 1600px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
         .logo { font-size: 2rem; font-weight: 800; }
-        .platform-badge { background: rgba(255, 255, 255, 0.2); padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
         .logout-btn { background: rgba(255, 255, 255, 0.2); color: white; border: 2px solid white; padding: 0.7rem 1.5rem; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.95rem; }
         .logout-btn:hover { background: white; color: var(--primary); }
         .container { max-width: 1600px; margin: 0 auto; padding: 2rem; }
@@ -67,7 +66,7 @@
         .options-group label { display: block; margin-bottom: 1rem; font-weight: 600; color: var(--gray-800); }
         .option-item { display: flex; align-items: center; padding: 1rem; background: #f8f9fa; border: 2px solid #e5e7eb; border-radius: 10px; margin-bottom: 0.8rem; cursor: pointer; transition: all 0.3s ease; }
         .option-item:hover { background: #f3f4f6; border-color: var(--primary); transform: translateX(-5px); }
-        .option-item input[type="radio"] { margin-left: 1rem; width: 20px; height: 20px; accent-color: var(--primary); }
+        .option-item input[type="radio"] { margin-left: 1rem; width: 20px; height: 20px; cursor: pointer; accent-color: var(--primary); }
         .option-label { flex: 1; cursor: pointer; color: var(--gray-800); font-weight: 500; }
         .form-label { display: block; margin-bottom: 0.8rem; font-weight: 600; color: var(--gray-800); }
         textarea { width: 100%; min-height: 100px; padding: 1rem; border: 2px solid #e5e7eb; border-radius: 10px; font-family: inherit; font-size: 0.95rem; }
@@ -106,7 +105,7 @@
             <form id="loginForm" onsubmit="handleLogin(event)">
                 <div class="form-group">
                     <label>نام کاربری</label>
-                    <input type="text" id="username" class="form-control" placeholder="pilot2025 یا pilot2026" required>
+                    <input type="text" id="username" class="form-control" placeholder="pilot2025" required>
                 </div>
                 <div class="form-group">
                     <label>رمز عبور</label>
@@ -121,7 +120,6 @@
         <header class="header">
             <div class="header-content">
                 <div class="logo">🏥 MentorAI</div>
-                <span class="platform-badge" id="platformBadge"></span>
                 <button class="logout-btn" onclick="handleLogout()">🚪 خروج</button>
             </div>
         </header>
@@ -146,7 +144,7 @@
                                 <div class="clinical-content" id="hpi"></div>
                             </div>
                             <div class="clinical-item">
-                                <div class="clinical-label">📊 علائم حیاتی</div>
+                                <div class="clinical-label">📊 عکس حیاتی</div>
                                 <div class="vitals-grid" id="vitals"></div>
                             </div>
                             <div class="clinical-item">
@@ -251,8 +249,7 @@
 
     <script>
         const users = {
-            'pilot2025': { password: 'pilot2025', platform: '📚 پلتفرم اصلی', cases: 5 },
-            'pilot2026': { password: 'pilot2026', platform: '🎯 نمایشی', cases: 2 }
+            'pilot2025': { password: 'pilot2025', platform: '📚 پلتفرم اصلی', cases: 5 }
         };
 
         const optionsPerCase = {
@@ -312,7 +309,7 @@
             pneumothorax: {
                 title: 'مورد 3: ریه فروپاشی',
                 chief_complaint: 'درد ناگهانی، تنگی نفس',
-                hpi: 'بیمار 28 ساله، درد یکبارگی',
+                hpi: 'بیمار 28 ساله، درد یکباره',
                 vitals: [{label:'دما', value:'37.2°C'}, {label:'ضربان', value:'110'}, {label:'تنفس', value:'26'}, {label:'فشار', value:'128/82'}, {label:'اکسیژن', value:'94%'}],
                 pe: 'کاهش صوت در سمت راست',
                 image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Pneumothorax_CXR.jpg/512px-Pneumothorax_CXR.jpg',
@@ -351,7 +348,6 @@
                 currentUser = u;
                 maxCases = users[u].cases;
                 document.getElementById('totalCases').textContent = maxCases;
-                document.getElementById('platformBadge').textContent = users[u].platform;
                 document.getElementById('loginPage').style.display = 'none';
                 document.getElementById('appWrapper').style.display = 'block';
                 loadCase();
@@ -373,7 +369,7 @@
             document.getElementById('hpi').textContent = data.hpi;
             document.getElementById('pe').textContent = data.pe;
             document.getElementById('vitals').innerHTML = data.vitals.map(v => `<div class="vital"><div class="vital-value">${v.value}</div><div class="vital-label">${v.label}</div></div>`).join('');
-            document.getElementById('optionsContainer').innerHTML = opts.options.map(opt => `<div class="option-item" onclick="selectOption('${opt.id}', event)"><input type="radio" name="diagnosis"><label class="option-label">${opt.label}</label></div>`).join('');
+            document.getElementById('optionsContainer').innerHTML = opts.options.map(opt => `<div class="option-item" onclick="selectOption('${opt.id}', event)"><input type="radio" name="diagnosis" value="${opt.id}"><label class="option-label">${opt.label}</label></div>`).join('');
             const img = document.getElementById('cxrImage');
             img.src = data.image; img.style.transform = 'scale(1)'; zoomLevel = 1;
             document.getElementById('brightness').value = 100;
@@ -389,12 +385,16 @@
             updateProgress();
         }
 
-        function selectOption(id, e) { selectedOption = id; e.target.parentElement.querySelector('input').checked = true; }
+        function selectOption(id, e) {
+            selectedOption = id;
+            document.querySelectorAll('input[name="diagnosis"]').forEach(el => el.checked = false);
+            e.currentTarget.querySelector('input[type="radio"]').checked = true;
+        }
 
         function submitAnswer() {
-            if (!selectedOption) { alert('گزینه انتخاب کنید'); return; }
+            if (!selectedOption) { alert('لطفا گزینه انتخاب کنید'); return; }
             const answer = document.getElementById('answerText').value.trim();
-            if (!answer) { alert('توضیح بنویسید'); return; }
+            if (!answer) { alert('لطفا توضیح بنویسید'); return; }
             const caseId = caseOrder[caseIndex], opts = optionsPerCase[caseId], time = Math.round((Date.now() - startTime) / 1000), accuracy = selectedOption === opts.correct ? 100 : 40;
             responses.push({caseId, option: selectedOption, answer, time, accuracy});
             document.getElementById('answerCard').classList.remove('active');
@@ -406,7 +406,12 @@
             document.getElementById('timeScore').textContent = time;
         }
 
-        function resetAnswer() { document.getElementById('answerText').value = ''; selectedOption = null; document.querySelectorAll('input[name="diagnosis"]').forEach(el => el.checked = false); }
+        function resetAnswer() {
+            document.getElementById('answerText').value = '';
+            selectedOption = null;
+            document.querySelectorAll('input[name="diagnosis"]').forEach(el => el.checked = false);
+        }
+
         function nextCase() { caseIndex++; loadCase(); }
         function updateProgress() { document.getElementById('progressFill').style.width = ((caseIndex + 1) / maxCases) * 100 + '%'; }
 
