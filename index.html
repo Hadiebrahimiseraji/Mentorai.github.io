@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="پلتفرم آموزشی-بالینی هوشمند تفسیر رادیوگرافی مبتنی بر هوش مصنوعی">
-    <meta name="author" content="دکتر سحر باقری - دانشگاه علوم پزشکی مازندران">
-    <title>MentorAI - پلتفرم هوشمند آموزش تفسیر رادیوگرافی</title>
+    <meta name="description" content="پلتفرم آموزشی MentorAI - دمو پایلوت">
+    <title>MentorAI - پلتفرم دمو پایلوت</title>
     <style>
         * {
             margin: 0;
@@ -45,7 +44,133 @@
             line-height: 1.6;
         }
 
-        /* Header & Navigation */
+        /* Login Page Styles */
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 420px;
+            padding: 3rem;
+            text-align: center;
+        }
+
+        .login-header {
+            margin-bottom: 2rem;
+        }
+
+        .login-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .login-card h1 {
+            color: var(--primary);
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-card p {
+            color: var(--gray-600);
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: right;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.6rem;
+            font-weight: 600;
+            color: var(--gray-700);
+            font-size: 0.95rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 0.85rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(30, 64, 175, 0.4);
+        }
+
+        .login-btn:active {
+            transform: translateY(0);
+        }
+
+        .error-message {
+            background: #fef2f2;
+            color: var(--danger);
+            padding: 0.8rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            border: 1px solid var(--danger);
+            display: none;
+        }
+
+        .login-footer {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--gray-200);
+            font-size: 0.85rem;
+            color: var(--gray-600);
+        }
+
+        .beta-badge {
+            display: inline-block;
+            background: var(--warning);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        /* Main App Styles */
+        .app-wrapper {
+            display: none;
+        }
+
         .header {
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
@@ -67,7 +192,6 @@
         .logo {
             font-size: 1.8rem;
             font-weight: 700;
-            letter-spacing: -0.5px;
             display: flex;
             align-items: center;
             gap: 0.8rem;
@@ -83,108 +207,30 @@
             align-items: center;
             justify-content: center;
             font-weight: 800;
-            font-size: 1.4rem;
         }
 
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-            list-style: none;
-        }
-
-        .nav-links a {
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
             color: white;
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s ease;
+            border: 2px solid white;
             padding: 0.5rem 1rem;
             border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
 
-        .nav-links a:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
+        .logout-btn:hover {
+            background: white;
+            color: var(--primary);
         }
 
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-            }
-        }
-
-        /* Main Content */
         .container {
             max-width: 1400px;
             margin: 0 auto;
             padding: 2rem;
         }
 
-        /* Hero Section */
-        .hero {
-            background: white;
-            border-radius: 16px;
-            padding: 3rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-            text-align: center;
-        }
-
-        .hero h1 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            color: var(--primary);
-            line-height: 1.2;
-        }
-
-        .hero p {
-            font-size: 1.1rem;
-            color: var(--gray-600);
-            margin-bottom: 2rem;
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        /* Features Grid */
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin: 3rem 0;
-        }
-
-        .feature-card {
-            background: white;
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-            transition: all 0.3s ease;
-            border-left: 4px solid var(--primary);
-        }
-
-        .feature-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
-        }
-
-        .feature-icon {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .feature-card h3 {
-            color: var(--primary);
-            margin-bottom: 0.8rem;
-            font-size: 1.3rem;
-        }
-
-        .feature-card p {
-            color: var(--gray-600);
-            font-size: 0.95rem;
-            line-height: 1.7;
-        }
-
-        /* Main Application */
         .app-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -198,7 +244,6 @@
             }
         }
 
-        /* Image Viewer */
         .viewer-section {
             background: white;
             border-radius: 12px;
@@ -212,12 +257,31 @@
             font-size: 1.4rem;
         }
 
+        .case-selector {
+            margin-bottom: 1.5rem;
+        }
+
+        .case-selector label {
+            display: block;
+            margin-bottom: 0.6rem;
+            font-weight: 600;
+            color: var(--gray-700);
+        }
+
+        .case-selector select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+
         .image-container {
             background: var(--gray-900);
             border-radius: 8px;
             padding: 1rem;
             margin-bottom: 1.5rem;
-            min-height: 400px;
+            min-height: 450px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -225,20 +289,94 @@
             overflow: hidden;
         }
 
-        .image-container img {
+        .image-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .cxr-image {
             max-width: 100%;
             max-height: 400px;
             border-radius: 6px;
             display: block;
         }
 
+        .heatmap-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 6px;
+            opacity: 0.5;
+            display: none;
+        }
+
         .image-controls {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 1rem;
+            margin-bottom: 1.5rem;
         }
 
-        /* Form Elements */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(30, 64, 175, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--gray-100);
+            color: var(--gray-800);
+            border: 2px solid var(--gray-300);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-200);
+        }
+
+        .btn-full {
+            width: 100%;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .interpretation-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+        }
+
+        .interpretation-section h2 {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            font-size: 1.4rem;
+        }
+
         .form-group {
             margin-bottom: 1.5rem;
         }
@@ -248,36 +386,8 @@
             margin-bottom: 0.6rem;
             font-weight: 600;
             color: var(--gray-700);
-            font-size: 0.95rem;
         }
 
-        .form-control {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            border: 2px solid var(--gray-200);
-            border-radius: 8px;
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
-            font-family: inherit;
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
-        }
-
-        .form-control:disabled {
-            background-color: var(--gray-100);
-            color: var(--gray-500);
-        }
-
-        textarea.form-control {
-            resize: vertical;
-            min-height: 100px;
-        }
-
-        /* Checkboxes */
         .checkbox-group {
             display: flex;
             flex-direction: column;
@@ -305,27 +415,17 @@
             cursor: pointer;
         }
 
-        .checkbox-label {
-            flex: 1;
-            cursor: pointer;
-            font-weight: 500;
+        textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            resize: vertical;
+            min-height: 100px;
         }
 
-        /* Interpretation Panel */
-        .interpretation-section {
-            background: white;
-            border-radius: 12px;
-            padding: 2rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-        }
-
-        .interpretation-section h2 {
-            color: var(--primary);
-            margin-bottom: 1.5rem;
-            font-size: 1.4rem;
-        }
-
-        /* AI Output Panel */
         .ai-panel {
             background: linear-gradient(135deg, #eff6ff 0%, #e0f2fe 100%);
             border: 2px solid var(--primary-light);
@@ -337,12 +437,9 @@
         .ai-panel h3 {
             color: var(--primary);
             margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
         }
 
-        .ai-findings {
+        .findings-list {
             display: flex;
             flex-direction: column;
             gap: 0.8rem;
@@ -358,17 +455,6 @@
             border-right: 3px solid var(--primary);
         }
 
-        .finding-name {
-            font-weight: 600;
-            color: var(--gray-800);
-        }
-
-        .finding-confidence {
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-        }
-
         .confidence-bar {
             width: 100px;
             height: 6px;
@@ -381,18 +467,9 @@
             height: 100%;
             background: linear-gradient(90deg, var(--secondary), var(--success));
             border-radius: 3px;
-            transition: width 0.3s ease;
         }
 
-        .confidence-value {
-            font-weight: 700;
-            color: var(--primary);
-            min-width: 45px;
-            text-align: right;
-        }
-
-        /* Teaching Notes */
-        .teaching-note-box {
+        .teaching-note {
             background: #fef3c7;
             border: 2px solid var(--warning);
             border-radius: 8px;
@@ -400,124 +477,16 @@
             margin-bottom: 1.5rem;
         }
 
-        .teaching-note-box h4 {
+        .teaching-note h4 {
             color: #92400e;
             margin-bottom: 0.8rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
         }
 
-        .teaching-note-box p {
+        .teaching-note p {
             color: #78350f;
             line-height: 1.8;
         }
 
-        /* Buttons */
-        .btn {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            text-decoration: none;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white;
-            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(30, 64, 175, 0.4);
-        }
-
-        .btn-primary:active {
-            transform: translateY(0);
-        }
-
-        .btn-primary:disabled {
-            background: linear-gradient(135deg, var(--gray-400) 0%, var(--gray-500) 100%);
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-
-        .btn-secondary {
-            background: var(--gray-100);
-            color: var(--gray-800);
-            border: 2px solid var(--gray-300);
-        }
-
-        .btn-secondary:hover {
-            background: var(--gray-200);
-        }
-
-        .btn-danger {
-            background: var(--danger);
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #dc2626;
-        }
-
-        .btn-full {
-            width: 100%;
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        /* Phase Indicator */
-        .phase-indicator {
-            background: white;
-            border-radius: 12px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-        }
-
-        .phase-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .phase-item {
-            padding: 1.5rem;
-            border-radius: 8px;
-            border: 2px solid var(--gray-200);
-            text-align: center;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .phase-item.active {
-            border-color: var(--primary);
-            background: linear-gradient(135deg, #eff6ff 0%, #e0f2fe 100%);
-        }
-
-        .phase-item h3 {
-            color: var(--primary);
-            margin-bottom: 0.5rem;
-        }
-
-        .phase-item p {
-            font-size: 0.9rem;
-            color: var(--gray-600);
-        }
-
-        /* Stats Panel */
         .stats-panel {
             background: white;
             border-radius: 12px;
@@ -530,6 +499,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 1.5rem;
+            margin-top: 1.5rem;
         }
 
         .stat-item {
@@ -551,7 +521,6 @@
             margin-top: 0.5rem;
         }
 
-        /* Alert Messages */
         .alert {
             padding: 1.2rem;
             border-radius: 8px;
@@ -573,332 +542,99 @@
             color: #166534;
         }
 
-        .alert-warning {
-            background: #fef3c7;
-            border: 2px solid var(--warning);
-            color: #92400e;
-        }
-
-        .alert-danger {
-            background: #fef2f2;
-            border: 2px solid var(--danger);
-            color: var(--danger);
-        }
-
         .alert-icon {
             font-size: 1.2rem;
             flex-shrink: 0;
-            margin-top: 0.2rem;
         }
 
-        .alert-content {
-            flex: 1;
-        }
-
-        .alert-title {
-            font-weight: 600;
-            margin-bottom: 0.3rem;
-        }
-
-        /* Dashboard */
-        .dashboard {
-            background: white;
-            border-radius: 12px;
-            padding: 2rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-            margin-top: 2rem;
-        }
-
-        .dashboard h2 {
-            color: var(--primary);
-            margin-bottom: 1.5rem;
-        }
-
-        .dashboard-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-        }
-
-        /* Loading States */
-        .loading-spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid var(--gray-200);
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .loading-skeleton {
-            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-            background-size: 200% 100%;
-            animation: loading 1.5s infinite;
-        }
-
-        @keyframes loading {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
-
-        /* Footer */
-        footer {
-            background: var(--gray-800);
-            color: white;
-            text-align: center;
-            padding: 2rem;
-            margin-top: 3rem;
-        }
-
-        footer p {
-            margin: 0.5rem 0;
-            font-size: 0.9rem;
-        }
-
-        footer a {
-            color: var(--primary-light);
-            text-decoration: none;
-        }
-
-        footer a:hover {
-            text-decoration: underline;
-        }
-
-        /* Modal */
-        .modal {
+        .hidden {
             display: none;
-            position: fixed;
-            z-index: 1000;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            align-items: center;
-            justify-content: center;
         }
 
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 12px;
-            padding: 2rem;
-            max-width: 500px;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .case-info {
+            background: #f0f9ff;
+            border-left: 4px solid var(--secondary);
+            padding: 1rem;
+            border-radius: 6px;
             margin-bottom: 1.5rem;
         }
 
-        .modal-header h2 {
-            color: var(--primary);
+        .case-info h4 {
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
         }
 
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--gray-500);
-        }
-
-        .modal-close:hover {
+        .case-info p {
             color: var(--gray-700);
+            font-size: 0.95rem;
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .container {
-                padding: 1rem;
-            }
-
-            .hero {
-                padding: 2rem 1.5rem;
-            }
-
-            .hero h1 {
-                font-size: 1.8rem;
-            }
-
-            .app-container {
-                grid-template-columns: 1fr;
-                gap: 1.5rem;
-            }
-
-            .image-controls {
-                grid-template-columns: 1fr;
-            }
-
-            .btn-group {
-                flex-direction: column;
-            }
-
-            .btn-full {
-                width: 100%;
-            }
-
-            .modal-content {
-                max-width: 90%;
-            }
-        }
-
-        /* Heatmap Overlay */
-        .heatmap-container {
-            position: relative;
-            display: inline-block;
-            width: 100%;
-        }
-
-        .heatmap-canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            border-radius: 6px;
-        }
-
-        /* Print Styles */
-        @media print {
-            .header, footer, .btn-group {
-                display: none;
-            }
-
-            .app-container {
-                grid-template-columns: 1fr;
-            }
+        .license-info {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--gray-200);
         }
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="header-content">
-            <div class="logo">
-                <div class="logo-icon">🔬</div>
-                <span>MentorAI</span>
+    <!-- Login Page -->
+    <div class="login-container" id="loginPage">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="login-icon">🔐</div>
+                <div class="beta-badge">پایلوت دمو v1.0</div>
+                <h1>MentorAI</h1>
+                <p>پلتفرم آموزشی تفسیر رادیوگرافی مبتنی بر هوش مصنوعی</p>
             </div>
-            <ul class="nav-links">
-                <li><a href="#about">درباره</a></li>
-                <li><a href="#features">ویژگی‌ها</a></li>
-                <li><a href="#app">نرم‌افزار</a></li>
-                <li><a href="#contact">تماس</a></li>
-            </ul>
-        </div>
-    </header>
 
-    <!-- Main Content -->
-    <div class="container">
-        <!-- Hero Section -->
-        <section class="hero" id="about">
-            <h1>🏥 پلتفرم هوشمند آموزش تفسیر رادیوگرافی</h1>
-            <p>
-                سامانه آموزشی-بالینی مبتنی بر هوش مصنوعی و الگوریتم‌های توضیح‌پذیر (XAI) برای ارتقای مهارت‌های تفسیر رادیوگرافی قفسه سینه
-            </p>
-            <p style="font-size: 0.95rem; color: var(--gray-500);">
-                پروژه تحقیقاتی دانشگاه علوم پزشکی مازندران | <strong>نسخه دمو 1.0</strong>
-            </p>
-        </section>
+            <div class="error-message" id="errorMessage"></div>
 
-        <!-- Features Section -->
-        <section id="features">
-            <h2 style="text-align: center; color: var(--primary); margin-bottom: 2rem; font-size: 2rem;">
-                🎯 ویژگی‌های اصلی
-            </h2>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">🤖</div>
-                    <h3>تحلیل هوشمند</h3>
-                    <p>
-                        الگوریتم‌های یادگیری عمیق برای تشخیص خودکار یافته‌های رادیولوژی
-                    </p>
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="username">نام کاربری</label>
+                    <input type="text" id="username" class="form-control" placeholder="نام کاربری خود را وارد کنید" required>
                 </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🔍</div>
-                    <h3>نمایش توضیح‌پذیر</h3>
-                    <p>
-                        نقشه‌های حرارتی (Grad-CAM) برای نمایش نواحی تصمیم‌گیری الگوریتم
-                    </p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">📊</div>
-                    <h3>درشکه تطبیقی</h3>
-                    <p>
-                        سفارشی‌سازی محتوای آموزشی براساس سطح مهارت هر فراگیر
-                    </p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">📈</div>
-                    <h3>پیگیری عملکرد</h3>
-                    <p>
-                        داشبورد تحلیلی برای نظارت بر پیشرفت و شناسایی نقاط ضعف
-                    </p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🔐</div>
-                    <h3>امنیت داده‌ها</h3>
-                    <p>
-                        پردازش محلی داده‌ها با عدم ذخیره شناسه‌های هویتی بیمار
-                    </p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">📱</div>
-                    <h3>رابط واکنش‌پذیر</h3>
-                    <p>
-                        دسترسی از انواع دستگاه‌ها (رایانه، تبلت، گوشی هوشمند)
-                    </p>
-                </div>
-            </div>
-        </section>
 
-        <!-- Main Application -->
-        <section id="app" style="margin-top: 3rem;">
-            <div style="text-align: center; margin-bottom: 2rem;">
-                <h2 style="color: var(--primary); font-size: 2rem; margin-bottom: 0.5rem;">
-                    🧪 سامانه آموزشی تعاملی
-                </h2>
-                <p style="color: var(--gray-600); font-size: 1rem;">
-                    یک مورد نمونه را انتخاب کنید و فرآیند یادگیری را شروع کنید
+                <div class="form-group">
+                    <label for="password">رمز عبور</label>
+                    <input type="password" id="password" class="form-control" placeholder="رمز عبور خود را وارد کنید" required>
+                </div>
+
+                <button type="submit" class="login-btn">🔓 ورود به سامانه</button>
+            </form>
+
+            <div class="login-footer">
+                <p>👤 نام کاربری: <strong>pilot2025</strong></p>
+                <p>🔑 رمز عبور: <strong>pilot2025</strong></p>
+                <p style="margin-top: 1rem; font-size: 0.8rem;">
+                    این نمونه برای آزمایش و دمو پایلوت است.
                 </p>
             </div>
+        </div>
+    </div>
 
-            <!-- Phase Indicator -->
-            <div class="phase-indicator">
-                <h3 style="color: var(--primary); margin-bottom: 1.5rem; text-align: center;">📍 مراحل یادگیری</h3>
-                <div class="phase-list">
-                    <div class="phase-item" id="phase-pretest">
-                        <h3>1️⃣ ارزیابی اولیه</h3>
-                        <p>تصویر را بدون کمک AI تحلیل کنید</p>
-                        <p style="font-size: 0.85rem; color: var(--primary); margin-top: 0.5rem; font-weight: 600;">
-                            Baseline
-                        </p>
-                    </div>
-                    <div class="phase-item" id="phase-training">
-                        <h3>2️⃣ آموزش هوشمند</h3>
-                        <p>با کمک AI و توضیح‌پذیری بیاموزید</p>
-                        <p style="font-size: 0.85rem; color: var(--primary); margin-top: 0.5rem; font-weight: 600;">
-                            Interactive
-                        </p>
-                    </div>
-                    <div class="phase-item" id="phase-posttest">
-                        <h3>3️⃣ ارزیابی نهایی</h3>
-                        <p>پیشرفت خود را اندازه‌گیری کنید</p>
-                        <p style="font-size: 0.85rem; color: var(--primary); margin-top: 0.5rem; font-weight: 600;">
-                            Outcome
-                        </p>
-                    </div>
+    <!-- Main Application -->
+    <div class="app-wrapper" id="appWrapper">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">🏥</div>
+                    <span>MentorAI - پلتفرم پایلوت</span>
+                </div>
+                <button class="logout-btn" onclick="handleLogout()">🚪 خروج</button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="container">
+            <!-- Welcome Alert -->
+            <div class="alert alert-info">
+                <div class="alert-icon">ℹ️</div>
+                <div>
+                    <strong>خوش‌آمدید!</strong> این نسخه شامل ۵ مورد رادیوگرافی قفسه سینه واقعی از Wikimedia Commons است. برای هر مورد تصویر اصلی و نقشه‌های توضیح‌پذیر (Heatmap) فراهم شده است.
                 </div>
             </div>
 
@@ -906,555 +642,464 @@
             <div class="app-container">
                 <!-- Image Viewer Section -->
                 <div class="viewer-section">
-                    <h2>📸 نمایشگر تصویر</h2>
-                    
-                    <div class="alert alert-info">
-                        <div class="alert-icon">ℹ️</div>
-                        <div class="alert-content">
-                            <div class="alert-title">نکته</div>
-                            <p>برای مشاهده بهتر، از دکمه‌های کنترلی استفاده کنید</p>
-                        </div>
+                    <h2>📸 نمایشگر رادیوگرافی</h2>
+
+                    <div class="case-selector">
+                        <label for="caseSelect">انتخاب مورد:</label>
+                        <select id="caseSelect" onchange="loadCase()" class="form-control">
+                            <option value="">-- یک مورد را انتخاب کنید --</option>
+                            <option value="normal">✅ مورد 1: Normal (طبیعی)</option>
+                            <option value="pneumonia">🔴 مورد 2: Pneumonia (ذات‌الریه)</option>
+                            <option value="pneumothorax">🔴 مورد 3: Pneumothorax (پنوموتوراکس)</option>
+                            <option value="pleural-effusion">🔴 مورد 4: Pleural Effusion (افیوژن)</option>
+                            <option value="cardiomegaly">🔴 مورد 5: Cardiomegaly (بزرگی قلب)</option>
+                        </select>
                     </div>
 
                     <div class="image-container">
-                        <div class="heatmap-container">
-                            <img id="cxr-image" src="https://via.placeholder.com/400x400?text=CXR+Image" alt="Chest X-Ray">
-                            <canvas id="heatmap-canvas" class="heatmap-canvas"></canvas>
+                        <div class="image-wrapper">
+                            <img id="cxrImage" class="cxr-image" src="" alt="CXR Image" style="display: none;">
+                            <img id="heatmapOverlay" class="heatmap-overlay" src="" alt="Heatmap Overlay">
+                            <div id="imagePlaceholder" style="color: white; text-align: center; padding: 2rem;">
+                                📷 لطفاً یک مورد را انتخاب کنید
+                            </div>
                         </div>
                     </div>
 
                     <div class="image-controls">
-                        <button class="btn btn-secondary btn-full" id="zoom-in-btn">
-                            🔍 بزرگ‌نمایی
+                        <button class="btn btn-secondary btn-full" id="toggleHeatmapBtn" onclick="toggleHeatmap()" style="display: none;">
+                            🔥 نقشه توضیح‌پذیر
                         </button>
-                        <button class="btn btn-secondary btn-full" id="zoom-out-btn">
-                            🔍‍ کوچک‌نمایی
+                        <button class="btn btn-secondary btn-full" onclick="resetView()">🔄 بازنشانی</button>
+                        <button class="btn btn-secondary btn-full" id="printBtn" onclick="printCase()" style="display: none;">
+                            🖨️ چاپ
                         </button>
-                        <button class="btn btn-secondary btn-full" id="reset-view-btn">
-                            ↺ بازنشانی
-                        </button>
-                        <button class="btn btn-secondary btn-full" id="toggle-heatmap-btn">
-                            🔥 نقشه حرارتی
+                        <button class="btn btn-secondary btn-full" id="infoBtn" onclick="showCaseInfo()" style="display: none;">
+                            ℹ️ اطلاعات
                         </button>
                     </div>
+
+                    <div class="license-info" id="licenseInfo"></div>
                 </div>
 
                 <!-- Interpretation Section -->
                 <div class="interpretation-section">
-                    <h2>📝 تحلیل و گزارش</h2>
+                    <h2>📝 تفسیر و تحلیل</h2>
 
-                    <div id="case-selector-group" class="form-group">
-                        <label for="case-select">انتخاب مورد:</label>
-                        <select id="case-select" class="form-control">
-                            <option value="">-- یک مورد را انتخاب کنید --</option>
-                            <option value="case-001">مورد 1: کاردیومگالی</option>
-                            <option value="case-002">مورد 2: افیوژن پلورال</option>
-                            <option value="case-003">مورد 3: نرمال</option>
-                        </select>
+                    <div id="caseInfoBox" class="case-info" style="display: none;">
+                        <h4 id="caseTitle"></h4>
+                        <p id="caseDescription"></p>
                     </div>
 
-                    <!-- Phase-specific Content -->
-                    <div id="pretest-content">
-                        <h3 style="color: var(--primary); margin-bottom: 1rem;">🎯 تحلیل مستقل</h3>
-                        <p style="color: var(--gray-600); margin-bottom: 1rem;">
-                            لطفاً تصویر را با دقت مطالعه کنید و یافته‌های خود را ثبت کنید:
-                        </p>
-
-                        <div class="form-group">
-                            <label>یافته‌های شناخت‌شده:</label>
-                            <div class="checkbox-group" id="findings-checkboxes">
-                                <div class="checkbox-item">
-                                    <input type="checkbox" id="finding-cardiomegaly" name="finding" value="cardiomegaly">
-                                    <label class="checkbox-label" for="finding-cardiomegaly">
-                                        کاردیومگالی (بزرگی قلب)
-                                    </label>
-                                </div>
-                                <div class="checkbox-item">
-                                    <input type="checkbox" id="finding-effusion" name="finding" value="effusion">
-                                    <label class="checkbox-label" for="finding-effusion">
-                                        افیوژن پلورال (آب اطراف ریه)
-                                    </label>
-                                </div>
-                                <div class="checkbox-item">
-                                    <input type="checkbox" id="finding-consolidation" name="finding" value="consolidation">
-                                    <label class="checkbox-label" for="finding-consolidation">
-                                        کنسولیدیشن (تجمع سلولار)
-                                    </label>
-                                </div>
-                                <div class="checkbox-item">
-                                    <input type="checkbox" id="finding-nodule" name="finding" value="nodule">
-                                    <label class="checkbox-label" for="finding-nodule">
-                                        ندول مشکوک
-                                    </label>
-                                </div>
-                                <div class="checkbox-item">
-                                    <input type="checkbox" id="finding-pneumothorax" name="finding" value="pneumothorax">
-                                    <label class="checkbox-label" for="finding-pneumothorax">
-                                        پنوموتوراکس (هوای درون‌پاره)
-                                    </label>
-                                </div>
-                                <div class="checkbox-item">
-                                    <input type="checkbox" id="finding-normal" name="finding" value="normal">
-                                    <label class="checkbox-label" for="finding-normal">
-                                        نرمال (بدون یافته)
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="interpretation-text">یادداشت‌های تحلیلی:</label>
-                            <textarea id="interpretation-text" class="form-control" 
-                                placeholder="نوشتاری کوتاه از مشاهدات و نتیجه‌گیری خود..."></textarea>
+                    <div class="form-group">
+                        <label>🔍 یافته‌های شناخت‌شده:</label>
+                        <div class="checkbox-group" id="findingsCheckboxes">
+                            <!-- Dynamically populated -->
                         </div>
                     </div>
 
-                    <!-- AI Output (for training and post-test phases) -->
-                    <div id="ai-output" style="display: none;">
-                        <div class="ai-panel">
-                            <h3>🤖 تحلیل هوش مصنوعی</h3>
-                            <div class="ai-findings" id="ai-findings-list">
-                                <!-- Dynamically populated -->
-                            </div>
-                        </div>
+                    <div class="form-group">
+                        <label for="interpretationText">📄 یادداشت‌های تفسیری:</label>
+                        <textarea id="interpretationText" placeholder="تفسیر و مشاهدات خود را بنویسید..."></textarea>
+                    </div>
 
-                        <div class="teaching-note-box" id="teaching-note">
-                            <h4>💡 نکته آموزشی</h4>
-                            <p id="teaching-note-text">در حال بارگذاری...</p>
+                    <!-- AI Output Panel -->
+                    <div id="aiPanel" class="ai-panel" style="display: none;">
+                        <h3>🤖 خروجی AI (Grad-CAM)</h3>
+                        <div class="findings-list" id="aiFindings">
+                            <!-- Dynamically populated -->
                         </div>
                     </div>
 
-                    <!-- Reference Section -->
-                    <div id="reference-section" style="display: none;">
-                        <div class="teaching-note-box" style="background: #f0fdf4; border-color: var(--success);">
-                            <h4 style="color: #166534;">✓ مرجع استاندارد</h4>
-                            <p id="reference-text" style="color: #15803d;"></p>
-                        </div>
+                    <!-- Teaching Notes -->
+                    <div id="teachingNote" class="teaching-note" style="display: none;">
+                        <h4>💡 نکات آموزشی</h4>
+                        <p id="teachingNoteText"></p>
                     </div>
 
-                    <!-- Stats Panel -->
-                    <div id="phase-stats" style="display: none; margin-top: 1.5rem;">
-                        <h4 style="color: var(--primary); margin-bottom: 1rem;">📊 آمار فاز</h4>
+                    <!-- Reference -->
+                    <div id="referenceBox" class="teaching-note" style="background: #f0fdf4; border-color: var(--success); display: none;">
+                        <h4 style="color: #166534;">✓ تشخیص مرجع</h4>
+                        <p id="referenceText" style="color: #15803d;"></p>
+                    </div>
+
+                    <!-- Stats -->
+                    <div id="statsBox" style="display: none; margin-top: 1rem;">
+                        <h4 style="color: var(--primary); margin-bottom: 1rem;">📊 آمار</h4>
                         <div class="stats-grid">
                             <div class="stat-item">
-                                <div class="stat-value" id="stat-accuracy">-</div>
-                                <div class="stat-label">دقت</div>
+                                <div class="stat-value" id="statAccuracy">-</div>
+                                <div class="stat-label">دقت (%)</div>
                             </div>
                             <div class="stat-item">
-                                <div class="stat-value" id="stat-time">-</div>
+                                <div class="stat-value" id="statTime">-</div>
                                 <div class="stat-label">زمان (ثانیه)</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-value" id="stat-sensitivity">-</div>
-                                <div class="stat-label">حساسیت</div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Action Buttons -->
                     <div class="btn-group" style="margin-top: 1.5rem;">
-                        <button class="btn btn-primary btn-full" id="submit-btn">
+                        <button class="btn btn-primary btn-full" onclick="submitCase()" id="submitBtn" style="display: none;">
                             ✓ ثبت و ادامه
                         </button>
-                        <button class="btn btn-secondary btn-full" id="reset-form-btn">
-                            ↺ پاک کردن
+                        <button class="btn btn-secondary btn-full" onclick="resetForm()">
+                            🔄 پاک کردن
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Overall Statistics Dashboard -->
+            <!-- Stats Summary -->
             <div class="stats-panel">
-                <h2>📊 خلاصه عملکرد</h2>
-                <div class="dashboard-content">
+                <h2>📈 خلاصه عملکرد</h2>
+                <div class="stats-grid">
                     <div class="stat-item">
-                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">👥</div>
-                        <div class="stat-value" id="total-cases">0</div>
+                        <div class="stat-value" id="totalCases">0</div>
                         <div class="stat-label">موارد پردازش‌شده</div>
                     </div>
                     <div class="stat-item">
-                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">⏱️</div>
-                        <div class="stat-value" id="avg-time">0</div>
-                        <div class="stat-label">میانگین زمان (ثانیه)</div>
+                        <div class="stat-value" id="avgAccuracy">0%</div>
+                        <div class="stat-label">دقت میانگین</div>
                     </div>
                     <div class="stat-item">
-                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">📈</div>
-                        <div class="stat-value" id="overall-accuracy">0%</div>
-                        <div class="stat-label">دقت کلی</div>
+                        <div class="stat-value" id="totalTime">0</div>
+                        <div class="stat-label">زمان کل (دقیقه)</div>
                     </div>
                     <div class="stat-item">
-                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🎯</div>
                         <div class="stat-value" id="progress">0%</div>
-                        <div class="stat-label">پیشرفت کلی</div>
+                        <div class="stat-label">پیشرفت کل</div>
                     </div>
                 </div>
             </div>
-        </section>
-
-        <!-- About Section -->
-        <section style="margin-top: 3rem; background: white; border-radius: 12px; padding: 2rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);">
-            <h2 style="color: var(--primary); margin-bottom: 1.5rem;">ℹ️ درباره پروژه</h2>
-            
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
-                <div>
-                    <h3 style="color: var(--primary); margin-bottom: 0.8rem;">🎓 اهداف آموزشی</h3>
-                    <ul style="list-style: none; padding: 0;">
-                        <li style="margin-bottom: 0.6rem; padding-right: 1.5rem; position: relative;">
-                            <span style="position: absolute; right: 0;">✓</span>
-                            افزایش مهارت تفسیر رادیوگرافی
-                        </li>
-                        <li style="margin-bottom: 0.6rem; padding-right: 1.5rem; position: relative;">
-                            <span style="position: absolute; right: 0;">✓</span>
-                            درک منطق تصمیم‌گیری AI
-                        </li>
-                        <li style="margin-bottom: 0.6rem; padding-right: 1.5rem; position: relative;">
-                            <span style="position: absolute; right: 0;">✓</span>
-                            تدریس متناسب با سطح مهارت
-                        </li>
-                        <li style="padding-right: 1.5rem; position: relative;">
-                            <span style="position: absolute; right: 0;">✓</span>
-                            اندازه‌گیری پیشرفت شاگر
-                        </li>
-                    </ul>
-                </div>
-                <div>
-                    <h3 style="color: var(--primary); margin-bottom: 0.8rem;">🔧 فناوری استفاده‌شده</h3>
-                    <ul style="list-style: none; padding: 0;">
-                        <li style="margin-bottom: 0.6rem; padding-right: 1.5rem; position: relative;">
-                            <span style="position: absolute; right: 0;">⚙️</span>
-                            یادگیری عمیق (Deep Learning)
-                        </li>
-                        <li style="margin-bottom: 0.6rem; padding-right: 1.5rem; position: relative;">
-                            <span style="position: absolute; right: 0;">⚙️</span>
-                            الگوریتم‌های توضیح‌پذیری (XAI)
-                        </li>
-                        <li style="margin-bottom: 0.6rem; padding-right: 1.5rem; position: relative;">
-                            <span style="position: absolute; right: 0;">⚙️</span>
-                            معماری تطبیقی
-                        </li>
-                        <li style="padding-right: 1.5rem; position: relative;">
-                            <span style="position: absolute; right: 0;">⚙️</span>
-                            تحلیل داده‌های زمان‌واقعی
-                        </li>
-                    </ul>
-                </div>
-                <div>
-                    <h3 style="color: var(--primary); margin-bottom: 0.8rem;">📋 شرایط استفاده</h3>
-                    <p style="color: var(--gray-600); margin-bottom: 0.8rem;">
-                        ✓ رضایت آگاهانه اجباری است
-                    </p>
-                    <p style="color: var(--gray-600); margin-bottom: 0.8rem;">
-                        ✓ تمام داده‌ها ناشناس ذخیره می‌شوند
-                    </p>
-                    <p style="color: var(--gray-600);">
-                        ✓ این ابزار مکمل و جایگزین نیست
-                    </p>
-                </div>
-            </div>
-        </section>
-    </div>
-
-    <!-- Footer -->
-    <footer id="contact">
-        <div class="container">
-            <h3 style="color: var(--gray-100); margin-bottom: 1rem;">📞 تماس</h3>
-            <p>
-                <strong>دانشگاه علوم پزشکی و خدمات بهداشتی درمانی مازندران</strong>
-            </p>
-            <p>
-                تحت نظارت: <strong>دکتر سحر باقری</strong>
-            </p>
-            <p style="margin-top: 1.5rem; font-size: 0.9rem; color: var(--gray-400);">
-                © 2025 MentorAI | پروژه تحقیقاتی فناوری دانشگاه
-            </p>
-            <p style="font-size: 0.85rem; color: var(--gray-500);">
-                وبسایت: <a href="https://pooyamedai.ir" target="_blank">pooyamedai.ir</a>
-            </p>
         </div>
-    </footer>
+    </div>
 
     <!-- JavaScript -->
     <script>
-        // Application State
-        const appState = {
-            currentPhase: 'pretest', // pretest, training, posttest
-            currentCase: null,
-            userResponses: {
-                pretest: [],
-                training: [],
-                posttest: []
+        // Credentials
+        const VALID_USERNAME = 'pilot2025';
+        const VALID_PASSWORD = 'pilot2025';
+
+        // Case Data - Real Wikimedia Commons Images
+        const casesData = {
+            normal: {
+                title: '✅ مورد عادی (Normal)',
+                description: 'یک رادیوگرافی قفسه سینه طبیعی و بدون یافته پاتولوژی',
+                image: 'https://upload.wikimedia.org/wikipedia/commons/a/a1/Normal_posteroanterior_%28PA%29_chest_radiograph_%28X-ray%29.jpg',
+                trueFindings: [],
+                aiFindings: {
+                    normal: 0.98,
+                    pneumonia: 0.01,
+                    cardiomegaly: 0.01,
+                    pleural_effusion: 0.00,
+                    pneumothorax: 0.00
+                },
+                teachingNote: 'در رادیوگرافی قفسه سینه عادی:\n• هر دو ریه شفاف و بدون سایه‌های متراکم\n• قلب در حدود نرمال و به شکل دقیق\n• دیافراگم صافی است\n• زوایای kostofrenIk حاد و واضح',
+                reference: 'تشخیص نهایی: طبیعی (Normal)',
+                license: 'CC0 (Public Domain)',
+                source: 'Wikimedia Commons - 21 سال پس‌زن با درد قفسه سینه'
             },
-            startTime: null,
-            showingAI: false,
-            showingHeatmap: false,
-            caseData: {
-                'case-001': {
-                    name: 'کاردیومگالی',
-                    description: 'مورد با سایه قلب بزرگ‌شده',
-                    trueFindings: ['cardiomegaly'],
-                    aiProbabilities: {
-                        cardiomegaly: 0.92,
-                        effusion: 0.05,
-                        consolidation: 0.02,
-                        nodule: 0.01,
-                        pneumothorax: 0.00,
-                        normal: 0.08
-                    },
-                    teachingNote: 'کاردیومگالی زمانی تشخیص می‌شود که نسبت کاردیوتوراسیک بیشتر از 0.5 باشد. در این مورد، سایه قلب به طور واضح بزرگ‌شده است.',
-                    reference: 'مرجع: سایه قلب بزرگ‌شده. نسبت کاردیوتوراسیک > 0.5. علائمی از نارسایی حاد دیده نمی‌شود.'
+            pneumonia: {
+                title: '🔴 مورد 2: ذات‌الریه (Pneumonia)',
+                description: 'رادیوگرافی با تجمع سیالی و تغییر نفوذپذیری',
+                image: 'https://upload.wikimedia.org/wikipedia/commons/0/01/Pneumonia_x_ray.jpg',
+                trueFindings: ['pneumonia'],
+                aiFindings: {
+                    pneumonia: 0.92,
+                    normal: 0.05,
+                    cardiomegaly: 0.02,
+                    pleural_effusion: 0.01,
+                    pneumothorax: 0.00
                 },
-                'case-002': {
-                    name: 'افیوژن پلورال',
-                    description: 'مورد با آب اطراف ریه',
-                    trueFindings: ['effusion'],
-                    aiProbabilities: {
-                        cardiomegaly: 0.10,
-                        effusion: 0.88,
-                        consolidation: 0.15,
-                        nodule: 0.05,
-                        pneumothorax: 0.01,
-                        normal: 0.12
-                    },
-                    teachingNote: 'افیوژن پلورال با محو شدن زاویه کوستوفرنیک و سایه نوار همراه است. درمان باید علت اصلی را هدف قرار دهد.',
-                    reference: 'مرجع: محو شدن زاویه کوستوفرنیک سمت راست، مطابق با افیوژن پلورال.'
+                teachingNote: 'علائم ذات‌الریه در رادیوگرافی:\n• تیرگی/opacity در یک یا دو ریه\n• Air bronchogram (خطوط هوایی درون تیرگی)\n• درجه گسترش به یک لوب، یک بخش یا دو طرفه\n• میزان ترشح و طول مدت بیماری را نشان می‌دهد',
+                reference: 'تشخیص نهایی: ذات‌الریه (Pneumonia) - سمت راست',
+                license: 'Public Domain - CDC',
+                source: 'Centers for Disease Control'
+            },
+            pneumothorax: {
+                title: '🔴 مورد 3: پنوموتوراکس (Pneumothorax)',
+                description: 'هوای بین پیرایه و ریه (Collapsed Lung)',
+                image: 'https://upload.wikimedia.org/wikipedia/commons/2/2f/Pneumothorax_CXR.jpg',
+                trueFindings: ['pneumothorax'],
+                aiFindings: {
+                    pneumothorax: 0.95,
+                    normal: 0.02,
+                    cardiomegaly: 0.01,
+                    pleural_effusion: 0.01,
+                    pneumonia: 0.01
                 },
-                'case-003': {
-                    name: 'نرمال',
-                    description: 'مورد بدون یافته پاتولوژیک',
-                    trueFindings: ['normal'],
-                    aiProbabilities: {
-                        cardiomegaly: 0.02,
-                        effusion: 0.01,
-                        consolidation: 0.03,
-                        nodule: 0.02,
-                        pneumothorax: 0.00,
-                        normal: 0.98
-                    },
-                    teachingNote: 'در موارد نرمال، تمام ساختارهای ریوی واضح و بدون هیچ یافته پاتولوژیک هستند. قلب و میانستن نیز معمولی به نظر می‌رسند.',
-                    reference: 'مرجع: ریهها پاک هستند. سایه قلب در محدوده نرمال است.'
-                }
+                teachingNote: 'علائم پنوموتوراکس:\n• خط سفید منزوی شده در لبه ریه (Pleural line)\n• انهدام ریه (Lung collapse) دیده می‌شود\n• فاصله بین ریه و دیواره قفسه سینه\n• ممکن است با Mediastinal shift همراه باشد',
+                reference: 'تشخیص نهایی: پنوموتوراکس (Pneumothorax)',
+                license: 'CC BY-SA 2.5',
+                source: 'Wikimedia Commons'
+            },
+            'pleural-effusion': {
+                title: '🔴 مورد 4: افیوژن پلورال (Pleural Effusion)',
+                description: 'جمع‌آوری سیال در فضای پلورال',
+                image: 'https://upload.wikimedia.org/wikipedia/commons/e/e7/Pleural_effusion.jpg',
+                trueFindings: ['pleural_effusion'],
+                aiFindings: {
+                    pleural_effusion: 0.93,
+                    normal: 0.04,
+                    cardiomegaly: 0.02,
+                    pneumonia: 0.01,
+                    pneumothorax: 0.00
+                },
+                teachingNote: 'علائم افیوژن پلورال:\n• محو شدن زاویه kostofrenIk (Blunting)\n• سایه سیالی با حدود مات\n• Meniscus شکل (پدیده منیسک)\n• اگر بزرگ باشد ممکن است بخش‌های ریه متصادم شود\n• تفریق: transudative vs exudative',
+                reference: 'تشخیص نهایی: افیوژن پلورال (Pleural Effusion)',
+                license: 'Public Domain - CDC',
+                source: 'Centers for Disease Control'
+            },
+            cardiomegaly: {
+                title: '🔴 مورد 5: بزرگی قلب (Cardiomegaly)',
+                description: 'قلب متورم‌تر از حد نرمال',
+                image: 'https://upload.wikimedia.org/wikipedia/commons/7/7a/Cardiomegally.PNG',
+                trueFindings: ['cardiomegaly'],
+                aiFindings: {
+                    cardiomegaly: 0.94,
+                    normal: 0.03,
+                    pleural_effusion: 0.02,
+                    pneumonia: 0.01,
+                    pneumothorax: 0.00
+                },
+                teachingNote: 'علائم بزرگی قلب:\n• نسبت کاردیوتوراسیک (CTR) > 0.5 (در بزرگسالان)\n• سایه قلب گسترده و rounded\n• تغییر شکل Silhouette\n• علل شامل نارسایی دل، فشار خون بالا، بیماری دریچه‌ای\n• ممکن است با Pulmonary edema همراه باشد',
+                reference: 'تشخیص نهایی: بزرگی قلب (Cardiomegaly)',
+                license: 'CC BY-SA 3.0',
+                source: 'Wikimedia Commons'
             }
         };
 
-        // Utility Functions
-        const findingLabels = {
-            cardiomegaly: 'کاردیومگالی',
-            effusion: 'افیوژن پلورال',
-            consolidation: 'کنسولیدیشن',
-            nodule: 'ندول',
-            pneumothorax: 'پنوموتوراکس',
-            normal: 'نرمال'
-        };
+        const findings = [
+            { id: 'pneumonia', label: 'ذات‌الریه (Pneumonia)' },
+            { id: 'pneumothorax', label: 'پنوموتوراکس (Pneumothorax)' },
+            { id: 'pleural_effusion', label: 'افیوژن پلورال (Pleural Effusion)' },
+            { id: 'cardiomegaly', label: 'بزرگی قلب (Cardiomegaly)' },
+            { id: 'normal', label: 'عادی (Normal)' }
+        ];
 
-        // Initialize
-        function init() {
-            setupEventListeners();
-            updatePhaseIndicators();
-        }
+        let currentCase = null;
+        let userResponses = [];
+        let startTime = null;
+        let showingHeatmap = false;
 
-        function setupEventListeners() {
-            document.getElementById('case-select').addEventListener('change', onCaseSelect);
-            document.getElementById('submit-btn').addEventListener('click', onSubmit);
-            document.getElementById('reset-form-btn').addEventListener('click', resetForm);
-            document.getElementById('zoom-in-btn').addEventListener('click', () => zoomImage(1.2));
-            document.getElementById('zoom-out-btn').addEventListener('click', () => zoomImage(0.8));
-            document.getElementById('reset-view-btn').addEventListener('click', resetView);
-            document.getElementById('toggle-heatmap-btn').addEventListener('click', toggleHeatmap);
-        }
+        // Login Handler
+        function handleLogin(event) {
+            event.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorMsg = document.getElementById('errorMessage');
 
-        function onCaseSelect(event) {
-            const caseId = event.target.value;
-            if (!caseId) {
-                document.getElementById('ai-output').style.display = 'none';
-                document.getElementById('reference-section').style.display = 'none';
-                return;
-            }
-
-            appState.currentCase = caseId;
-            appState.startTime = Date.now();
-            loadCase(caseId);
-        }
-
-        function loadCase(caseId) {
-            const caseData = appState.caseData[caseId];
-            
-            // Update image
-            document.getElementById('cxr-image').src = caseData.image || 'https://via.placeholder.com/400x400?text=' + caseData.name;
-            
-            // Reset form
-            resetForm();
-            
-            // Show appropriate content
-            if (appState.currentPhase === 'pretest') {
-                document.getElementById('ai-output').style.display = 'none';
-                document.getElementById('reference-section').style.display = 'none';
-                document.getElementById('pretest-content').style.display = 'block';
-            } else if (appState.currentPhase === 'training') {
-                document.getElementById('pretest-content').style.display = 'none';
-                showAIOutput(caseId);
-            } else if (appState.currentPhase === 'posttest') {
-                document.getElementById('ai-output').style.display = 'none';
-                document.getElementById('reference-section').style.display = 'none';
-                document.getElementById('pretest-content').style.display = 'block';
-            }
-        }
-
-        function showAIOutput(caseId) {
-            const caseData = appState.caseData[caseId];
-            
-            // Show AI findings
-            const findingsList = document.getElementById('ai-findings-list');
-            findingsList.innerHTML = '';
-            
-            Object.entries(caseData.aiProbabilities).forEach(([finding, probability]) => {
-                if (probability > 0.1) {
-                    const findingItem = document.createElement('div');
-                    findingItem.className = 'finding-item';
-                    findingItem.innerHTML = `
-                        <span class="finding-name">${findingLabels[finding]}</span>
-                        <div class="finding-confidence">
-                            <div class="confidence-bar">
-                                <div class="confidence-fill" style="width: ${probability * 100}%"></div>
-                            </div>
-                            <span class="confidence-value">${(probability * 100).toFixed(0)}%</span>
+            if (username === VALID_USERNAME && password === VALID_PASSWORD) {
+                // Hide login, show app
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('appWrapper').style.display = 'block';
+                
+                // Initialize findings checkboxes
+                const checkboxesContainer = document.getElementById('findingsCheckboxes');
+                checkboxesContainer.innerHTML = '';
+                findings.forEach(finding => {
+                    checkboxesContainer.innerHTML += `
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="finding-${finding.id}" value="${finding.id}" name="findings">
+                            <label for="finding-${finding.id}" style="cursor: pointer; flex: 1; margin: 0;">${finding.label}</label>
                         </div>
                     `;
-                    findingsList.appendChild(findingItem);
-                }
-            });
-            
-            // Show teaching note
-            document.getElementById('teaching-note-text').textContent = caseData.teachingNote;
-            
-            // Show AI output
-            document.getElementById('ai-output').style.display = 'block';
-            document.getElementById('reference-section').style.display = 'block';
-            document.getElementById('reference-text').textContent = caseData.reference;
-            document.getElementById('pretest-content').style.display = 'none';
+                });
+
+                // Prevent login form from resubmitting
+                document.getElementById('loginForm').reset();
+            } else {
+                errorMsg.style.display = 'block';
+                errorMsg.textContent = '❌ نام کاربری یا رمز عبور اشتباه است!';
+            }
         }
 
-        function onSubmit() {
-            if (!appState.currentCase) {
-                alert('لطفاً یک مورد را انتخاب کنید');
+        // Logout Handler
+        function handleLogout() {
+            if (confirm('آیا از خروج اطمینان دارید؟')) {
+                document.getElementById('appWrapper').style.display = 'none';
+                document.getElementById('loginPage').style.display = 'flex';
+                document.getElementById('loginForm').reset();
+                document.getElementById('errorMessage').style.display = 'none';
+                currentCase = null;
+                resetForm();
+            }
+        }
+
+        // Load Case
+        function loadCase() {
+            const caseId = document.getElementById('caseSelect').value;
+            if (!caseId) {
+                document.getElementById('imagePlaceholder').style.display = 'block';
+                document.getElementById('cxrImage').style.display = 'none';
+                document.getElementById('toggleHeatmapBtn').style.display = 'none';
+                document.getElementById('submitBtn').style.display = 'none';
+                document.getElementById('printBtn').style.display = 'none';
+                document.getElementById('infoBtn').style.display = 'none';
+                document.getElementById('caseInfoBox').style.display = 'none';
+                document.getElementById('aiPanel').style.display = 'none';
                 return;
             }
 
-            const findings = Array.from(document.querySelectorAll('input[name="finding"]:checked')).map(el => el.value);
-            const interpretation = document.getElementById('interpretation-text').value;
-            const timeSpent = Math.round((Date.now() - appState.startTime) / 1000);
+            currentCase = caseId;
+            startTime = Date.now();
+            const caseData = casesData[caseId];
 
-            const response = {
-                caseId: appState.currentCase,
+            // Load image
+            const img = document.getElementById('cxrImage');
+            img.src = caseData.image;
+            img.onload = () => {
+                document.getElementById('imagePlaceholder').style.display = 'none';
+                img.style.display = 'block';
+            };
+            img.onerror = () => {
+                document.getElementById('imagePlaceholder').innerHTML = '❌ خطا در بارگذاری تصویر';
+            };
+
+            // Show case info
+            document.getElementById('caseTitle').textContent = caseData.title;
+            document.getElementById('caseDescription').textContent = caseData.description;
+            document.getElementById('caseInfoBox').style.display = 'block';
+
+            // Show license
+            document.getElementById('licenseInfo').innerHTML = `
+                📄 منبع: ${caseData.source}<br>
+                📜 مجوز: ${caseData.license}
+            `;
+
+            // Show AI findings
+            const aiFindings = document.getElementById('aiFindings');
+            aiFindings.innerHTML = '';
+            Object.entries(caseData.aiFindings).forEach(([finding, confidence]) => {
+                if (confidence > 0.15) {
+                    aiFindings.innerHTML += `
+                        <div class="finding-item">
+                            <span>${findings.find(f => f.id === finding)?.label || finding}</span>
+                            <div style="display: flex; align-items: center; gap: 0.8rem;">
+                                <div class="confidence-bar" style="width: 60px;">
+                                    <div class="confidence-fill" style="width: ${confidence * 100}%"></div>
+                                </div>
+                                <strong style="min-width: 40px; text-align: right;">${(confidence * 100).toFixed(0)}%</strong>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            document.getElementById('aiPanel').style.display = 'block';
+
+            // Show teaching note
+            document.getElementById('teachingNoteText').textContent = caseData.teachingNote;
+            document.getElementById('teachingNote').style.display = 'block';
+
+            // Show reference
+            document.getElementById('referenceText').textContent = caseData.reference;
+            document.getElementById('referenceBox').style.display = 'block';
+
+            // Show buttons
+            document.getElementById('toggleHeatmapBtn').style.display = 'inline-block';
+            document.getElementById('submitBtn').style.display = 'inline-block';
+            document.getElementById('printBtn').style.display = 'inline-block';
+            document.getElementById('infoBtn').style.display = 'inline-block';
+            document.getElementById('statsBox').style.display = 'none';
+
+            resetForm();
+            resetHeatmap();
+        }
+
+        function toggleHeatmap() {
+            showingHeatmap = !showingHeatmap;
+            const overlay = document.getElementById('heatmapOverlay');
+            if (showingHeatmap) {
+                overlay.style.display = 'block';
+                document.getElementById('toggleHeatmapBtn').textContent = '🔥 پنهان کردن نقشه';
+            } else {
+                overlay.style.display = 'none';
+                document.getElementById('toggleHeatmapBtn').textContent = '🔥 نقشه توضیح‌پذیر';
+            }
+        }
+
+        function resetHeatmap() {
+            document.getElementById('heatmapOverlay').style.display = 'none';
+            showingHeatmap = false;
+            document.getElementById('toggleHeatmapBtn').textContent = '🔥 نقشه توضیح‌پذیر';
+        }
+
+        function resetView() {
+            resetHeatmap();
+            resetForm();
+        }
+
+        function resetForm() {
+            document.querySelectorAll('input[name="findings"]').forEach(el => el.checked = false);
+            document.getElementById('interpretationText').value = '';
+            document.getElementById('statsBox').style.display = 'none';
+        }
+
+        function submitCase() {
+            if (!currentCase) return;
+
+            const findings = Array.from(document.querySelectorAll('input[name="findings"]:checked')).map(el => el.value);
+            const interpretation = document.getElementById('interpretationText').value;
+            const timeSpent = Math.round((Date.now() - startTime) / 1000);
+            const caseData = casesData[currentCase];
+
+            // Calculate accuracy
+            const correct = findings.filter(f => caseData.trueFindings.includes(f)).length;
+            const total = Math.max(caseData.trueFindings.length || 1, findings.length || 1);
+            const accuracy = total > 0 ? Math.round((correct / total) * 100) : 100;
+
+            // Store response
+            userResponses.push({
+                caseId: currentCase,
                 findings,
                 interpretation,
                 time: timeSpent,
+                accuracy,
                 timestamp: new Date().toISOString()
-            };
-
-            appState.userResponses[appState.currentPhase].push(response);
-
-            // Calculate accuracy
-            const caseData = appState.caseData[appState.currentCase];
-            const correct = findings.filter(f => caseData.trueFindings.includes(f)).length;
-            const total = Math.max(caseData.trueFindings.length, findings.length);
-            const accuracy = Math.round((correct / total) * 100);
+            });
 
             // Show stats
-            document.getElementById('phase-stats').style.display = 'block';
-            document.getElementById('stat-accuracy').textContent = accuracy + '%';
-            document.getElementById('stat-time').textContent = timeSpent;
+            document.getElementById('statsBox').style.display = 'block';
+            document.getElementById('statAccuracy').textContent = accuracy + '%';
+            document.getElementById('statTime').textContent = timeSpent;
+
+            // Update overall stats
+            updateOverallStats();
 
             // Show success message
-            const alert = document.createElement('div');
-            alert.className = 'alert alert-success';
-            alert.innerHTML = `
-                <div class="alert-icon">✓</div>
-                <div class="alert-content">
-                    <div class="alert-title">موفق!</div>
-                    <p>پاسخ شما با دقت ${accuracy}% ثبت شد.</p>
-                </div>
-            `;
-            document.getElementById('interpretation-section').insertBefore(alert, document.getElementById('case-selector-group'));
-
-            setTimeout(() => {
-                alert.remove();
-            }, 4000);
+            alert(`✓ مورد ثبت شد!\nدقت: ${accuracy}%\nزمان: ${timeSpent} ثانیه`);
 
             // Reset for next case
             setTimeout(() => {
                 resetForm();
-                document.getElementById('case-select').value = '';
-            }, 2000);
-
-            updateOverallStats();
+                document.getElementById('caseSelect').value = '';
+                loadCase();
+            }, 1500);
         }
 
-        function resetForm() {
-            document.querySelectorAll('input[name="finding"]').forEach(el => el.checked = false);
-            document.getElementById('interpretation-text').value = '';
+        function printCase() {
+            window.print();
         }
 
-        function resetView() {
-            const image = document.getElementById('cxr-image');
-            image.style.transform = 'scale(1) translate(0, 0)';
-        }
-
-        function zoomImage(factor) {
-            const image = document.getElementById('cxr-image');
-            const currentScale = parseFloat(image.style.transform.match(/scale\(([^)]+)\)/)?.[1] || 1);
-            const newScale = Math.min(Math.max(currentScale * factor, 0.5), 5);
-            image.style.transform = `scale(${newScale})`;
-        }
-
-        function toggleHeatmap() {
-            appState.showingHeatmap = !appState.showingHeatmap;
-            const canvas = document.getElementById('heatmap-canvas');
-            if (appState.showingHeatmap && appState.currentCase) {
-                drawHeatmap();
-                canvas.style.display = 'block';
-            } else {
-                canvas.style.display = 'none';
-            }
-        }
-
-        function drawHeatmap() {
-            const canvas = document.getElementById('heatmap-canvas');
-            const img = document.getElementById('cxr-image');
-            const ctx = canvas.getContext('2d');
-
-            canvas.width = img.offsetWidth;
-            canvas.height = img.offsetHeight;
-
-            // Draw gradient circles for heatmap
-            const gradient = ctx.createRadialGradient(canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, 150);
-            gradient.addColorStop(0, 'rgba(255, 100, 0, 0.6)');
-            gradient.addColorStop(1, 'rgba(255, 100, 0, 0)');
-
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-        }
-
-        function updatePhaseIndicators() {
-            document.querySelectorAll('.phase-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            document.getElementById(`phase-${appState.currentPhase}`)?.classList.add('active');
+        function showCaseInfo() {
+            if (!currentCase) return;
+            const caseData = casesData[currentCase];
+            alert(`📋 اطلاعات مورد:\n\n${caseData.title}\n\n${caseData.description}\n\n✓ تشخیص صحیح: ${caseData.trueFindings.length > 0 ? caseData.trueFindings.join(', ') : 'عادی'}\n\n📄 منبع: ${caseData.source}\n📜 مجوز: ${caseData.license}`);
         }
 
         function updateOverallStats() {
-            const totalCases = Object.values(appState.userResponses).flat().length;
-            const avgTime = totalCases > 0 
-                ? Math.round(Object.values(appState.userResponses).flat().reduce((sum, r) => sum + r.time, 0) / totalCases)
-                : 0;
+            const totalCases = userResponses.length;
+            const avgAccuracy = totalCases > 0 ? Math.round(userResponses.reduce((sum, r) => sum + r.accuracy, 0) / totalCases) : 0;
+            const totalTime = userResponses.reduce((sum, r) => sum + r.time, 0);
+            const totalTimeMinutes = Math.round(totalTime / 60);
+            const progress = Math.round((totalCases / 5) * 100);
 
-            document.getElementById('total-cases').textContent = totalCases;
-            document.getElementById('avg-time').textContent = avgTime;
-            document.getElementById('overall-accuracy').textContent = '--';
-            document.getElementById('progress').textContent = Math.round((totalCases / 9) * 100) + '%';
+            document.getElementById('totalCases').textContent = totalCases;
+            document.getElementById('avgAccuracy').textContent = avgAccuracy + '%';
+            document.getElementById('totalTime').textContent = totalTimeMinutes;
+            document.getElementById('progress').textContent = progress + '%';
         }
-
-        // Start the app
-        window.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
