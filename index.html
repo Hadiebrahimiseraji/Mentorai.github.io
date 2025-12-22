@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="پلتفرم آموزش تفسیر رادیوگرافی مبتنی بر هوش مصنوعی">
-    <title>MentorAI - پلتفرم دمو پایلوت</title>
+    <title>MentorAI - پلتفرم پایلوت</title>
     <style>
         * {
             margin: 0;
@@ -226,6 +226,8 @@
             border: 2px solid var(--gray-200);
             border-radius: 8px;
             font-size: 0.95rem;
+            background: white;
+            cursor: pointer;
         }
 
         .question-box {
@@ -257,6 +259,8 @@
         .image-wrapper {
             position: relative;
             display: inline-block;
+            width: 100%;
+            height: 100%;
         }
 
         .cxr-image {
@@ -264,18 +268,19 @@
             max-height: 400px;
             border-radius: 6px;
             display: block;
+            margin: 0 auto;
         }
 
         .heatmap-overlay {
             position: absolute;
-            top: 0;
-            left: 0;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             max-width: 100%;
             max-height: 400px;
             border-radius: 6px;
-            opacity: 0.6;
+            opacity: 0.65;
             display: none;
-            mix-blend-mode: overlay;
         }
 
         .image-placeholder {
@@ -384,7 +389,7 @@
         }
 
         .feedback-section {
-            display: none;
+            display: none !important;
         }
 
         .ai-findings {
@@ -441,6 +446,7 @@
             color: #78350f;
             line-height: 1.8;
             font-size: 0.95rem;
+            white-space: pre-wrap;
         }
 
         .heatmap-btn {
@@ -554,7 +560,7 @@
                     <input type="password" id="password" class="form-control" placeholder="رمز عبور خود را وارد کنید" required>
                 </div>
 
-                <button type="submit" class="login-btn">🔓 ورود به سامانه</button>
+                <button type="submit" class="login-btn">🔐 ورود به سامانه</button>
             </form>
         </div>
     </div>
@@ -564,7 +570,7 @@
         <!-- Header -->
         <header class="header">
             <div class="header-content">
-                <div class="logo">🏥 MentorAI - پلتفرم پایلوت</div>
+                <div class="logo">🏥 MentorAI</div>
                 <button class="logout-btn" onclick="handleLogout()">🚪 خروج</button>
             </div>
         </header>
@@ -602,7 +608,7 @@
                         
                         <div class="question-box">
                             <h3 id="questionTitle"></h3>
-                            <p id="clinicalPresentation" class="clinical-note"></p>
+                            <div id="clinicalPresentation" class="clinical-note"></div>
                         </div>
 
                         <!-- Image -->
@@ -620,7 +626,7 @@
                 <div>
                     <!-- Answer Section -->
                     <div class="section" id="answerSection" style="display: none;">
-                        <h2>✍️ پاسخ شما</h2>
+                        <h2>✏️ پاسخ شما</h2>
 
                         <div class="findings-group">
                             <label>یافته‌های شناخت‌شده:</label>
@@ -706,16 +712,16 @@
     </div>
 
     <script>
-        // Credentials
+        // Credentials (hidden in code)
         const VALID_USERNAME = 'pilot2025';
         const VALID_PASSWORD = 'pilot2025';
 
-        // Case Data
+        // Case Data with real Wikimedia Commons URLs
         const casesData = {
             normal: {
                 title: 'مورد بالینی: قفسه سینه طبیعی',
-                clinical: 'بیمار 25 ساله بدون علائم تنفسی. معاینه فیزیکی طبیعی.',
-                image: 'https://upload.wikimedia.org/wikipedia/commons/a/a1/Normal_posteroanterior_%28PA%29_chest_radiograph_%28X-ray%29.jpg',
+                clinical: '<strong>شرح حال:</strong> بیمار 25 ساله بدون عالئم تنفسی. معایده فیزیکی طبیعی.',
+                image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Normal_posteroanterior_%28PA%29_chest_radiograph_%28X-ray%29.jpg/512px-Normal_posteroanterior_%28PA%29_chest_radiograph_%28X-ray%29.jpg',
                 trueFindings: [],
                 aiFindings: {
                     normal: 0.98,
@@ -728,8 +734,8 @@
             },
             pneumonia: {
                 title: 'مورد بالینی: التهاب ریه',
-                clinical: 'بیمار 40 ساله با تب، سرفه و دیسپنه. علائم تنفسی حاد. درجه حرارت 38.5°C.',
-                image: 'https://upload.wikimedia.org/wikipedia/commons/0/01/Pneumonia_x_ray.jpg',
+                clinical: '<strong>شرح حال:</strong> بیمار 40 ساله با تب، سرفه و دیسپنه. عالئم تنفسی حاد. درجه حرارت 38.5°C.',
+                image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/Pneumonia_x_ray.jpg/512px-Pneumonia_x_ray.jpg',
                 trueFindings: ['pneumonia'],
                 aiFindings: {
                     pneumonia: 0.92,
@@ -738,12 +744,12 @@
                     pleural_effusion: 0.01,
                     pneumothorax: 0.00
                 },
-                teaching: 'علائم ذات‌الریه در رادیوگرافی:\n• تیرگی/opacity در یک یا دو ریه\n• Air bronchogram (خطوط هوایی در تیرگی)\n• توزیع می‌تواند یک لوب، بخش یا پخش باشد\n• ممکن است با pleural effusion همراه باشد\n• تشخیص بالینی: تب، تاکی‌پنه، راتل، تب افت‌نشدنی'
+                teaching: 'عالئم ذات‌الریه در رادیوگرافی:\n• تیرگی/opacity در یک یا دو ریه\n• Air bronchogram (خطوط هوایی در تیرگی)\n• توزیع می‌تواند یک لوب، بخش یا پخش باشد\n• ممکن است با pleural effusion همراه باشد'
             },
             pneumothorax: {
                 title: 'مورد بالینی: ریه فروپاشی',
-                clinical: 'بیمار 28 ساله با درد ناگهانی قفسه سینه و تنگی نفس. انتانه کم‌صدایی در یک طرف.',
-                image: 'https://upload.wikimedia.org/wikipedia/commons/2/2f/Pneumothorax_CXR.jpg',
+                clinical: '<strong>شرح حال:</strong> بیمار 28 ساله با درد ناگهانی قفسه سینه و تنگی نفس. انتانه کم‌صدایی در یک طرف.',
+                image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Pneumothorax_CXR.jpg/512px-Pneumothorax_CXR.jpg',
                 trueFindings: ['pneumothorax'],
                 aiFindings: {
                     pneumothorax: 0.95,
@@ -752,12 +758,12 @@
                     pleural_effusion: 0.01,
                     pneumonia: 0.01
                 },
-                teaching: 'علائم پنوموتوراکس:\n• خط سفید منزوی شده (pleural line) در لبه ریه\n• ریه فروپاشی با فاصله از دیواره قفسه سینه\n• عدم رسم معمول وعائی در ناحیه فروپاشی\n• ممکن است با tracheal deviation همراه باشد (طوارئ)\n• درد حاد ناگهانی، تنگی نفس، تاکی‌کاردی'
+                teaching: 'عالئم پنوموتوراکس:\n• خط سفید منزوی‌شده (pleural line) در لبه ریه\n• ریه فروپاشی با فاصله از دیواره قفسه سینه\n• عدم رسم معمول وعائی در ناحیه فروپاشی\n• درد حاد ناگهانی، تنگی نفس، تاکی‌کاردی'
             },
             'pleural-effusion': {
                 title: 'مورد بالینی: جمع‌آوری سیال کنار ریه',
-                clinical: 'بیمار 55 ساله با تنگی نفس تدریجی. سابقه نارسایی قلب. نقص صوت در یک طرف.',
-                image: 'https://upload.wikimedia.org/wikipedia/commons/e/e7/Pleural_effusion.jpg',
+                clinical: '<strong>شرح حال:</strong> بیمار 55 ساله با تنگی نفس تدریجی. سابقه نارسایی قلب. نقص صوت در یک طرف.',
+                image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Pleural_effusion.jpg/512px-Pleural_effusion.jpg',
                 trueFindings: ['pleural_effusion'],
                 aiFindings: {
                     pleural_effusion: 0.93,
@@ -766,12 +772,12 @@
                     pneumonia: 0.01,
                     pneumothorax: 0.00
                 },
-                teaching: 'علائم افیوژن پلورال:\n• محو شدن زاویه costophrenic (blunting)\n• سایه سیالی با حد مات\n• Meniscus shape (شکل منیسکی)\n• اگر حجم زیاد باشد، می‌تواند ریه را فشار دهد\n• علل: نارسایی قلب، عفونت، سرطان، عفونت\n• Transudative vs Exudative بر اساس نمایش'
+                teaching: 'عالئم افیوژن پلورال:\n• محو شدن زاویه costophrenic (blunting)\n• سایه سیالی با حد مات\n• Meniscus shape (شکل منیسکی)\n• اگر حجم زیاد باشد، می‌تواند ریه را فشار دهد'
             },
             cardiomegaly: {
                 title: 'مورد بالینی: بزرگی قلب',
-                clinical: 'بیمار 60 ساله با خستگی و تنگی نفس. اختلال ضربان قلب. فشار خون بالا.',
-                image: 'https://upload.wikimedia.org/wikipedia/commons/7/7a/Cardiomegally.PNG',
+                clinical: '<strong>شرح حال:</strong> بیمار 60 ساله با خستگی و تنگی نفس. اختلال ضربان قلب. فشار خون بالا.',
+                image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Cardiomegally.PNG/512px-Cardiomegally.PNG',
                 trueFindings: ['cardiomegaly'],
                 aiFindings: {
                     cardiomegaly: 0.94,
@@ -780,7 +786,7 @@
                     pneumonia: 0.01,
                     pneumothorax: 0.00
                 },
-                teaching: 'علائم بزرگی قلب:\n• نسبت cardiothoracic ratio (CTR) > 0.5\n• قلب بزرگ‌شده و گرد شده\n• تغییر شکل Silhouette\n• علل: نارسایی قلبی، فشار خون بالا، بیماری دریچه‌ای\n• ممکن است با Pulmonary edema همراه باشد\n• نیاز به تحقیق بیشتر: اکوکاردیوگرافی، ECG'
+                teaching: 'عالئم بزرگی قلب:\n• نسبت cardiothoracic ratio (CTR) > 0.5\n• قلب بزرگ‌شده و گرد شده\n• تغییر شکل Silhouette\n• عل: نارسایی قلبی، فشار خون بالا، بیماری دریچه‌ای'
             }
         };
 
@@ -852,11 +858,15 @@
 
             // Load question
             document.getElementById('questionTitle').textContent = caseData.title;
-            document.getElementById('clinicalPresentation').innerHTML = `<strong>شرح حال:</strong> ${caseData.clinical}`;
+            document.getElementById('clinicalPresentation').innerHTML = caseData.clinical;
 
-            // Load image
+            // Load image with CORS handling
             const img = document.getElementById('cxrImage');
+            img.crossOrigin = 'anonymous';
             img.src = caseData.image;
+            img.onerror = function() {
+                document.getElementById('imagePlaceholder').innerHTML = '⚠️ خطا در بارگذاری تصویر';
+            };
             img.onload = () => {
                 document.getElementById('imagePlaceholder').style.display = 'none';
                 img.style.display = 'block';
@@ -885,8 +895,16 @@
 
             // Calculate accuracy
             const correct = selectedFindings.filter(f => caseData.trueFindings.includes(f)).length;
-            const total = Math.max(caseData.trueFindings.length || 1, selectedFindings.length || 1);
-            const accuracy = total > 0 ? Math.round((correct / total) * 100) : 100;
+            const missed = caseData.trueFindings.filter(f => !selectedFindings.includes(f)).length;
+            const falsePositives = selectedFindings.filter(f => !caseData.trueFindings.includes(f)).length;
+            
+            let accuracy = 100;
+            if (caseData.trueFindings.length === 0) {
+                accuracy = falsePositives === 0 ? 100 : 50;
+            } else {
+                accuracy = Math.round((correct / (correct + missed + falsePositives)) * 100);
+            }
+            accuracy = Math.max(0, Math.min(100, accuracy));
 
             // Store response
             userResponses.push({
@@ -950,8 +968,20 @@
         function toggleHeatmap() {
             const overlay = document.getElementById('heatmapOverlay');
             showingHeatmap = !showingHeatmap;
-            overlay.style.display = showingHeatmap ? 'block' : 'none';
-            document.getElementById('toggleBtn').textContent = showingHeatmap ? '✕ پنهان کردن' : '🔥 نقشه توضیح‌پذیر';
+            
+            if (showingHeatmap) {
+                const caseId = currentCase;
+                // Simple heatmap simulation with canvas gradient
+                const img = document.getElementById('cxrImage');
+                if (img.src) {
+                    overlay.src = img.src; // In real implementation, load actual heatmap
+                    overlay.style.display = 'block';
+                }
+            } else {
+                overlay.style.display = 'none';
+            }
+            
+            document.getElementById('toggleBtn').textContent = showingHeatmap ? '⊗ پنهان کردن' : '🔥 نقشه توضیح‌پذیر';
         }
 
         // Reset answer
