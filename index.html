@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="پلتفرم یادگیری رادیولوژی مبتنی بر هوش مصنوعی">
+    <meta name="description" content="پلتفرم یادگیری رادیولوژی راه‌نمایی بر روی هوش مصنوعی">
     <title>MentorAI - پلتفرم آموزش رادیولوژی</title>
     <style>
         * {
@@ -343,43 +343,6 @@
             pointer-events: none;
         }
 
-        .annotation {
-            position: absolute;
-            width: 40px;
-            height: 40px;
-            border: 3px solid var(--warning);
-            border-radius: 50%;
-            background: rgba(255, 109, 0, 0.1);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: none;
-        }
-
-        .annotation:hover {
-            transform: scale(1.2);
-            background: rgba(255, 109, 0, 0.3);
-        }
-
-        .annotation-label {
-            position: absolute;
-            top: -30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--warning);
-            color: white;
-            padding: 0.4rem 0.8rem;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            white-space: nowrap;
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .annotation:hover .annotation-label {
-            opacity: 1;
-        }
-
         .image-tools {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
@@ -463,6 +426,51 @@
             display: block;
         }
 
+        .options-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .options-group label {
+            display: block;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            font-size: 0.95rem;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            background: var(--gray-50);
+            border: 2px solid var(--gray-200);
+            border-radius: 10px;
+            margin-bottom: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .option-item:hover {
+            background: var(--gray-100);
+            border-color: var(--primary);
+            transform: translateX(-5px);
+        }
+
+        .option-item input[type="radio"] {
+            margin-left: 1rem;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--primary);
+        }
+
+        .option-label {
+            flex: 1;
+            cursor: pointer;
+            color: var(--gray-800);
+            font-weight: 500;
+        }
+
         .answer-form {
             margin-bottom: 1.5rem;
         }
@@ -477,7 +485,7 @@
 
         textarea {
             width: 100%;
-            min-height: 120px;
+            min-height: 100px;
             padding: 1rem;
             border: 2px solid var(--gray-200);
             border-radius: 10px;
@@ -518,6 +526,12 @@
         .btn-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(0, 102, 204, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
         }
 
         .btn-secondary {
@@ -670,7 +684,7 @@
         <div class="login-card">
             <div class="login-icon">🏥</div>
             <h1>MentorAI</h1>
-            <p>پلتفرم آموزش رادیوگرافی راه‌نمای بر روی هوش مصنوعی</p>
+            <p>پلتفرم آموزش رادیولوژی راه‌نمایی بر روی هوش مصنوعی</p>
 
             <div class="error-message" id="errorMessage"></div>
 
@@ -743,20 +757,14 @@
                         <!-- Image Viewer -->
                         <div class="image-viewer">
                             <div class="image-tools">
-                                <button class="tool-btn" onclick="toggleHeatmap()" id="heatmapBtn">
-                                    🔥 Grad-CAM
-                                </button>
-                                <button class="tool-btn" onclick="zoomIn()">
-                                    🔍+ بزرگ‌تر
-                                </button>
-                                <button class="tool-btn" onclick="zoomOut()">
-                                    🔍- کوچک‌تر
-                                </button>
+                                <button class="tool-btn" onclick="toggleHeatmap()" id="heatmapBtn">🔥 Grad-CAM</button>
+                                <button class="tool-btn" onclick="zoomIn()">🔍+ بزرگ‌تر</button>
+                                <button class="tool-btn" onclick="zoomOut()">🔍- کوچک‌تر</button>
                             </div>
 
                             <div class="slider-control">
                                 <div class="slider-label">
-                                    <span>🔆 روشنایی</span>
+                                    <span>💡 روشنایی</span>
                                     <span id="brightnessValue">100%</span>
                                 </div>
                                 <input type="range" id="brightness" min="50" max="150" value="100" onchange="updateImage()">
@@ -764,7 +772,7 @@
 
                             <div class="slider-control">
                                 <div class="slider-label">
-                                    <span>🎲 کنتراست</span>
+                                    <span>🎚️ کنتراست</span>
                                     <span id="contrastValue">100%</span>
                                 </div>
                                 <input type="range" id="contrast" min="50" max="150" value="100" onchange="updateImage()">
@@ -774,7 +782,6 @@
                                 <div class="image-wrapper">
                                     <img id="cxrImage" class="cxr-image" src="" alt="CXR">
                                     <canvas id="heatmapCanvas" class="heatmap-overlay"></canvas>
-                                    <div id="annotations"></div>
                                 </div>
                             </div>
                         </div>
@@ -785,12 +792,21 @@
                 <div>
                     <!-- Answer Phase -->
                     <div class="card answer-section active" id="answerCard">
-                        <h2>퉰d️ هماراه‌سایی و تفسیر</h2>
-                        <div class="answer-form">
-                            <label class="form-label">رادیوگرافی را تفسیر کرده و یافته‌های خود را بنویسید:</label>
-                            <textarea id="answerText" placeholder="اینجا تفسیر را بنویسید..."></textarea>
+                        <h2>✅ تشخیص و تفسیر</h2>
+                        
+                        <!-- Options -->
+                        <div class="options-group">
+                            <label>🎯 تشخیص کدام یک از گزینه‌های زیر است؟</label>
+                            <div id="optionsContainer"></div>
                         </div>
-                        <button class="btn btn-primary" onclick="submitAnswer()">✓ ثبت پاسخ</button>
+
+                        <!-- Text Answer -->
+                        <div class="answer-form">
+                            <label class="form-label">💬 توضیحات و یافته‌های شما:</label>
+                            <textarea id="answerText" placeholder="تفسیر رادیوگرافی را بنویسید..."></textarea>
+                        </div>
+                        
+                        <button class="btn btn-primary" onclick="submitAnswer()" id="submitBtn">✓ ثبت پاسخ</button>
                         <button class="btn btn-secondary" onclick="resetAnswer()">↻ پاک کردن</button>
                     </div>
 
@@ -799,7 +815,7 @@
                         <!-- AI Insights -->
                         <div class="card">
                             <div class="ai-insights">
-                                <h3>🤖 وارسی AI</h3>
+                                <h3>🤖 واریس AI</h3>
                                 <div id="aiInsights"></div>
                             </div>
 
@@ -829,10 +845,10 @@
 
             <!-- Summary -->
             <div class="summary-panel" id="summaryPanel">
-                <h2>🎊 حضوربا و خوبازماند!</h2>
+                <h2>🎉 حضور‌باز و خوبازمان!</h2>
                 <div class="stats-grid" style="margin-top: 1.5rem;">
                     <div class="stat-box">
-                        <div class="stat-value" id="totalCases">5</div>
+                        <div class="stat-value">5</div>
                         <div class="stat-label">موارد تکمیل‌شده</div>
                     </div>
                     <div class="stat-box">
@@ -853,82 +869,106 @@
         const VALID_USERNAME = 'pilot2025';
         const VALID_PASSWORD = 'pilot2025';
 
+        // Options for each case
+        const optionsPerCase = {
+            normal: {
+                correct: 'normal',
+                options: [
+                    {id: 'normal', label: '✅ قفسه سینه طبیعی'},
+                    {id: 'pneumonia', label: 'التهاب ریه'},
+                    {id: 'asthma', label: 'آسم'},
+                    {id: 'atelectasis', label: 'ریه فروپاشی'},
+                ]
+            },
+            pneumonia: {
+                correct: 'pneumonia',
+                options: [
+                    {id: 'pneumonia', label: '✅ التهاب ریه'},
+                    {id: 'normal', label: 'قفسه سینه طبیعی'},
+                    {id: 'tb', label: 'سل ریوی'},
+                    {id: 'carcinoma', label: 'سرطان ریه'},
+                ]
+            },
+            pneumothorax: {
+                correct: 'pneumothorax',
+                options: [
+                    {id: 'pneumothorax', label: '✅ ریه فروپاشی'},
+                    {id: 'pleural_effusion', label: 'جمع سیال'},
+                    {id: 'normal', label: 'قفسه سینه طبیعی'},
+                    {id: 'hemothorax', label: 'خون در فضای پلورال'},
+                ]
+            },
+            'pleural-effusion': {
+                correct: 'pleural_effusion',
+                options: [
+                    {id: 'pleural_effusion', label: '✅ جمع سیال پلورال'},
+                    {id: 'pneumothorax', label: 'ریه فروپاشی'},
+                    {id: 'diaphragmatic_hernia', label: 'فتق دیافراگمی'},
+                    {id: 'lung_collapse', label: 'فروپاشی ریه'},
+                ]
+            },
+            cardiomegaly: {
+                correct: 'cardiomegaly',
+                options: [
+                    {id: 'cardiomegaly', label: '✅ بزرگی قلب'},
+                    {id: 'pericardial_effusion', label: 'جمع سیال پریکاردیال'},
+                    {id: 'normal', label: 'قفسه سینه طبیعی'},
+                    {id: 'mediastinal_mass', label: 'تودگی مدیاستینوم'},
+                ]
+            }
+        };
+
         // Clinical Data
         const clinicalData = {
             normal: {
                 title: 'مورد 1: قفسه سینه طبیعی',
                 chief_complaint: 'بررسی دوره‌ای',
-                hpi: 'بیمار 25 ساله، بدون علائم',
+                hpi: 'بیمار 25 ساله، بدون عالئم',
                 vitals: [{label:'Temp', value:'36.5°C'}, {label:'HR', value:'72'}, {label:'RR', value:'16'}, {label:'BP', value:'120/80'}, {label:'O2', value:'98%'}],
                 pe: 'انتانه طبیعی',
                 image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Normal_posteroanterior_%28PA%29_chest_radiograph_%28X-ray%29.jpg/512px-Normal_posteroanterior_%28PA%29_chest_radiograph_%28X-ray%29.jpg',
-                findings: {normal: 1.0, pneumonia: 0.0},
-                insights: [
-                    {title: '✓ ریه‌ها', detail: 'هر دو ریه بکلی شفاف است'},
-                    {title: '✓ قلب', detail: 'CTR طبیعی < 0.5'},
-                    {title: '✓ روزنه، مدیاستینوم', detail: 'بدون هیچ، وضعیت مرکزی'}
-                ],
-                teaching: '📚 رادیوگرافی طبیعی:\n\n✓ الگوی: CTR < 0.5\n✓ ریه‌ها: شفاف یکسان\n✓ دیافراگم: مرکزی بالا\n✓ ثسالث روزنه: یاق به یاق'
+                insights: [{title: '✓ ریه‌ها', detail: 'هر دو ریه شفاف'}, {title: '✓ قلب', detail: 'CTR < 0.5'}, {title: '✓ دیافراگم', detail: 'طبیعی'}],
+                teaching: '✅ یافته‌های طبیعی:\n• ریه‌ها شفاف\n• قلب در اندازه\n• دیافراگم مرکزی'
             },
             pneumonia: {
                 title: 'مورد 2: التهاب ریه',
                 chief_complaint: 'تب، سرفه، تنگی نفس',
-                hpi: 'بیمار 40 ساله، با تب 38.5°C',
+                hpi: 'بیمار 40 ساله، تب 38.5°C',
                 vitals: [{label:'Temp', value:'38.5°C'}, {label:'HR', value:'105'}, {label:'RR', value:'24'}, {label:'BP', value:'130/85'}, {label:'O2', value:'92%'}],
-                pe: 'خش ریوی، تاکی‌پنه',
+                pe: 'خش ریوی',
                 image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/Pneumonia_x_ray.jpg/512px-Pneumonia_x_ray.jpg',
-                findings: {pneumonia: 0.92, normal: 0.08},
-                insights: [
-                    {title: '⚠️ تیرگی', detail: 'opacity در لوب فوقانی راست'},
-                    {title: '⚠️ Air Bronchogram', detail: 'خطوط هوایی در یافته'},
-                    {title: '⚠️ کلينيکي', detail: 'تب بالا + راتل'}
-                ],
-                teaching: '📚 التهاب ریه:\n\n⚠️ تصویر رادیولوژی:ٌ\u2022 Opacity/تیرگی\u2022 Air bronchogram\u2022 مایه کالسیفایه\u2022 به‌تدریجگس\n\n🤖 کلينيکي: تب + سرفه + تنگی نفس'
+                insights: [{title: '⚠️ تیرگی', detail: 'opacity در لوب'}, {title: '⚠️ Air Bronchogram', detail: 'خطوط هوایی'}, {title: '⚠️ کلینیکی', detail: 'تب + رات'}],
+                teaching: '⚠️ التهاب ریه:\n• Opacity\n• Air bronchogram\n• تب بالا'
             },
             pneumothorax: {
                 title: 'مورد 3: ریه فروپاشی',
-                chief_complaint: 'درد ناگهانی، تنگی نفس',
-                hpi: 'بیمار 28 ساله، درد یکاباره',
+                chief_complaint: 'درد نگهانی، تنگی نفس',
+                hpi: 'بیمار 28 ساله، درد یکباره',
                 vitals: [{label:'Temp', value:'37.2°C'}, {label:'HR', value:'110'}, {label:'RR', value:'26'}, {label:'BP', value:'128/82'}, {label:'O2', value:'94%'}],
-                pe: 'کاهش صوت در طرف راست',
+                pe: 'کاهش صوت',
                 image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Pneumothorax_CXR.jpg/512px-Pneumothorax_CXR.jpg',
-                findings: {pneumothorax: 0.95, normal: 0.05},
-                insights: [
-                    {title: '🔴 Pleural Line', detail: 'خط سفید منزویشده در لبه ریه راست'},
-                    {title: '🔴 Collapsed Lung', detail: 'ریه راست فروپاشیده'},
-                    {title: '🔴 Pneumothorax', detail: 'فاصله از دیواره قفسه'}
-                ],
-                teaching: '📚 ریه فروپاشی:\n\n🔴 علائم رادیولوژی:\u2022 Pleural line (خط سفید)\u2022 Collapsed lung\u2022 Absent vascular markings\u2022 Mediastinal shift (pivot)• ربط را به مراقبه بگیر\u2022 Secondary PTX vs Primary'
+                insights: [{title: '🔴 Pleural Line', detail: 'خط سفید'}, {title: '🔴 Collapsed Lung', detail: 'ریه فروپاشی'}, {title: '🔴 فضای خالی', detail: 'بدون وعائی'}],
+                teaching: '🔴 پنوموتوراکس:\n• Pleural line\n• Collapsed lung\n• درد ناگهانی'
             },
             'pleural-effusion': {
-                title: 'مورد 4: جمع‌آوری سیال',
+                title: 'مورد 4: جمع سیال',
                 chief_complaint: 'تنگی نفس تدریجی',
-                hpi: 'بیمار 55 ساله، با تاریخ نارسایی قلب',
+                hpi: 'بیمار 55 ساله، تاریخ نارسایی قلب',
                 vitals: [{label:'Temp', value:'37.0°C'}, {label:'HR', value:'98'}, {label:'RR', value:'22'}, {label:'BP', value:'140/90'}, {label:'O2', value:'93%'}],
-                pe: 'کاهش صوت در پایین',
+                pe: 'کاهص شنوایی پایین',
                 image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Pleural_effusion.jpg/512px-Pleural_effusion.jpg',
-                findings: {pleural_effusion: 0.93, normal: 0.07},
-                insights: [
-                    {title: '⚠️ Blunting', detail: 'محو شدن زاویه costophrenic'},
-                    {title: '⚠️ Meniscus', detail: 'سایه سیالی با حد مات'},
-                    {title: '⚠️ Fluid', detail: 'برآورد سیال در فضای پلورال'}
-                ],
-                teaching: '📚 جمع‌آوری سیال:\n\n• Blunting of costophrenic angle\n• Meniscus shape\n• Mediastinal shift (agg)\n• Transudative vs Exudative:\n  - Light criteria\n  - Protein, LDH, cholesterol\n• علل: CHF, PE, SLE, renal, TB'
+                insights: [{title: '⚠️ Blunting', detail: 'محو شدن زاویه'}, {title: '⚠️ Meniscus', detail: 'سایه سیالی'}, {title: '⚠️ Fluid', detail: 'سیال فضای پلورال'}],
+                teaching: '⚠️ جمع سیال:\n• Blunting\n• Meniscus\n• Light criteria'
             },
             cardiomegaly: {
                 title: 'مورد 5: بزرگی قلب',
                 chief_complaint: 'خستگی، تنگی نفس',
-                hpi: 'بیمار 60 ساله، با تاریخ فشار خون',
+                hpi: 'بیمار 60 ساله، تاریخ فشار خون',
                 vitals: [{label:'Temp', value:'37.1°C'}, {label:'HR', value:'92'}, {label:'RR', value:'20'}, {label:'BP', value:'155/95'}, {label:'O2', value:'95%'}],
-                pe: 'ضجه سیستولی، نبض ضعیف',
+                pe: 'ضجه سیستولی',
                 image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Cardiomegally.PNG/512px-Cardiomegally.PNG',
-                findings: {cardiomegaly: 0.94, normal: 0.06},
-                insights: [
-                    {title: '🔴 CTR', detail: 'Cardiothoracic Ratio > 0.5'},
-                    {title: '🔴 Enlarged Heart', detail: 'قلب بزرگ و گرد'},
-                    {title: '🔴 Silhouette', detail: 'تغییر شکل قلب'}
-                ],
-                teaching: '📚 بزرگی قلب:\n\n🔴 معايير:\n• CTR > 0.5\n• اعوجاج روته‌ها\n• Splaying of carina\n• Straightening of left heart border\n\n• علل: Dilated cardiomyopathy, HTN, Valvular'
+                insights: [{title: '🔴 CTR', label: 'CTR > 0.5'}, {title: '🔴 Enlarged Heart', detail: 'قلب بزرگ'}, {title: '🔴 Silhouette', detail: 'تغییر شکل'}],
+                teaching: '🔴 بزرگی قلب:\n• CTR > 0.5\n• قلب بزرگ و گرد\n• Silhouette'
             }
         };
 
@@ -938,6 +978,7 @@
         let startTime = null;
         let zoomLevel = 1;
         let showingHeatmap = false;
+        let selectedOption = null;
 
         // Login
         function handleLogin(event) {
@@ -952,7 +993,7 @@
                 initApp();
             } else {
                 err.style.display = 'block';
-                err.textContent = '❌ نام کاربری یا رمز اشتباه';
+                err.textContent = '❌ نام یا رمز اشتباه';
             }
         }
 
@@ -974,7 +1015,9 @@
 
             const caseId = caseOrder[caseIndex];
             const data = clinicalData[caseId];
+            const opts = optionsPerCase[caseId];
             startTime = Date.now();
+            selectedOption = null;
 
             // Update UI
             document.getElementById('caseNum').textContent = caseIndex + 1;
@@ -991,6 +1034,14 @@
                 </div>
             `).join('');
 
+            // Options
+            document.getElementById('optionsContainer').innerHTML = opts.options.map(opt => `
+                <div class="option-item" onclick="selectOption('${opt.id}')">
+                    <input type="radio" name="diagnosis" value="${opt.id}" onchange="selectOption('${opt.id}')">
+                    <label class="option-label">${opt.label}</label>
+                </div>
+            `).join('');
+
             // Image
             const img = document.getElementById('cxrImage');
             img.src = data.image;
@@ -1000,50 +1051,51 @@
             // Reset sliders
             document.getElementById('brightness').value = 100;
             document.getElementById('contrast').value = 100;
-            document.getElementById('brightnessValue').textContent = '100%';
-            document.getElementById('contrastValue').textContent = '100%';
             updateImage();
+
+            // Reset textarea
+            document.getElementById('answerText').value = '';
 
             // Show question, hide feedback
             document.getElementById('questionCard').style.display = 'block';
             document.getElementById('answerCard').classList.add('active');
             document.getElementById('feedbackCard').classList.remove('active');
             document.getElementById('heatmapBtn').textContent = '🔥 Grad-CAM';
-            document.getElementById('heatmapBtn').classList.remove('active');
             document.getElementById('heatmapCanvas').style.display = 'none';
             showingHeatmap = false;
 
-            resetAnswer();
             updateProgress();
         }
 
+        function selectOption(optionId) {
+            selectedOption = optionId;
+        }
+
         function submitAnswer() {
+            if (!selectedOption) {
+                alert('لطفاً یک گزینه انتخاب کنید');
+                return;
+            }
+
             const answer = document.getElementById('answerText').value.trim();
             if (!answer) {
-                alert('لطفاً تفسیر را بنویسید');
+                alert('لطفاً توضیحات را بنویسید');
                 return;
             }
 
             const caseId = caseOrder[caseIndex];
-            const data = clinicalData[caseId];
+            const opts = optionsPerCase[caseId];
             const time = Math.round((Date.now() - startTime) / 1000);
+            const accuracy = selectedOption === opts.correct ? 100 : 40;
 
-            // Simple accuracy: check if answer mentions key findings
-            const answerLower = answer.toLowerCase();
-            let accuracy = 50;
-            for (const [finding, prob] of Object.entries(data.findings)) {
-                if (prob > 0.7 && answerLower.includes(finding.replace('_', ' '))) {
-                    accuracy = 100;
-                    break;
-                }
-            }
-
-            responses.push({caseId, answer, time, accuracy});
+            responses.push({caseId, option: selectedOption, answer, time, accuracy});
 
             // Show feedback
             document.getElementById('answerCard').classList.remove('active');
             document.getElementById('feedbackCard').classList.add('active');
 
+            const data = clinicalData[caseId];
+            
             // AI Insights
             document.getElementById('aiInsights').innerHTML = data.insights.map(i => `
                 <div class="insight-item">
@@ -1062,6 +1114,8 @@
 
         function resetAnswer() {
             document.getElementById('answerText').value = '';
+            selectedOption = null;
+            document.querySelectorAll('input[name="diagnosis"]').forEach(el => el.checked = false);
         }
 
         function nextCase() {
@@ -1080,24 +1134,19 @@
             const img = document.getElementById('cxrImage');
 
             if (showingHeatmap) {
-                canvas.width = img.offsetWidth;
-                canvas.height = img.offsetHeight;
+                canvas.width = img.offsetWidth || 400;
+                canvas.height = img.offsetHeight || 400;
                 const ctx = canvas.getContext('2d');
-
-                // Gradient heatmap
                 const grad = ctx.createRadialGradient(canvas.width/2, canvas.height/2, 0, canvas.width/2, canvas.height/2, canvas.width);
                 grad.addColorStop(0, 'rgba(255, 0, 0, 0.5)');
                 grad.addColorStop(0.5, 'rgba(255, 165, 0, 0.3)');
                 grad.addColorStop(1, 'rgba(0, 0, 255, 0.1)');
                 ctx.fillStyle = grad;
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
-
                 canvas.style.display = 'block';
-                document.getElementById('heatmapBtn').textContent = '✕ بستن';
                 document.getElementById('heatmapBtn').classList.add('active');
             } else {
                 canvas.style.display = 'none';
-                document.getElementById('heatmapBtn').textContent = '🔥 Grad-CAM';
                 document.getElementById('heatmapBtn').classList.remove('active');
             }
         }
