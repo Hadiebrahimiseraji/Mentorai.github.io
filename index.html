@@ -3,765 +3,171 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="پلتفرم یادگیری رادیولوژی راه‌نمایی بر روی هوش مصنوعی">
-    <title>MentorAI - پلتفرم آموزش رادیولوژی</title>
+    <title>MentorAI - Platform CXR</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
             --primary: #0066cc;
-            --primary-dark: #0052a3;
-            --secondary: #00a8e8;
             --success: #00c853;
             --danger: #d32f2f;
             --warning: #ff6d00;
-            --gray-50: #f8f9fa;
-            --gray-100: #f3f4f6;
-            --gray-200: #e5e7eb;
             --gray-800: #1f2937;
-            --gray-900: #111827;
         }
-
-        body {
-            font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: var(--gray-800);
-            min-height: 100vh;
-            line-height: 1.6;
-        }
-
-        .login-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .login-card {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            width: 100%;
-            max-width: 450px;
-            padding: 3.5rem 2.5rem;
-            text-align: center;
-        }
-
-        .login-icon {
-            font-size: 5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .login-card h1 {
-            color: var(--primary);
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-            font-weight: 700;
-        }
-
-        .login-card p {
-            color: var(--gray-800);
-            font-size: 1rem;
-            margin-bottom: 2rem;
-            line-height: 1.5;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-            text-align: right;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.8rem;
-            font-weight: 600;
-            color: var(--gray-800);
-            font-size: 0.95rem;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 1rem;
-            border: 2px solid var(--gray-200);
-            border-radius: 10px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            font-family: inherit;
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.1);
-        }
-
-        .login-btn {
-            width: 100%;
-            padding: 1rem;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
-        }
-
-        .login-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 102, 204, 0.4);
-        }
-
-        .error-message {
-            background: #ffebee;
-            color: var(--danger);
-            padding: 1rem;
-            border-radius: 10px;
-            margin-bottom: 1rem;
-            border-left: 4px solid var(--danger);
-            display: none;
-        }
-
-        .app-wrapper {
-            display: none;
-            background: var(--gray-50);
-            min-height: 100vh;
-        }
-
-        .header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white;
-            padding: 1.5rem 2rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .header-content {
-            max-width: 1600px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            font-size: 2rem;
-            font-weight: 800;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .logout-btn {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: 2px solid white;
-            padding: 0.7rem 1.5rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            font-size: 0.95rem;
-        }
-
-        .logout-btn:hover {
-            background: white;
-            color: var(--primary);
-        }
-
-        .container {
-            max-width: 1600px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-
-        .progress-container {
-            margin-bottom: 2rem;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 10px;
-            background: var(--gray-200);
-            border-radius: 10px;
-            overflow: hidden;
-            margin-bottom: 1rem;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary), var(--success));
-            transition: width 0.5s ease;
-        }
-
-        .case-counter {
-            font-size: 0.95rem;
-            color: var(--gray-800);
-            font-weight: 600;
-        }
-
-        .main-grid {
-            display: grid;
-            grid-template-columns: 1.2fr 1fr;
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        @media (max-width: 1200px) {
-            .main-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .card {
-            background: white;
-            border-radius: 16px;
-            padding: 2rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            overflow: hidden;
-        }
-
-        .card h2 {
-            color: var(--primary);
-            font-size: 1.5rem;
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-        }
-
-        .clinical-section {
-            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
-            border: 2px solid var(--primary);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .clinical-item {
-            margin-bottom: 1.2rem;
-        }
-
-        .clinical-item:last-child {
-            margin-bottom: 0;
-        }
-
-        .clinical-label {
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 0.5rem;
-            font-size: 0.95rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .clinical-content {
-            color: var(--gray-800);
-            line-height: 1.8;
-            font-size: 0.95rem;
-        }
-
-        .vitals-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-            gap: 1rem;
-        }
-
-        .vital {
-            background: white;
-            padding: 1rem;
-            border-radius: 10px;
-            border-left: 4px solid var(--primary);
-            text-align: center;
-        }
-
-        .vital-value {
-            font-weight: 700;
-            color: var(--primary);
-            font-size: 1.2rem;
-            margin-bottom: 0.3rem;
-        }
-
-        .vital-label {
-            font-size: 0.8rem;
-            color: var(--gray-800);
-        }
-
-        .image-viewer {
-            background: var(--gray-900);
-            border-radius: 12px;
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .image-container {
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 500px;
-            background: var(--gray-900);
-            border-radius: 8px;
-        }
-
-        .image-wrapper {
-            position: relative;
-            display: inline-block;
-            max-width: 100%;
-        }
-
-        .cxr-image {
-            max-width: 100%;
-            max-height: 500px;
-            border-radius: 6px;
-            display: block;
-            filter: brightness(1) contrast(1);
-            transition: filter 0.3s ease;
-        }
-
-        .heatmap-overlay {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            max-width: 100%;
-            max-height: 500px;
-            border-radius: 6px;
-            display: none;
-            opacity: 0.7;
-            pointer-events: none;
-        }
-
-        .image-tools {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-            gap: 0.8rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .tool-btn {
-            background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
-            color: white;
-            border: none;
-            padding: 0.8rem 1rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-
-        .tool-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3);
-        }
-
-        .tool-btn.active {
-            background: linear-gradient(135deg, var(--success) 0%, #00a152 100%);
-        }
-
-        .slider-control {
-            margin-bottom: 1rem;
-        }
-
-        .slider-label {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--gray-800);
-            margin-bottom: 0.5rem;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        input[type="range"] {
-            width: 100%;
-            height: 6px;
-            border-radius: 3px;
-            background: var(--gray-200);
-            outline: none;
-            -webkit-appearance: none;
-        }
-
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background: var(--primary);
-            cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0, 102, 204, 0.3);
-        }
-
-        input[type="range"]::-moz-range-thumb {
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background: var(--primary);
-            cursor: pointer;
-            border: none;
-            box-shadow: 0 2px 8px rgba(0, 102, 204, 0.3);
-        }
-
-        .answer-section {
-            display: none;
-        }
-
-        .answer-section.active {
-            display: block;
-        }
-
-        .options-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .options-group label {
-            display: block;
-            margin-bottom: 1rem;
-            font-weight: 600;
-            color: var(--gray-800);
-            font-size: 0.95rem;
-        }
-
-        .option-item {
-            display: flex;
-            align-items: center;
-            padding: 1rem;
-            background: var(--gray-50);
-            border: 2px solid var(--gray-200);
-            border-radius: 10px;
-            margin-bottom: 0.8rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .option-item:hover {
-            background: var(--gray-100);
-            border-color: var(--primary);
-            transform: translateX(-5px);
-        }
-
-        .option-item input[type="radio"] {
-            margin-left: 1rem;
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-            accent-color: var(--primary);
-        }
-
-        .option-label {
-            flex: 1;
-            cursor: pointer;
-            color: var(--gray-800);
-            font-weight: 500;
-        }
-
-        .answer-form {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 0.8rem;
-            font-weight: 600;
-            color: var(--gray-800);
-            font-size: 0.95rem;
-        }
-
-        textarea {
-            width: 100%;
-            min-height: 100px;
-            padding: 1rem;
-            border: 2px solid var(--gray-200);
-            border-radius: 10px;
-            font-family: inherit;
-            font-size: 0.95rem;
-            resize: vertical;
-            transition: all 0.3s ease;
-        }
-
-        textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.1);
-        }
-
-        .btn {
-            padding: 1rem 1.5rem;
-            border: none;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white;
-            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
-            width: 100%;
-            margin-bottom: 1rem;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 102, 204, 0.4);
-        }
-
-        .btn-primary:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .btn-secondary {
-            background: var(--gray-100);
-            color: var(--gray-800);
-            border: 2px solid var(--gray-200);
-            width: 100%;
-        }
-
-        .btn-secondary:hover {
-            background: var(--gray-200);
-        }
-
-        .feedback-section {
-            display: none;
-            animation: slideIn 0.5s ease;
-        }
-
-        .feedback-section.active {
-            display: block;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .ai-insights {
-            background: linear-gradient(135deg, #fff8e1 0%, #fff3e0 100%);
-            border: 2px solid var(--warning);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .ai-insights h3 {
-            color: #e65100;
-            margin-bottom: 1rem;
-            font-size: 1.1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-        }
-
-        .insight-item {
-            background: white;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 0.8rem;
-            border-right: 4px solid var(--warning);
-        }
-
-        .insight-item:last-child {
-            margin-bottom: 0;
-        }
-
-        .insight-title {
-            font-weight: 700;
-            color: var(--gray-900);
-            margin-bottom: 0.4rem;
-            font-size: 0.95rem;
-        }
-
-        .insight-detail {
-            color: var(--gray-800);
-            font-size: 0.9rem;
-            line-height: 1.6;
-        }
-
-        .teaching-box {
-            background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
-            border: 2px solid var(--success);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .teaching-box h4 {
-            color: #2e7d32;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-        }
-
-        .teaching-content {
-            color: var(--gray-800);
-            font-size: 0.95rem;
-            line-height: 1.8;
-            white-space: pre-wrap;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .stat-box {
-            background: linear-gradient(135deg, #f5f7fa 0%, #e8eef2 100%);
-            padding: 1.5rem;
-            border-radius: 10px;
-            text-align: center;
-            border-top: 3px solid var(--primary);
-        }
-
-        .stat-value {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 0.4rem;
-        }
-
-        .stat-label {
-            font-size: 0.8rem;
-            color: var(--gray-800);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .summary-panel {
-            background: white;
-            border-radius: 16px;
-            padding: 2rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            display: none;
-            animation: slideIn 0.5s ease;
-        }
-
-        .summary-panel.active {
-            display: block;
-        }
-
-        .hidden {
-            display: none !important;
-        }
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: var(--gray-800); min-height: 100vh; }
+        .login-container { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+        .login-card { background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); width: 100%; max-width: 450px; padding: 3.5rem 2.5rem; text-align: center; }
+        .login-icon { font-size: 5rem; margin-bottom: 1.5rem; }
+        .login-card h1 { color: var(--primary); font-size: 2.5rem; margin-bottom: 0.5rem; font-weight: 700; }
+        .login-card p { color: var(--gray-800); font-size: 1rem; margin-bottom: 2rem; }
+        .form-group { margin-bottom: 1.5rem; text-align: right; }
+        .form-group label { display: block; margin-bottom: 0.8rem; font-weight: 600; color: var(--gray-800); }
+        .form-control { width: 100%; padding: 1rem; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 1rem; font-family: inherit; }
+        .form-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.1); }
+        .login-btn { width: 100%; padding: 1rem; background: linear-gradient(135deg, var(--primary) 0%, #0052a3 100%); color: white; border: none; border-radius: 10px; font-size: 1rem; font-weight: 700; cursor: pointer; }
+        .login-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 102, 204, 0.4); }
+        .error-message { background: #ffebee; color: var(--danger); padding: 1rem; border-radius: 10px; margin-bottom: 1rem; border-left: 4px solid var(--danger); display: none; }
+        .app-wrapper { display: none; background: #f8f9fa; min-height: 100vh; }
+        .header { background: linear-gradient(135deg, var(--primary) 0%, #0052a3 100%); color: white; padding: 1.5rem 2rem; position: sticky; top: 0; z-index: 1000; }
+        .header-content { max-width: 1600px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 2rem; font-weight: 800; }
+        .platform-badge { background: rgba(255, 255, 255, 0.2); padding: 0.4rem 1rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
+        .logout-btn { background: rgba(255, 255, 255, 0.2); color: white; border: 2px solid white; padding: 0.7rem 1.5rem; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.95rem; }
+        .logout-btn:hover { background: white; color: var(--primary); }
+        .container { max-width: 1600px; margin: 0 auto; padding: 2rem; }
+        .progress-bar { width: 100%; height: 10px; background: #e5e7eb; border-radius: 10px; overflow: hidden; margin-bottom: 1rem; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--success)); transition: width 0.5s ease; }
+        .main-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 2rem; margin-bottom: 2rem; }
+        @media (max-width: 1200px) { .main-grid { grid-template-columns: 1fr; } }
+        .card { background: white; border-radius: 16px; padding: 2rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); }
+        .card h2 { color: var(--primary); font-size: 1.5rem; margin-bottom: 1.5rem; }
+        .clinical-section { background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%); border: 2px solid var(--primary); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
+        .clinical-item { margin-bottom: 1.2rem; }
+        .clinical-label { font-weight: 700; color: var(--primary); margin-bottom: 0.5rem; font-size: 0.95rem; text-transform: uppercase; }
+        .clinical-content { color: var(--gray-800); line-height: 1.8; font-size: 0.95rem; }
+        .vitals-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 1rem; }
+        .vital { background: white; padding: 1rem; border-radius: 10px; border-left: 4px solid var(--primary); text-align: center; }
+        .vital-value { font-weight: 700; color: var(--primary); font-size: 1.2rem; }
+        .vital-label { font-size: 0.8rem; color: var(--gray-800); }
+        .image-viewer { background: #1f2937; border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem; }
+        .image-container { position: relative; display: flex; align-items: center; justify-content: center; min-height: 500px; background: #1f2937; border-radius: 8px; }
+        .image-wrapper { position: relative; display: inline-block; max-width: 100%; }
+        .cxr-image { max-width: 100%; max-height: 500px; border-radius: 6px; display: block; filter: brightness(1); }
+        .heatmap-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); max-width: 100%; max-height: 500px; border-radius: 6px; display: none; pointer-events: none; }
+        .image-tools { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 0.8rem; margin-bottom: 1.5rem; }
+        .tool-btn { background: linear-gradient(135deg, #00a8e8 0%, var(--primary) 100%); color: white; border: none; padding: 0.8rem 1rem; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 600; }
+        .tool-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3); }
+        .tool-btn.active { background: linear-gradient(135deg, var(--success) 0%, #00a152 100%); }
+        .slider-control { margin-bottom: 1rem; }
+        .slider-label { font-size: 0.85rem; font-weight: 600; color: var(--gray-800); margin-bottom: 0.5rem; display: flex; justify-content: space-between; }
+        input[type="range"] { width: 100%; height: 6px; border-radius: 3px; background: #e5e7eb; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--primary); cursor: pointer; }
+        .answer-section { display: none; }
+        .answer-section.active { display: block; }
+        .options-group { margin-bottom: 1.5rem; }
+        .options-group label { display: block; margin-bottom: 1rem; font-weight: 600; color: var(--gray-800); }
+        .option-item { display: flex; align-items: center; padding: 1rem; background: #f8f9fa; border: 2px solid #e5e7eb; border-radius: 10px; margin-bottom: 0.8rem; cursor: pointer; transition: all 0.3s ease; }
+        .option-item:hover { background: #f3f4f6; border-color: var(--primary); transform: translateX(-5px); }
+        .option-item input[type="radio"] { margin-left: 1rem; width: 20px; height: 20px; accent-color: var(--primary); }
+        .option-label { flex: 1; cursor: pointer; color: var(--gray-800); font-weight: 500; }
+        .form-label { display: block; margin-bottom: 0.8rem; font-weight: 600; color: var(--gray-800); }
+        textarea { width: 100%; min-height: 100px; padding: 1rem; border: 2px solid #e5e7eb; border-radius: 10px; font-family: inherit; font-size: 0.95rem; }
+        textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.1); }
+        .btn { padding: 1rem 1.5rem; border: none; border-radius: 10px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
+        .btn-primary { background: linear-gradient(135deg, var(--primary) 0%, #0052a3 100%); color: white; width: 100%; margin-bottom: 1rem; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 102, 204, 0.4); }
+        .btn-secondary { background: #f3f4f6; color: var(--gray-800); border: 2px solid #e5e7eb; width: 100%; }
+        .feedback-section { display: none; animation: slideIn 0.5s ease; }
+        .feedback-section.active { display: block; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .ai-insights { background: linear-gradient(135deg, #fff8e1 0%, #fff3e0 100%); border: 2px solid var(--warning); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
+        .ai-insights h3 { color: #e65100; margin-bottom: 1rem; font-size: 1.1rem; }
+        .insight-item { background: white; padding: 1rem; border-radius: 8px; margin-bottom: 0.8rem; border-right: 4px solid var(--warning); }
+        .insight-title { font-weight: 700; color: #1f2937; margin-bottom: 0.4rem; }
+        .insight-detail { color: var(--gray-800); font-size: 0.9rem; line-height: 1.6; }
+        .teaching-box { background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%); border: 2px solid var(--success); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
+        .teaching-box h4 { color: #2e7d32; margin-bottom: 1rem; }
+        .teaching-content { color: var(--gray-800); font-size: 0.95rem; white-space: pre-wrap; }
+        .explainability-note { background: #e3f2fd; border-left: 4px solid var(--primary); padding: 1rem; border-radius: 8px; font-size: 0.85rem; color: #1565c0; margin-bottom: 1rem; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+        .stat-box { background: linear-gradient(135deg, #f5f7fa 0%, #e8eef2 100%); padding: 1.5rem; border-radius: 10px; text-align: center; border-top: 3px solid var(--primary); }
+        .stat-value { font-size: 1.8rem; font-weight: 700; color: var(--primary); margin-bottom: 0.4rem; }
+        .stat-label { font-size: 0.8rem; color: var(--gray-800); font-weight: 600; text-transform: uppercase; }
+        .summary-panel { background: white; border-radius: 16px; padding: 2rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); display: none; }
+        .summary-panel.active { display: block; }
     </style>
 </head>
 <body>
-    <!-- Login -->
     <div class="login-container" id="loginPage">
         <div class="login-card">
             <div class="login-icon">🏥</div>
             <h1>MentorAI</h1>
-            <p>پلتفرم آموزش رادیولوژی راه‌نمایی بر روی هوش مصنوعی</p>
-
+            <p>پلتفرم تفسیر رادیوگرافی مبتنی بر هوش مصنوعی</p>
             <div class="error-message" id="errorMessage"></div>
-
             <form id="loginForm" onsubmit="handleLogin(event)">
                 <div class="form-group">
-                    <label for="username">نام کاربری</label>
-                    <input type="text" id="username" class="form-control" placeholder="..." required>
+                    <label>نام کاربری</label>
+                    <input type="text" id="username" class="form-control" placeholder="pilot2025 یا pilot2026" required>
                 </div>
-
                 <div class="form-group">
-                    <label for="password">رمز عبور</label>
+                    <label>رمز عبور</label>
                     <input type="password" id="password" class="form-control" placeholder="..." required>
                 </div>
-
                 <button type="submit" class="login-btn">🔐 ورود</button>
             </form>
         </div>
     </div>
 
-    <!-- App -->
     <div class="app-wrapper" id="appWrapper">
-        <!-- Header -->
         <header class="header">
             <div class="header-content">
                 <div class="logo">🏥 MentorAI</div>
+                <span class="platform-badge" id="platformBadge"></span>
                 <button class="logout-btn" onclick="handleLogout()">🚪 خروج</button>
             </div>
         </header>
 
-        <!-- Main Content -->
         <div class="container">
-            <!-- Progress -->
-            <div class="progress-container">
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
-                </div>
-                <div class="case-counter">مورد <strong id="caseNum">1</strong> از <strong>5</strong></div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
             </div>
+            <div style="text-align: left; margin-bottom: 2rem; font-weight: 600; color: #1f2937;">مورد <strong id="caseNum">1</strong> از <strong id="totalCases">5</strong></div>
 
             <div class="main-grid">
-                <!-- Left: Question & Image -->
                 <div>
-                    <!-- Question Phase -->
                     <div class="card" id="questionCard">
                         <h2 id="caseTitle"></h2>
-
-                        <!-- Clinical Info -->
                         <div class="clinical-section">
                             <div class="clinical-item">
                                 <div class="clinical-label">🔴 شکایت اصلی</div>
                                 <div class="clinical-content" id="chiefComplaint"></div>
                             </div>
-
                             <div class="clinical-item">
                                 <div class="clinical-label">📝 تاریخ بیماری</div>
                                 <div class="clinical-content" id="hpi"></div>
                             </div>
-
                             <div class="clinical-item">
                                 <div class="clinical-label">📊 علائم حیاتی</div>
                                 <div class="vitals-grid" id="vitals"></div>
                             </div>
-
                             <div class="clinical-item">
                                 <div class="clinical-label">🩺 معایده فیزیکی</div>
                                 <div class="clinical-content" id="pe"></div>
                             </div>
                         </div>
 
-                        <!-- Image Viewer -->
                         <div class="image-viewer">
                             <div class="image-tools">
                                 <button class="tool-btn" onclick="toggleHeatmap()" id="heatmapBtn">🔥 Grad-CAM</button>
-                                <button class="tool-btn" onclick="zoomIn()">🔍+ بزرگ‌تر</button>
-                                <button class="tool-btn" onclick="zoomOut()">🔍- کوچک‌تر</button>
+                                <button class="tool-btn" onclick="zoomIn()">🔍+ بزرگ</button>
+                                <button class="tool-btn" onclick="zoomOut()">🔍- کوچک</button>
                             </div>
-
+                            <div class="slider-control" id="opacityControl" style="display:none;">
+                                <div class="slider-label">
+                                    <span>🔍 شفافیت</span>
+                                    <span id="opacityValue">60%</span>
+                                </div>
+                                <input type="range" id="opacity" min="0" max="100" value="60" onchange="updateOpacity()">
+                            </div>
                             <div class="slider-control">
                                 <div class="slider-label">
                                     <span>💡 روشنایی</span>
@@ -769,15 +175,6 @@
                                 </div>
                                 <input type="range" id="brightness" min="50" max="150" value="100" onchange="updateImage()">
                             </div>
-
-                            <div class="slider-control">
-                                <div class="slider-label">
-                                    <span>🎚️ کنتراست</span>
-                                    <span id="contrastValue">100%</span>
-                                </div>
-                                <input type="range" id="contrast" min="50" max="150" value="100" onchange="updateImage()">
-                            </div>
-
                             <div class="image-container">
                                 <div class="image-wrapper">
                                     <img id="cxrImage" class="cxr-image" src="" alt="CXR">
@@ -788,44 +185,34 @@
                     </div>
                 </div>
 
-                <!-- Right: Answer & Feedback -->
                 <div>
-                    <!-- Answer Phase -->
                     <div class="card answer-section active" id="answerCard">
                         <h2>✅ تشخیص و تفسیر</h2>
-                        
-                        <!-- Options -->
                         <div class="options-group">
-                            <label>🎯 تشخیص کدام یک از گزینه‌های زیر است؟</label>
+                            <label>🏥 تشخیص رادیولوژی:</label>
                             <div id="optionsContainer"></div>
                         </div>
-
-                        <!-- Text Answer -->
                         <div class="answer-form">
-                            <label class="form-label">💬 توضیحات و یافته‌های شما:</label>
-                            <textarea id="answerText" placeholder="تفسیر رادیوگرافی را بنویسید..."></textarea>
+                            <label class="form-label">💬 توضیحات و یافته‌ها:</label>
+                            <textarea id="answerText" placeholder="اصل یافته‌ها را بنویسید..."></textarea>
                         </div>
-                        
-                        <button class="btn btn-primary" onclick="submitAnswer()" id="submitBtn">✓ ثبت پاسخ</button>
+                        <button class="btn btn-primary" onclick="submitAnswer()">✓ ثبت پاسخ</button>
                         <button class="btn btn-secondary" onclick="resetAnswer()">↻ پاک کردن</button>
                     </div>
 
-                    <!-- Feedback Phase -->
                     <div class="feedback-section" id="feedbackCard">
-                        <!-- AI Insights -->
+                        <div class="explainability-note">
+                            🔍 <strong>زیر افق Grad-CAM:</strong> این نقشه تشخیص قطعی نیست، بلکه نشان می‌دهد مدل به کدام نواحی توجه کرد.
+                        </div>
                         <div class="card">
                             <div class="ai-insights">
-                                <h3>🤖 واریس AI</h3>
+                                <h3>🤖 واریس AI - نقاط کلیدی</h3>
                                 <div id="aiInsights"></div>
                             </div>
-
-                            <!-- Teaching -->
                             <div class="teaching-box">
-                                <h4>📚 درس مهم</h4>
+                                <h4>📚 نکات آموزشی</h4>
                                 <div class="teaching-content" id="teaching"></div>
                             </div>
-
-                            <!-- Accuracy -->
                             <div class="stats-grid">
                                 <div class="stat-box">
                                     <div class="stat-value" id="accuracyScore">-</div>
@@ -833,22 +220,20 @@
                                 </div>
                                 <div class="stat-box">
                                     <div class="stat-value" id="timeScore">-</div>
-                                    <div class="stat-label">زمان ثانیه</div>
+                                    <div class="stat-label">زمان (ثا)</div>
                                 </div>
                             </div>
-
                             <button class="btn btn-primary" onclick="nextCase()">→ مورد بعدی</button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Summary -->
             <div class="summary-panel" id="summaryPanel">
-                <h2>🎉 حضور‌باز و خوبازمان!</h2>
+                <h2>🎉 خوبازمان!</h2>
                 <div class="stats-grid" style="margin-top: 1.5rem;">
                     <div class="stat-box">
-                        <div class="stat-value">5</div>
+                        <div class="stat-value" id="totalCasesCompleted">-</div>
                         <div class="stat-label">موارد تکمیل‌شده</div>
                     </div>
                     <div class="stat-box">
@@ -865,319 +250,199 @@
     </div>
 
     <script>
-        // Credentials
-        const VALID_USERNAME = 'pilot2025';
-        const VALID_PASSWORD = 'pilot2025';
-
-        // Options for each case
-        const optionsPerCase = {
-            normal: {
-                correct: 'normal',
-                options: [
-                    {id: 'normal', label: '✅ قفسه سینه طبیعی'},
-                    {id: 'pneumonia', label: 'التهاب ریه'},
-                    {id: 'asthma', label: 'آسم'},
-                    {id: 'atelectasis', label: 'ریه فروپاشی'},
-                ]
-            },
-            pneumonia: {
-                correct: 'pneumonia',
-                options: [
-                    {id: 'pneumonia', label: '✅ التهاب ریه'},
-                    {id: 'normal', label: 'قفسه سینه طبیعی'},
-                    {id: 'tb', label: 'سل ریوی'},
-                    {id: 'carcinoma', label: 'سرطان ریه'},
-                ]
-            },
-            pneumothorax: {
-                correct: 'pneumothorax',
-                options: [
-                    {id: 'pneumothorax', label: '✅ ریه فروپاشی'},
-                    {id: 'pleural_effusion', label: 'جمع سیال'},
-                    {id: 'normal', label: 'قفسه سینه طبیعی'},
-                    {id: 'hemothorax', label: 'خون در فضای پلورال'},
-                ]
-            },
-            'pleural-effusion': {
-                correct: 'pleural_effusion',
-                options: [
-                    {id: 'pleural_effusion', label: '✅ جمع سیال پلورال'},
-                    {id: 'pneumothorax', label: 'ریه فروپاشی'},
-                    {id: 'diaphragmatic_hernia', label: 'فتق دیافراگمی'},
-                    {id: 'lung_collapse', label: 'فروپاشی ریه'},
-                ]
-            },
-            cardiomegaly: {
-                correct: 'cardiomegaly',
-                options: [
-                    {id: 'cardiomegaly', label: '✅ بزرگی قلب'},
-                    {id: 'pericardial_effusion', label: 'جمع سیال پریکاردیال'},
-                    {id: 'normal', label: 'قفسه سینه طبیعی'},
-                    {id: 'mediastinal_mass', label: 'تودگی مدیاستینوم'},
-                ]
-            }
+        const users = {
+            'pilot2025': { password: 'pilot2025', platform: '📚 پلتفرم اصلی', cases: 5 },
+            'pilot2026': { password: 'pilot2026', platform: '🎯 نمایشی', cases: 2 }
         };
 
-        // Clinical Data
+        const optionsPerCase = {
+            normal: { correct: 'normal', options: [
+                {id: 'normal', label: '✅ قفسه سینه طبیعی'},
+                {id: 'pneumonia', label: 'التهاب ریه'},
+                {id: 'asthma', label: 'آسم'},
+                {id: 'atelectasis', label: 'ریه فروپاشی'}
+            ]},
+            pneumonia: { correct: 'pneumonia', options: [
+                {id: 'pneumonia', label: '✅ التهاب ریه'},
+                {id: 'normal', label: 'قفسه طبیعی'},
+                {id: 'tb', label: 'سل'},
+                {id: 'carcinoma', label: 'سرطان'}
+            ]},
+            pneumothorax: { correct: 'pneumothorax', options: [
+                {id: 'pneumothorax', label: '✅ ریه فروپاشی'},
+                {id: 'pleural_effusion', label: 'جمع سیال'},
+                {id: 'normal', label: 'طبیعی'},
+                {id: 'hemothorax', label: 'خون'}
+            ]},
+            'pleural-effusion': { correct: 'pleural_effusion', options: [
+                {id: 'pleural_effusion', label: '✅ جمع سیال'},
+                {id: 'pneumothorax', label: 'ریه فروپاشی'},
+                {id: 'hernia', label: 'فتق'},
+                {id: 'collapse', label: 'فروپاشی'}
+            ]},
+            cardiomegaly: { correct: 'cardiomegaly', options: [
+                {id: 'cardiomegaly', label: '✅ بزرگی قلب'},
+                {id: 'pericardial', label: 'جمع پریکاردیال'},
+                {id: 'normal', label: 'طبیعی'},
+                {id: 'mediastinal', label: 'تودگی'}
+            ]}
+        };
+
         const clinicalData = {
             normal: {
                 title: 'مورد 1: قفسه سینه طبیعی',
                 chief_complaint: 'بررسی دوره‌ای',
-                hpi: 'بیمار 25 ساله، بدون عالئم',
-                vitals: [{label:'Temp', value:'36.5°C'}, {label:'HR', value:'72'}, {label:'RR', value:'16'}, {label:'BP', value:'120/80'}, {label:'O2', value:'98%'}],
+                hpi: 'بیمار 25 ساله، بدون علائم',
+                vitals: [{label:'دما', value:'36.5°C'}, {label:'ضربان', value:'72'}, {label:'تنفس', value:'16'}, {label:'فشار', value:'120/80'}, {label:'اکسیژن', value:'98%'}],
                 pe: 'انتانه طبیعی',
                 image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Normal_posteroanterior_%28PA%29_chest_radiograph_%28X-ray%29.jpg/512px-Normal_posteroanterior_%28PA%29_chest_radiograph_%28X-ray%29.jpg',
-                insights: [{title: '✓ ریه‌ها', detail: 'هر دو ریه شفاف'}, {title: '✓ قلب', detail: 'CTR < 0.5'}, {title: '✓ دیافراگم', detail: 'طبیعی'}],
+                insights: [{title: '✓ ریه‌ها', detail: 'شفاف'}, {title: '✓ قلب', detail: 'CTR < 0.5'}, {title: '✓ روزنه', detail: 'طبیعی'}],
                 teaching: '✅ یافته‌های طبیعی:\n• ریه‌ها شفاف\n• قلب در اندازه\n• دیافراگم مرکزی'
             },
             pneumonia: {
                 title: 'مورد 2: التهاب ریه',
                 chief_complaint: 'تب، سرفه، تنگی نفس',
                 hpi: 'بیمار 40 ساله، تب 38.5°C',
-                vitals: [{label:'Temp', value:'38.5°C'}, {label:'HR', value:'105'}, {label:'RR', value:'24'}, {label:'BP', value:'130/85'}, {label:'O2', value:'92%'}],
-                pe: 'خش ریوی',
+                vitals: [{label:'دما', value:'38.5°C'}, {label:'ضربان', value:'105'}, {label:'تنفس', value:'24'}, {label:'فشار', value:'130/85'}, {label:'اکسیژن', value:'92%'}],
+                pe: 'خش ریوی، تاکی‌پنه',
                 image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/Pneumonia_x_ray.jpg/512px-Pneumonia_x_ray.jpg',
-                insights: [{title: '⚠️ تیرگی', detail: 'opacity در لوب'}, {title: '⚠️ Air Bronchogram', detail: 'خطوط هوایی'}, {title: '⚠️ کلینیکی', detail: 'تب + رات'}],
-                teaching: '⚠️ التهاب ریه:\n• Opacity\n• Air bronchogram\n• تب بالا'
+                insights: [{title: '⚠ Opacity', detail: 'تیرگی درلوب'}, {title: '⚠ Air Bronchogram', detail: 'خطوط هوایی'}, {title: '⚠ کلینیکی', detail: 'تب + رات'}],
+                teaching: '⚠ التهاب ریه:\n• Opacity\n• Air bronchogram\n• تب بالا'
             },
             pneumothorax: {
                 title: 'مورد 3: ریه فروپاشی',
-                chief_complaint: 'درد نگهانی، تنگی نفس',
-                hpi: 'بیمار 28 ساله، درد یکباره',
-                vitals: [{label:'Temp', value:'37.2°C'}, {label:'HR', value:'110'}, {label:'RR', value:'26'}, {label:'BP', value:'128/82'}, {label:'O2', value:'94%'}],
-                pe: 'کاهش صوت',
+                chief_complaint: 'درد ناگهانی، تنگی نفس',
+                hpi: 'بیمار 28 ساله، درد یکبارگی',
+                vitals: [{label:'دما', value:'37.2°C'}, {label:'ضربان', value:'110'}, {label:'تنفس', value:'26'}, {label:'فشار', value:'128/82'}, {label:'اکسیژن', value:'94%'}],
+                pe: 'کاهش صوت در سمت راست',
                 image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Pneumothorax_CXR.jpg/512px-Pneumothorax_CXR.jpg',
-                insights: [{title: '🔴 Pleural Line', detail: 'خط سفید'}, {title: '🔴 Collapsed Lung', detail: 'ریه فروپاشی'}, {title: '🔴 فضای خالی', detail: 'بدون وعائی'}],
-                teaching: '🔴 پنوموتوراکس:\n• Pleural line\n• Collapsed lung\n• درد ناگهانی'
+                insights: [{title: '🔴 Pleural Line', detail: 'خط سفید'}, {title: '🔴 Collapsed Lung', detail: 'ریه فروپاشی'}, {title: '🔴 Absent', detail: 'بدون علامت'}],
+                teaching: '🔴 ریه فروپاشی:\n• Pleural line\n• Collapsed lung\n• Absent vascular'
             },
             'pleural-effusion': {
                 title: 'مورد 4: جمع سیال',
                 chief_complaint: 'تنگی نفس تدریجی',
                 hpi: 'بیمار 55 ساله، تاریخ نارسایی قلب',
-                vitals: [{label:'Temp', value:'37.0°C'}, {label:'HR', value:'98'}, {label:'RR', value:'22'}, {label:'BP', value:'140/90'}, {label:'O2', value:'93%'}],
-                pe: 'کاهص شنوایی پایین',
+                vitals: [{label:'دما', value:'37.0°C'}, {label:'ضربان', value:'98'}, {label:'تنفس', value:'22'}, {label:'فشار', value:'140/90'}, {label:'اکسیژن', value:'93%'}],
+                pe: 'کاهش شنوایی پایین',
                 image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Pleural_effusion.jpg/512px-Pleural_effusion.jpg',
-                insights: [{title: '⚠️ Blunting', detail: 'محو شدن زاویه'}, {title: '⚠️ Meniscus', detail: 'سایه سیالی'}, {title: '⚠️ Fluid', detail: 'سیال فضای پلورال'}],
-                teaching: '⚠️ جمع سیال:\n• Blunting\n• Meniscus\n• Light criteria'
+                insights: [{title: '⚠ Blunting', detail: 'محو شدن زاویه'}, {title: '⚠ Meniscus', detail: 'سایه سیالی'}, {title: '⚠ Fluid', detail: 'سیال پلورال'}],
+                teaching: '⚠ جمع سیال:\n• Blunting\n• Meniscus\n• Light criteria'
             },
             cardiomegaly: {
                 title: 'مورد 5: بزرگی قلب',
                 chief_complaint: 'خستگی، تنگی نفس',
                 hpi: 'بیمار 60 ساله، تاریخ فشار خون',
-                vitals: [{label:'Temp', value:'37.1°C'}, {label:'HR', value:'92'}, {label:'RR', value:'20'}, {label:'BP', value:'155/95'}, {label:'O2', value:'95%'}],
-                pe: 'ضجه سیستولی',
+                vitals: [{label:'دما', value:'37.1°C'}, {label:'ضربان', value:'92'}, {label:'تنفس', value:'20'}, {label:'فشار', value:'155/95'}, {label:'اکسیژن', value:'95%'}],
+                pe: 'ضجه سیستولی، نبض ضعیف',
                 image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Cardiomegally.PNG/512px-Cardiomegally.PNG',
-                insights: [{title: '🔴 CTR', label: 'CTR > 0.5'}, {title: '🔴 Enlarged Heart', detail: 'قلب بزرگ'}, {title: '🔴 Silhouette', detail: 'تغییر شکل'}],
-                teaching: '🔴 بزرگی قلب:\n• CTR > 0.5\n• قلب بزرگ و گرد\n• Silhouette'
+                insights: [{title: '🔴 CTR', detail: 'CTR > 0.5'}, {title: '🔴 Enlarged', detail: 'قلب بزرگ'}, {title: '🔴 Silhouette', detail: 'تغییر شکل'}],
+                teaching: '🔴 بزرگی قلب:\n• CTR > 0.5\n• Enlarged cardiac\n• Dilated cardiomyopathy'
             }
         };
 
-        let caseIndex = 0;
+        let currentUser = null, caseIndex = 0, responses = [], startTime = null, zoomLevel = 1, showingHeatmap = false, selectedOption = null, maxCases = 5;
         const caseOrder = ['normal', 'pneumonia', 'pneumothorax', 'pleural-effusion', 'cardiomegaly'];
-        let responses = [];
-        let startTime = null;
-        let zoomLevel = 1;
-        let showingHeatmap = false;
-        let selectedOption = null;
 
-        // Login
-        function handleLogin(event) {
-            event.preventDefault();
-            const u = document.getElementById('username').value;
-            const p = document.getElementById('password').value;
-            const err = document.getElementById('errorMessage');
-
-            if (u === VALID_USERNAME && p === VALID_PASSWORD) {
+        function handleLogin(e) {
+            e.preventDefault();
+            const u = document.getElementById('username').value, p = document.getElementById('password').value, err = document.getElementById('errorMessage');
+            if (users[u] && users[u].password === p) {
+                currentUser = u;
+                maxCases = users[u].cases;
+                document.getElementById('totalCases').textContent = maxCases;
+                document.getElementById('platformBadge').textContent = users[u].platform;
                 document.getElementById('loginPage').style.display = 'none';
                 document.getElementById('appWrapper').style.display = 'block';
-                initApp();
+                loadCase();
             } else {
                 err.style.display = 'block';
                 err.textContent = '❌ نام یا رمز اشتباه';
             }
         }
 
-        function handleLogout() {
-            if (confirm('از خروج اطمینان دارید؟')) {
-                location.reload();
-            }
-        }
-
-        function initApp() {
-            loadCase();
-        }
+        function handleLogout() { if (confirm('از خروج اطمینان دارید؟')) location.reload(); }
 
         function loadCase() {
-            if (caseIndex >= caseOrder.length) {
-                showSummary();
-                return;
-            }
-
-            const caseId = caseOrder[caseIndex];
-            const data = clinicalData[caseId];
-            const opts = optionsPerCase[caseId];
-            startTime = Date.now();
-            selectedOption = null;
-
-            // Update UI
+            if (caseIndex >= maxCases) { showSummary(); return; }
+            const caseId = caseOrder[caseIndex], data = clinicalData[caseId], opts = optionsPerCase[caseId];
+            startTime = Date.now(); selectedOption = null;
             document.getElementById('caseNum').textContent = caseIndex + 1;
             document.getElementById('caseTitle').textContent = data.title;
             document.getElementById('chiefComplaint').textContent = data.chief_complaint;
             document.getElementById('hpi').textContent = data.hpi;
             document.getElementById('pe').textContent = data.pe;
-
-            // Vitals
-            document.getElementById('vitals').innerHTML = data.vitals.map(v => `
-                <div class="vital">
-                    <div class="vital-value">${v.value}</div>
-                    <div class="vital-label">${v.label}</div>
-                </div>
-            `).join('');
-
-            // Options
-            document.getElementById('optionsContainer').innerHTML = opts.options.map(opt => `
-                <div class="option-item" onclick="selectOption('${opt.id}')">
-                    <input type="radio" name="diagnosis" value="${opt.id}" onchange="selectOption('${opt.id}')">
-                    <label class="option-label">${opt.label}</label>
-                </div>
-            `).join('');
-
-            // Image
+            document.getElementById('vitals').innerHTML = data.vitals.map(v => `<div class="vital"><div class="vital-value">${v.value}</div><div class="vital-label">${v.label}</div></div>`).join('');
+            document.getElementById('optionsContainer').innerHTML = opts.options.map(opt => `<div class="option-item" onclick="selectOption('${opt.id}', event)"><input type="radio" name="diagnosis"><label class="option-label">${opt.label}</label></div>`).join('');
             const img = document.getElementById('cxrImage');
-            img.src = data.image;
-            img.style.transform = 'scale(1)';
-            zoomLevel = 1;
-
-            // Reset sliders
+            img.src = data.image; img.style.transform = 'scale(1)'; zoomLevel = 1;
             document.getElementById('brightness').value = 100;
-            document.getElementById('contrast').value = 100;
             updateImage();
-
-            // Reset textarea
             document.getElementById('answerText').value = '';
-
-            // Show question, hide feedback
             document.getElementById('questionCard').style.display = 'block';
             document.getElementById('answerCard').classList.add('active');
             document.getElementById('feedbackCard').classList.remove('active');
             document.getElementById('heatmapBtn').textContent = '🔥 Grad-CAM';
             document.getElementById('heatmapCanvas').style.display = 'none';
+            document.getElementById('opacityControl').style.display = 'none';
             showingHeatmap = false;
-
             updateProgress();
         }
 
-        function selectOption(optionId) {
-            selectedOption = optionId;
-        }
+        function selectOption(id, e) { selectedOption = id; e.target.parentElement.querySelector('input').checked = true; }
 
         function submitAnswer() {
-            if (!selectedOption) {
-                alert('لطفاً یک گزینه انتخاب کنید');
-                return;
-            }
-
+            if (!selectedOption) { alert('گزینه انتخاب کنید'); return; }
             const answer = document.getElementById('answerText').value.trim();
-            if (!answer) {
-                alert('لطفاً توضیحات را بنویسید');
-                return;
-            }
-
-            const caseId = caseOrder[caseIndex];
-            const opts = optionsPerCase[caseId];
-            const time = Math.round((Date.now() - startTime) / 1000);
-            const accuracy = selectedOption === opts.correct ? 100 : 40;
-
+            if (!answer) { alert('توضیح بنویسید'); return; }
+            const caseId = caseOrder[caseIndex], opts = optionsPerCase[caseId], time = Math.round((Date.now() - startTime) / 1000), accuracy = selectedOption === opts.correct ? 100 : 40;
             responses.push({caseId, option: selectedOption, answer, time, accuracy});
-
-            // Show feedback
             document.getElementById('answerCard').classList.remove('active');
             document.getElementById('feedbackCard').classList.add('active');
-
             const data = clinicalData[caseId];
-            
-            // AI Insights
-            document.getElementById('aiInsights').innerHTML = data.insights.map(i => `
-                <div class="insight-item">
-                    <div class="insight-title">${i.title}</div>
-                    <div class="insight-detail">${i.detail}</div>
-                </div>
-            `).join('');
-
-            // Teaching
+            document.getElementById('aiInsights').innerHTML = data.insights.map(i => `<div class="insight-item"><div class="insight-title">${i.title}</div><div class="insight-detail">${i.detail}</div></div>`).join('');
             document.getElementById('teaching').textContent = data.teaching;
-
-            // Scores
             document.getElementById('accuracyScore').textContent = accuracy + '%';
             document.getElementById('timeScore').textContent = time;
         }
 
-        function resetAnswer() {
-            document.getElementById('answerText').value = '';
-            selectedOption = null;
-            document.querySelectorAll('input[name="diagnosis"]').forEach(el => el.checked = false);
-        }
-
-        function nextCase() {
-            caseIndex++;
-            loadCase();
-        }
-
-        function updateProgress() {
-            const p = ((caseIndex + 1) / caseOrder.length) * 100;
-            document.getElementById('progressFill').style.width = p + '%';
-        }
+        function resetAnswer() { document.getElementById('answerText').value = ''; selectedOption = null; document.querySelectorAll('input[name="diagnosis"]').forEach(el => el.checked = false); }
+        function nextCase() { caseIndex++; loadCase(); }
+        function updateProgress() { document.getElementById('progressFill').style.width = ((caseIndex + 1) / maxCases) * 100 + '%'; }
 
         function toggleHeatmap() {
             showingHeatmap = !showingHeatmap;
-            const canvas = document.getElementById('heatmapCanvas');
-            const img = document.getElementById('cxrImage');
-
+            const canvas = document.getElementById('heatmapCanvas'), img = document.getElementById('cxrImage'), opacityControl = document.getElementById('opacityControl');
             if (showingHeatmap) {
-                canvas.width = img.offsetWidth || 400;
-                canvas.height = img.offsetHeight || 400;
-                const ctx = canvas.getContext('2d');
-                const grad = ctx.createRadialGradient(canvas.width/2, canvas.height/2, 0, canvas.width/2, canvas.height/2, canvas.width);
-                grad.addColorStop(0, 'rgba(255, 0, 0, 0.5)');
-                grad.addColorStop(0.5, 'rgba(255, 165, 0, 0.3)');
+                opacityControl.style.display = 'block';
+                canvas.width = img.offsetWidth || 400; canvas.height = img.offsetHeight || 400;
+                const ctx = canvas.getContext('2d'), grad = ctx.createRadialGradient(canvas.width/2, canvas.height/2, 0, canvas.width/2, canvas.height/2, canvas.width);
+                grad.addColorStop(0, 'rgba(255, 0, 0, 0.6)');
+                grad.addColorStop(0.4, 'rgba(255, 165, 0, 0.4)');
+                grad.addColorStop(0.7, 'rgba(0, 255, 255, 0.2)');
                 grad.addColorStop(1, 'rgba(0, 0, 255, 0.1)');
-                ctx.fillStyle = grad;
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = grad; ctx.fillRect(0, 0, canvas.width, canvas.height);
                 canvas.style.display = 'block';
                 document.getElementById('heatmapBtn').classList.add('active');
             } else {
+                opacityControl.style.display = 'none';
                 canvas.style.display = 'none';
                 document.getElementById('heatmapBtn').classList.remove('active');
             }
         }
 
-        function zoomIn() {
-            zoomLevel = Math.min(zoomLevel + 0.2, 3);
-            document.getElementById('cxrImage').style.transform = `scale(${zoomLevel})`;
-        }
-
-        function zoomOut() {
-            zoomLevel = Math.max(zoomLevel - 0.2, 1);
-            document.getElementById('cxrImage').style.transform = `scale(${zoomLevel})`;
-        }
-
-        function updateImage() {
-            const b = document.getElementById('brightness').value;
-            const c = document.getElementById('contrast').value;
-            document.getElementById('cxrImage').style.filter = `brightness(${b}%) contrast(${c}%)`;
-            document.getElementById('brightnessValue').textContent = b + '%';
-            document.getElementById('contrastValue').textContent = c + '%';
-        }
+        function updateOpacity() { const opacity = document.getElementById('opacity').value; document.getElementById('opacityValue').textContent = opacity + '%'; document.getElementById('heatmapCanvas').style.opacity = opacity / 100; }
+        function zoomIn() { zoomLevel = Math.min(zoomLevel + 0.2, 3); document.getElementById('cxrImage').style.transform = `scale(${zoomLevel})`; }
+        function zoomOut() { zoomLevel = Math.max(zoomLevel - 0.2, 1); document.getElementById('cxrImage').style.transform = `scale(${zoomLevel})`; }
+        function updateImage() { const b = document.getElementById('brightness').value; document.getElementById('cxrImage').style.filter = `brightness(${b}%)`; document.getElementById('brightnessValue').textContent = b + '%'; }
 
         function showSummary() {
             document.getElementById('questionCard').style.display = 'none';
             document.getElementById('answerCard').classList.remove('active');
             document.getElementById('feedbackCard').classList.remove('active');
             document.getElementById('summaryPanel').classList.add('active');
-
-            const avg = responses.length > 0 ? Math.round(responses.reduce((s, r) => s + r.accuracy, 0) / responses.length) : 0;
-            const time = Math.round(responses.reduce((s, r) => s + r.time, 0) / 60);
-
+            const avg = responses.length > 0 ? Math.round(responses.reduce((s, r) => s + r.accuracy, 0) / responses.length) : 0, time = Math.round(responses.reduce((s, r) => s + r.time, 0) / 60);
+            document.getElementById('totalCasesCompleted').textContent = responses.length;
             document.getElementById('avgAccuracy').textContent = avg + '%';
             document.getElementById('totalTime').textContent = time + ' دقیقه';
         }
