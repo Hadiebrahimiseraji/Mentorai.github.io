@@ -144,11 +144,11 @@
                                 <div class="clinical-content" id="hpi"></div>
                             </div>
                             <div class="clinical-item">
-                                <div class="clinical-label">📊 عکس حیاتی</div>
+                                <div class="clinical-label">📊 علائم حیاتی</div>
                                 <div class="vitals-grid" id="vitals"></div>
                             </div>
                             <div class="clinical-item">
-                                <div class="clinical-label">🩺 معایده فیزیکی</div>
+                                <div class="clinical-label">🩺 معاینه فیزیکی</div>
                                 <div class="clinical-content" id="pe"></div>
                             </div>
                         </div>
@@ -175,7 +175,7 @@
                             </div>
                             <div class="image-container">
                                 <div class="image-wrapper">
-                                    <img id="cxrImage" class="cxr-image" src="" alt="CXR">
+                                    <img id="cxrImage" class="cxr-image" src="" alt="CXR" crossorigin="anonymous" onload="onImageLoad()" onerror="onImageError()">
                                     <canvas id="heatmapCanvas" class="heatmap-overlay"></canvas>
                                 </div>
                             </div>
@@ -192,7 +192,7 @@
                         </div>
                         <div class="answer-form">
                             <label class="form-label">💬 توضیحات و یافته‌ها:</label>
-                            <textarea id="answerText" placeholder="اصل یافته‌ها را بنویسید..."></textarea>
+                            <textarea id="answerText" placeholder="توضیحات یافته‌ها را بنویسید..."></textarea>
                         </div>
                         <button class="btn btn-primary" onclick="submitAnswer()">✓ ثبت پاسخ</button>
                         <button class="btn btn-secondary" onclick="resetAnswer()">↻ پاک کردن</button>
@@ -200,11 +200,11 @@
 
                     <div class="feedback-section" id="feedbackCard">
                         <div class="explainability-note">
-                            🔍 <strong>زیر افق Grad-CAM:</strong> این نقشه تشخیص قطعی نیست، بلکه نشان می‌دهد مدل به کدام نواحی توجه کرد.
+                            🔍 <strong>توضیح Grad-CAM:</strong> این نقشه تشخیص قطعی نیست، بلکه نشان می‌دهد مدل به کدام نواحی توجه کرده است.
                         </div>
                         <div class="card">
                             <div class="ai-insights">
-                                <h3>🤖 واریس AI - نقاط کلیدی</h3>
+                                <h3>🤖 ویژگی‌های AI - نکات کلیدی</h3>
                                 <div id="aiInsights"></div>
                             </div>
                             <div class="teaching-box">
@@ -228,7 +228,7 @@
             </div>
 
             <div class="summary-panel" id="summaryPanel">
-                <h2>🎉 خوبازمان!</h2>
+                <h2>🎉 خاتمه آزمون!</h2>
                 <div class="stats-grid" style="margin-top: 1.5rem;">
                     <div class="stat-box">
                         <div class="stat-value" id="totalCasesCompleted">-</div>
@@ -254,87 +254,87 @@
 
         const optionsPerCase = {
             normal: { correct: 'normal', options: [
-                {id: 'normal', label: 'قفسه سینه طبیعی'},
-                {id: 'pneumonia', label: 'التهاب ریه'},
+                {id: 'normal', label: 'طبیعی'},
+                {id: 'pneumonia', label: 'پنومونی ریه'},
                 {id: 'asthma', label: 'آسم'},
-                {id: 'atelectasis', label: 'ریه فروپاشی'}
+                {id: 'atelectasis', label: 'آتلکتازی'}
             ]},
             pneumonia: { correct: 'pneumonia', options: [
-                {id: 'pneumonia', label: 'التهاب ریه'},
+                {id: 'pneumonia', label: 'پنومونی ریه'},
                 {id: 'normal', label: 'قفسه طبیعی'},
                 {id: 'tb', label: 'سل'},
-                {id: 'carcinoma', label: 'سرطان'}
+                {id: 'carcinoma', label: 'کارسینوم'}
             ]},
             pneumothorax: { correct: 'pneumothorax', options: [
-                {id: 'pneumothorax', label: 'ریه فروپاشی'},
-                {id: 'pleural_effusion', label: 'جمع سیال'},
+                {id: 'pneumothorax', label: 'پنوموتوراکس'},
+                {id: 'pleural_effusion', label: 'افیوژن پلورال'},
                 {id: 'normal', label: 'طبیعی'},
-                {id: 'hemothorax', label: 'خون'}
+                {id: 'hemothorax', label: 'هموتوراکس'}
             ]},
             'pleural-effusion': { correct: 'pleural_effusion', options: [
-                {id: 'pleural_effusion', label: 'جمع سیال'},
-                {id: 'pneumothorax', label: 'ریه فروپاشی'},
-                {id: 'hernia', label: 'فتق'},
+                {id: 'pleural_effusion', label: 'افیوژن پلورال'},
+                {id: 'pneumothorax', label: 'پنوموتوراکس'},
+                {id: 'hernia', label: 'فتق دیافراگم'},
                 {id: 'collapse', label: 'فروپاشی'}
             ]},
             cardiomegaly: { correct: 'cardiomegaly', options: [
-                {id: 'cardiomegaly', label: 'بزرگی قلب'},
-                {id: 'pericardial', label: 'جمع پریکاردیال'},
+                {id: 'cardiomegaly', label: 'کاردیومگالی'},
+                {id: 'pericardial', label: 'افیوژن پریکاردیال'},
                 {id: 'normal', label: 'طبیعی'},
-                {id: 'mediastinal', label: 'تودگی'}
+                {id: 'mediastinal', label: 'توده مدیاستن'}
             ]}
         };
 
         const clinicalData = {
             normal: {
                 title: 'مورد 1: قفسه سینه طبیعی',
-                chief_complaint: 'بررسی دوره‌ای',
-                hpi: 'بیمار 25 ساله، بدون علائم',
+                chief_complaint: 'بررسی دوره‌ای سلامت',
+                hpi: 'بیمار 25 ساله، بدون علائم تنفسی، مراجعه برای چک‌آپ معمول',
                 vitals: [{label:'دما', value:'36.5°C'}, {label:'ضربان', value:'72'}, {label:'تنفس', value:'16'}, {label:'فشار', value:'120/80'}, {label:'اکسیژن', value:'98%'}],
-                pe: 'انتانه طبیعی',
+                pe: 'معاینه فیزیکی طبیعی، صداهای تنفسی واضح در تمام قسمت‌ها',
                 image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Normal_posteroanterior_%28PA%29_chest_radiograph_%28X-ray%29.jpg/512px-Normal_posteroanterior_%28PA%29_chest_radiograph_%28X-ray%29.jpg',
-                insights: [{title: '✓ ریه‌ها', detail: 'شفاف'}, {title: '✓ قلب', detail: 'CTR < 0.5'}, {title: '✓ روزنه', detail: 'طبیعی'}],
-                teaching: '✅ یافته‌های طبیعی:\n• ریه‌ها شفاف\n• قلب در اندازه\n• دیافراگم مرکزی'
+                insights: [{title: '✓ پارانشیم ریوی', detail: 'شفاف و بدون اینفیلتراسیون'}, {title: '✓ سایه قلبی', detail: 'CTR کمتر از 0.5 (طبیعی)'}, {title: '✓ دیافراگم', detail: 'خطوط واضح و در موقعیت طبیعی'}],
+                teaching: '✅ یافته‌های طبیعی CXR:\n• ریه‌ها شفاف بدون اینفیلتراسیون\n• قلب در اندازه و موقعیت طبیعی\n• دیافراگم مشخص و در جای خود\n• هیلوم‌ها در اندازه طبیعی'
             },
             pneumonia: {
-                title: 'مورد 2: التهاب ریه',
-                chief_complaint: 'تب، سرفه، تنگی نفس',
-                hpi: 'بیمار 40 ساله، تب 38.5°C',
+                title: 'مورد 2: پنومونی ریه',
+                chief_complaint: 'تب، سرفه با خلط، تنگی نفس',
+                hpi: 'بیمار 40 ساله با تب 38.5 درجه، سرفه مولد و تنگی نفس از 3 روز پیش',
                 vitals: [{label:'دما', value:'38.5°C'}, {label:'ضربان', value:'105'}, {label:'تنفس', value:'24'}, {label:'فشار', value:'130/85'}, {label:'اکسیژن', value:'92%'}],
-                pe: 'خش ریوی، تاکی‌پنه',
+                pe: 'کراکل در لوب تحتانی راست، تاکی‌پنه، کاهش صداهای تنفسی',
                 image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/Pneumonia_x_ray.jpg/512px-Pneumonia_x_ray.jpg',
-                insights: [{title: '⚠ Opacity', detail: 'تیرگی درلوب'}, {title: '⚠ Air Bronchogram', detail: 'خطوط هوایی'}, {title: '⚠ کلینیکی', detail: 'تب + رات'}],
-                teaching: '⚠ التهاب ریه:\n• Opacity\n• Air bronchogram\n• تب بالا'
+                insights: [{title: '⚠ کانسولیداسیون', detail: 'اوپاسیته متمرکز در لوب تحتانی'}, {title: '⚠ Air Bronchogram', detail: 'مشاهده برونشیول‌های هوایی در زمینه متراکم'}, {title: '⚠ علائم کلینیکی', detail: 'تب + کراکل + لکوسیتوز'}],
+                teaching: '⚠ پنومونی باکتریال:\n• کانسولیداسیون لوبار\n• Air bronchogram مثبت\n• همراهی با تب و لکوسیتوز\n• درمان با آنتی‌بیوتیک گسترده'
             },
             pneumothorax: {
-                title: 'مورد 3: ریه فروپاشی',
-                chief_complaint: 'درد ناگهانی، تنگی نفس',
-                hpi: 'بیمار 28 ساله، درد یکباره',
+                title: 'مورد 3: پنوموتوراکس',
+                chief_complaint: 'درد قفسه سینه ناگهانی، تنگی نفس شدید',
+                hpi: 'بیمار 28 ساله با شروع ناگهانی درد قفسه سینه و تنگی نفس',
                 vitals: [{label:'دما', value:'37.2°C'}, {label:'ضربان', value:'110'}, {label:'تنفس', value:'26'}, {label:'فشار', value:'128/82'}, {label:'اکسیژن', value:'94%'}],
-                pe: 'کاهش صوت در سمت راست',
+                pe: 'کاهش شدید صداهای تنفسی در نیمه راست، تاکی‌پنه، تاکی‌کاردی',
                 image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Pneumothorax_CXR.jpg/512px-Pneumothorax_CXR.jpg',
-                insights: [{title: '🔴 Pleural Line', detail: 'خط سفید'}, {title: '🔴 Collapsed Lung', detail: 'ریه فروپاشی'}, {title: '🔴 Absent', detail: 'بدون علامت'}],
-                teaching: '🔴 ریه فروپاشی:\n• Pleural line\n• Collapsed lung\n• Absent vascular'
+                insights: [{title: '🔴 خط پلورال', detail: 'مشاهده خط واضح ویسرال پلورا'}, {title: '🔴 فروپاشی ریه', detail: 'ریه کولپس شده به سمت هیلوم'}, {title: '🔴 عدم مارکینگ', detail: 'فضای بدون مارکینگ عروقی'}],
+                teaching: '🔴 پنوموتوراکس:\n• خط ویسرال پلورا مشخص\n• فروپاشی ریه به سمت هیلوم\n• عدم وجود مارکینگ عروقی در فضای پنوموتوراکس\n• نیاز به چست تیوب در موارد شدید'
             },
             'pleural-effusion': {
-                title: 'مورد 4: جمع سیال',
-                chief_complaint: 'تنگی نفس تدریجی',
-                hpi: 'بیمار 55 ساله، تاریخ نارسایی قلب',
+                title: 'مورد 4: افیوژن پلورال',
+                chief_complaint: 'تنگی نفس تدریجی، احساس سنگینی قفسه سینه',
+                hpi: 'بیمار 55 ساله با سابقه نارسایی احتقانی قلب، تنگی نفس افزایش یافته',
                 vitals: [{label:'دما', value:'37.0°C'}, {label:'ضربان', value:'98'}, {label:'تنفس', value:'22'}, {label:'فشار', value:'140/90'}, {label:'اکسیژن', value:'93%'}],
-                pe: 'کاهش شنوایی پایین',
+                pe: 'کاهش شنوایی در قاعده ریه چپ، برانش منیسکوس',
                 image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Pleural_effusion.jpg/512px-Pleural_effusion.jpg',
-                insights: [{title: '⚠ Blunting', detail: 'محو شدن زاویه'}, {title: '⚠ Meniscus', detail: 'سایه سیالی'}, {title: '⚠ Fluid', detail: 'سیال پلورال'}],
-                teaching: '⚠ جمع سیال:\n• Blunting\n• Meniscus\n• Light criteria'
+                insights: [{title: '⚠ Blunting کوستوفرنیک', detail: 'محو شدن زاویه کوستوفرنیک'}, {title: '⚠ علامت منیسکوس', detail: 'سایه مایع با خط منحنی مشخص'}, {title: '⚠ مایع پلورال', detail: 'جمع شدن مایع در فضای پلورال'}],
+                teaching: '⚠ افیوژن پلورال:\n• Blunting زاویه کوستوفرنیک\n• علامت منیسکوس\n• معیارهای Light برای تشخیص اگزودا/ترانسودا\n• ضرورت تاراسنتز در موارد بزرگ'
             },
             cardiomegaly: {
-                title: 'مورد 5: بزرگی قلب',
-                chief_complaint: 'خستگی، تنگی نفس',
-                hpi: 'بیمار 60 ساله، تاریخ فشار خون',
+                title: 'مورد 5: کاردیومگالی',
+                chief_complaint: 'خستگی مزمن، تنگی نفس با فعالیت',
+                hpi: 'بیمار 60 ساله با سابقه فشار خون کنترل نشده، خستگی و تنگی نفس',
                 vitals: [{label:'دما', value:'37.1°C'}, {label:'ضربان', value:'92'}, {label:'تنفس', value:'20'}, {label:'فشار', value:'155/95'}, {label:'اکسیژن', value:'95%'}],
-                pe: 'ضجه سیستولی، نبض ضعیف',
+                pe: 'سوفل سیستولیک، نبض محیطی ضعیف، ادم پا دوطرفه',
                 image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Cardiomegally.PNG/512px-Cardiomegally.PNG',
-                insights: [{title: '🔴 CTR', detail: 'CTR > 0.5'}, {title: '🔴 Enlarged', detail: 'قلب بزرگ'}, {title: '🔴 Silhouette', detail: 'تغییر شکل'}],
-                teaching: '🔴 بزرگی قلب:\n• CTR > 0.5\n• Enlarged cardiac\n• Dilated cardiomyopathy'
+                insights: [{title: '🔴 نسبت CTR', detail: 'CTR بیشتر از 0.5 (افزایش یافته)'}, {title: '🔴 بزرگی قلب', detail: 'افزایش اندازه سایه قلبی'}, {title: '🔴 تغییر سیلوئت', detail: 'تغییر شکل و اندازه قلب'}],
+                teaching: '🔴 کاردیومگالی:\n• CTR بیشتر از 0.5\n• افزایش اندازه سایه قلبی\n• احتمال کاردیومیوپاتی دیلاته\n• نیاز به اکوکاردیوگرافی برای ارزیابی دقیق'
             }
         };
 
@@ -353,11 +353,20 @@
                 loadCase();
             } else {
                 err.style.display = 'block';
-                err.textContent = '❌ نام یا رمز اشتباه';
+                err.textContent = '❌ نام کاربری یا رمز عبور اشتباه است';
             }
         }
 
         function handleLogout() { if (confirm('از خروج اطمینان دارید؟')) location.reload(); }
+
+        function onImageLoad() {
+            console.log('Image loaded successfully');
+        }
+
+        function onImageError() {
+            console.error('Failed to load image');
+            alert('خطا در بارگذاری تصویر. لطفا مجددا تلاش کنید.');
+        }
 
         function loadCase() {
             if (caseIndex >= maxCases) { showSummary(); return; }
@@ -392,9 +401,9 @@
         }
 
         function submitAnswer() {
-            if (!selectedOption) { alert('لطفا گزینه انتخاب کنید'); return; }
+            if (!selectedOption) { alert('لطفا یک گزینه را انتخاب کنید'); return; }
             const answer = document.getElementById('answerText').value.trim();
-            if (!answer) { alert('لطفا توضیح بنویسید'); return; }
+            if (!answer) { alert('لطفا توضیحات خود را بنویسید'); return; }
             const caseId = caseOrder[caseIndex], opts = optionsPerCase[caseId], time = Math.round((Date.now() - startTime) / 1000), accuracy = selectedOption === opts.correct ? 100 : 40;
             responses.push({caseId, option: selectedOption, answer, time, accuracy});
             document.getElementById('answerCard').classList.remove('active');
